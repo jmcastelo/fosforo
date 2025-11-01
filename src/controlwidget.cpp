@@ -1,23 +1,23 @@
 /*
-*  Copyright 2021 Jose Maria Castelo Ares
+*  Copyright 2025 Jose Maria Castelo Ares
 *
 *  Contact: <jose.maria.castelo@gmail.com>
-*  Repository: <https://github.com/jmcastelo/MorphogenGL>
+*  Repository: <https://github.com/jmcastelo/fosforo>
 *
-*  This file is part of MorphogenGL.
+*  This file is part of Fosforo.
 *
-*  MorphogenGL is free software: you can redistribute it and/or modify
+*  Fosforo is free software: you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
 *  the Free Software Foundation, either version 3 of the License, or
 *  (at your option) any later version.
 *
-*  MorphogenGL is distributed in the hope that it will be useful,
+*  Fosforo is distributed in the hope that it will be useful,
 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *  GNU General Public License for more details.
 *
 *  You should have received a copy of the GNU General Public License
-*  along with MorphogenGL.  If not, see <https://www.gnu.org/licenses/>.
+*  along with Fosforo.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 //#include "node.h"
@@ -384,7 +384,7 @@ void ControlWidget::about()
     lines.append("<h4>Videofeedback simulation software.</h4>");
     lines.append("<h5>Let the pixels come alive!</h5><br>");
     lines.append("Looking for help? Please visit:<br>");
-    lines.append("<a href='https://github.com/jmcastelo/MorphogenGL'>https://github.com/jmcastelo/MorphogenGL</a>");
+    lines.append("<a href='https://github.com/jmcastelo/fosforo'>https://github.com/jmcastelo/fosforo</a>");
 
     QString text = lines.join("");
 
