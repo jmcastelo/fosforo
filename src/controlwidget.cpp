@@ -366,25 +366,7 @@ void ControlWidget::saveConfig()
 void ControlWidget::toggleOverlay()
 {
     overlayEnabled = !overlayEnabled;
-
     emit overlayToggled(overlayEnabled);
-
-    /*if (overlayEnabled)
-    {
-        foreach (QUuid id, operationsWidgets.keys())
-            overlayLinkParametersWidget(id);
-
-        //foreach (QUuid id, blendFactorWidgets.keys())
-            //overlayLinkBlendFactorWidget(id);
-    }
-    else
-    {
-        foreach (QUuid id, operationsWidgets.keys())
-            overlayUnlinkParametersWidget(id);
-
-        //foreach (QUuid id, blendFactorWidgets.keys())
-            //overlayUnlinkBlendFactorWidget(id);
-    }*/
 }
 
 
@@ -394,10 +376,10 @@ void ControlWidget::about()
     QMessageBox* aboutBox = new QMessageBox(this);
 
     aboutBox->setTextFormat(Qt::RichText);
-    aboutBox->setIconPixmap(QPixmap(":/icons/logo.png"));
     aboutBox->setWindowTitle("About");
 
     QStringList lines;
+    lines.append("<img src=\":/icons/logo.png\"/>");
     lines.append(QString("<h2>F&oacute;sforo %1</h2>").arg(mNodeManager->version));
     lines.append("<h4>Videofeedback simulation software.</h4>");
     lines.append("<h5>Let the pixels come alive!</h5><br>");
@@ -408,11 +390,12 @@ void ControlWidget::about()
 
     aboutBox->setText(text);
 
-    aboutBox->setInformativeText("Copyright 2025 Jose Maria Castelo Ares\nLicense: GPLv3");
+    QStringList infoLines;
+    infoLines.append("Copyright 2025 <b>Jos&eacute; Mar&iacute;a Castelo Ares</b><br>");
+    infoLines.append("License: GPLv3");
+    aboutBox->setInformativeText(infoLines.join(""));
 
-    aboutBox->adjustSize();
-    aboutBox->layout()->activate();
-    aboutBox->adjustSize();
+    aboutBox->setContentsMargins(0, 10, 15, 0);
 
     aboutBox->exec();
 }

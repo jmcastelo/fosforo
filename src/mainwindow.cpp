@@ -126,7 +126,7 @@ MainWindow::MainWindow()
     connect(configParser, &ConfigurationParser::newImageSizeRead, this, &MainWindow::setSize);
 
     setWindowTitle("Fosforo");
-    setWindowIcon(QIcon(QPixmap(":/icons/logo.png")));
+    setWindowIcon(QIcon(QPixmap(":/icons/logo-small.png")));
     resize(renderManager->texWidth(), renderManager->texHeight());
 }
 
