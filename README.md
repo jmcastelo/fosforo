@@ -4,7 +4,7 @@ Imagine you had a videocamera and a television, connected in such a way that the
 
 A videofeedback loop is a system that processes images iteratively. Given an initial image displayed on the television, the camera captures it and modifies it adjusting things like its brightness, contrast or colors. Then the signal is transferred to the television, which can modify it in turn. Once the signal is converted into an image and the pixels on the screen are displaying it, a single iteration has happened and the process repeats.
 
-# What is MorphogenGL?
+# What is Fosforo?
 
 It is an interactive tool to simulate videofeedback. It does not restrict itself to two image processing elements (camera and television), but tries to be more flexible by giving the user the possibility of selecting operations and connecting them as the user wants. These operations are represented by nodes in a graph. An image flows from node to node, being processed in each one before passing to the next one. The connections are represented by the edges of the graph and are unidirectional. Multiple inputs and outputs are possible.
 
@@ -48,7 +48,7 @@ QT_QPA_PLATFORM=wayland
 QT_ASSUME_STDERR_HAS_CONSOLE=1
 ```
 
-# How to use MorphogenGL?
+# How to use Fosforo?
 
 To do...
 
