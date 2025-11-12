@@ -110,16 +110,12 @@ ControlWidget::ControlWidget(GraphWidget* graphWidget, NodeManager* nodeManager,
     statusBar->setSizeGripEnabled(false);
 
     iterationNumberLabel = new QLabel("Frame: 0");
-    timePerIterationLabel = new QLabel("uSPF: 0");
     iterationFPSLabel = new QLabel("FPS: 0");
-    timePerUpdateLabel = new QLabel("uSPF: 0");
-    updateFPSLabel = new QLabel("FPS: 0");
+    timePerIterationLabel = new QLabel("mSPF: 0");
 
-    statusBar->insertWidget(0, iterationNumberLabel, 4);
-    statusBar->insertWidget(1, timePerIterationLabel, 1);
-    statusBar->insertWidget(2, iterationFPSLabel, 1);
-    statusBar->insertWidget(3, timePerUpdateLabel, 1);
-    statusBar->insertWidget(4, updateFPSLabel, 1);
+    statusBar->insertWidget(0, iterationNumberLabel, 6);
+    statusBar->insertWidget(1, iterationFPSLabel, 1);
+    statusBar->insertWidget(2, timePerIterationLabel, 1);
 
     // Main layout
 
@@ -353,7 +349,6 @@ void ControlWidget::loadConfig()
 
         updateIterationNumberLabel();
         updateIterationMetricsLabels(0, 0);
-        updateUpdateMetricsLabels(0, 0);
     }
 }
 
@@ -416,18 +411,10 @@ void ControlWidget::updateIterationNumberLabel()
 
 
 
-void ControlWidget::updateIterationMetricsLabels(double uspf, double fps)
+void ControlWidget::updateIterationMetricsLabels(double mSpf, double fps)
 {
-    timePerIterationLabel->setText(QString("uSPF: %1").arg(uspf));
-    iterationFPSLabel->setText(QString("FPS: %1").arg(fps));
-}
-
-
-
-void ControlWidget::updateUpdateMetricsLabels(double uspf, double fps)
-{
-    timePerUpdateLabel->setText(QString("uSPF: %1").arg(uspf));
-    updateFPSLabel->setText(QString("FPS: %1").arg(fps));
+    iterationFPSLabel->setText(QString("FPS: %1").arg(fps, 0, 'f', 2));
+    timePerIterationLabel->setText(QString("mSPF: %1").arg(mSpf, 0, 'f', 2));
 }
 
 

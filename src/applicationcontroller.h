@@ -88,7 +88,7 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> multiStepStart;
     unsigned int numSteps = 0;
     std::chrono::nanoseconds stepTime;
-    std::chrono::microseconds multiStepTime;
+    std::chrono::milliseconds multiStepTime;
 
     // QQueue<qint64> timestamps;
 

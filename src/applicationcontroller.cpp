@@ -93,6 +93,7 @@ ApplicationController::ApplicationController()
     connect(plotsWidget, &PlotsWidget::drawCursor, morphoWidget, &MorphoWidget::setDrawingCursor);
     connect(morphoWidget, &MorphoWidget::closing, this, &ApplicationController::closeAll);
     connect(morphoWidget, &MorphoWidget::sizeChanged, renderManager, &RenderManager::resize);
+    connect(morphoWidget, &MorphoWidget::sizeChanged, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
     connect(morphoWidget, &MorphoWidget::sizeChanged, plotsWidget, &PlotsWidget::setSize);
 
     connect(controlWidget, &ControlWidget::iterateStateChanged, this, &ApplicationController::setIterationState);
@@ -111,7 +112,6 @@ ApplicationController::ApplicationController()
     connect(nodeManager, &NodeManager::midiSignalsRemoved, &midiLinkManager, &MidiLinkManager::removeMidiSignals);
 
     connect(controlWidget, &ControlWidget::iterationFPSChanged, this, &ApplicationController::setIterationTimerInterval);
-    connect(controlWidget, &ControlWidget::updateFPSChanged, this, &ApplicationController::setUpdateTimerInterval);
     connect(controlWidget, &ControlWidget::startRecording, this, &ApplicationController::startRecording);
     connect(controlWidget, &ControlWidget::stopRecording, this, &ApplicationController::stopRecording);
     connect(controlWidget, &ControlWidget::takeScreenshot, this, &ApplicationController::takeScreenshot);
@@ -202,18 +202,18 @@ void ApplicationController::measureFps()
     stepTime = std::chrono::duration_cast<std::chrono::nanoseconds>(stepEnd - stepStart);
     stepStart = stepEnd;
 
-    multiStepTime = std::chrono::duration_cast<std::chrono::microseconds>(stepEnd - multiStepStart);
+    multiStepTime = std::chrono::duration_cast<std::chrono::milliseconds>(stepEnd - multiStepStart);
 
     numSteps++;
 
     renderManager->adjustTimerInterval(stepTime.count());
 
-    if (multiStepTime.count() >= 1'000'000)
+    if (multiStepTime.count() >= 1'000)
     {
-        double uspf = static_cast<double>(multiStepTime.count()) / numSteps;
-        double fps = numSteps * 1'000'000.0 / multiStepTime.count();
+        double mSpf = static_cast<double>(multiStepTime.count()) / numSteps;
+        double fps = numSteps * 1'000.0 / multiStepTime.count();
 
-        controlWidget->updateIterationMetricsLabels(uspf, fps);
+        controlWidget->updateIterationMetricsLabels(mSpf, fps);
         controlWidget->updateIterationNumberLabel();
 
         numSteps = 0;

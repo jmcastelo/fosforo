@@ -94,7 +94,6 @@ signals:
     void takeScreenshot(QString filename);
 
     void iterationFPSChanged(double newFPS);
-    void updateFPSChanged(double newFPS);
 
     void readConfig(QString filename);
     void writeConfig(QString filename);
@@ -109,8 +108,7 @@ public slots:
     void populateTexFormatComboBox(QList<TextureFormat> formats);
 
     void updateIterationNumberLabel();
-    void updateIterationMetricsLabels(double uspf, double fps);
-    void updateUpdateMetricsLabels(double uspf, double fps);
+    void updateIterationMetricsLabels(double mSpf, double fps);
 
     void setVideoCaptureElapsedTimeLabel(int frameNumber);
     //void setupMidi(QString portName, bool open);
@@ -160,8 +158,6 @@ private:
     QLabel* iterationNumberLabel;
     QLabel* timePerIterationLabel;
     QLabel* iterationFPSLabel;
-    QLabel* timePerUpdateLabel;
-    QLabel* updateFPSLabel;
 
     QLineEdit* windowWidthLineEdit;
     QLineEdit* windowHeightLineEdit;
