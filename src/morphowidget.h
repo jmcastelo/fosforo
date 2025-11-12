@@ -30,7 +30,7 @@
 #include "texformat.h"
 #include "overlay.h"
 
-#include <QOpenGLWidget>
+#include <QOpenGLWindow>
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
@@ -42,21 +42,22 @@
 #include <QWheelEvent>
 #include <QMouseEvent>
 #include <QStyle>
+#include <QElapsedTimer>
+#include <QMutex>
 
 
 
-// MorphoWidget: OpenGL widget displaying Fosforo's output
-
-class MorphoWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
+class MorphoWidget : public QOpenGLWindow, protected QOpenGLExtraFunctions
 {
     Q_OBJECT
 
 public:
-    MorphoWidget(int width_, int height_, Overlay *overlay_, QWidget *parent = nullptr);
+    MorphoWidget(int width_, int height_, Overlay *overlay_);
     virtual ~MorphoWidget() override;
 
     void initializeGL() override;
     void paintGL() override;
+    void paintOverGL() override;
     void resizeGL(int width, int height) override;
 
 signals:
@@ -65,6 +66,8 @@ signals:
     void sizeChanged(int width, int height);
     void selectedPointChanged(QPoint point);
     void scaleTransformChanged(QTransform transform);
+    void closing();
+    void renderDone();
 
 public slots:
     void setOutputTextureId(GLuint* pTexId);
@@ -72,11 +75,13 @@ public slots:
     void setUpdate(bool state);
     void setDrawingCursor(bool on){ drawingCursor = on; }
     void setCursor(QPoint point);
+    void render(quintptr fence);
 
 protected:
     void wheelEvent(QWheelEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
+    void closeEvent(QCloseEvent* event) override;
 
 private:
     GLuint* pOutTexId = nullptr;
@@ -100,6 +105,8 @@ private:
     QOpenGLBuffer* vbo = nullptr;
 
     Overlay* overlay = nullptr;
+
+    QMutex mutex;
 
     void setSelectedPoint(QPointF pos);
     void updateCursor();

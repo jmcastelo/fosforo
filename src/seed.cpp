@@ -53,16 +53,16 @@ Seed::Seed(int type, bool fixed, QString imageFilename)
 
 
 
-Seed::Seed(GLenum texFormat, GLuint width, GLuint height, QOpenGLContext* context, QOffscreenSurface *surface)
+/*Seed::Seed(GLenum texFormat, GLuint width, GLuint height, QOpenGLContext* context, QOffscreenSurface *surface)
 {
-    /*mContext = new QOpenGLContext();
-    mContext->setFormat(context->format());
-    mContext->setShareContext(context);
-    mContext->create();
+    // mContext = new QOpenGLContext();
+    // mContext->setFormat(context->format());
+    // mContext->setShareContext(context);
+    // mContext->create();
 
-    mSurface = new QOffscreenSurface();
-    mSurface->setFormat(context->format());
-    mSurface->create();*/
+    // mSurface = new QOffscreenSurface();
+    // mSurface->setFormat(context->format());
+    // mSurface->create();
 
     mContext = context;
     mSurface = surface;
@@ -105,11 +105,11 @@ Seed::Seed(GLenum texFormat, GLuint width, GLuint height, QOpenGLContext* contex
     clearTexture(mClearTexId);
 
     mContext->doneCurrent();
-}
+}*/
 
 
 
-Seed::Seed(GLenum texFormat, GLuint width, GLuint height, const Seed& seed) :
+/*Seed::Seed(GLenum texFormat, GLuint width, GLuint height, const Seed& seed) :
     mType { seed.mType },
     mFixed { seed.mFixed },
     mImageFilename { seed.mImageFilename }
@@ -154,7 +154,7 @@ Seed::Seed(GLenum texFormat, GLuint width, GLuint height, const Seed& seed) :
 
     if (!mImageFilename.isEmpty())
         loadImage(mImageFilename);
-}
+}*/
 
 
 

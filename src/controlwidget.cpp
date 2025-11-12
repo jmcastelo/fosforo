@@ -33,7 +33,7 @@
 
 
 
-ControlWidget::ControlWidget(double itFPS, double updFPS, GraphWidget* graphWidget, NodeManager* nodeManager, RenderManager* renderManager, PlotsWidget* plotsWidget, QWidget* parent) :
+ControlWidget::ControlWidget(GraphWidget* graphWidget, NodeManager* nodeManager, RenderManager* renderManager, PlotsWidget* plotsWidget, QWidget* parent) :
     QWidget(parent),
     mNodeManager { nodeManager },
     mRenderManager { renderManager },
@@ -62,8 +62,10 @@ ControlWidget::ControlWidget(double itFPS, double updFPS, GraphWidget* graphWidg
     nodesToolBar->setOrientation(Qt::Vertical);
     nodesToolBar->hide();*/
 
+    outputDir = QDir::toNativeSeparators(QDir::currentPath() + "/output");
+
     constructSystemToolBar();
-    constructDisplayOptionsWidget(itFPS, updFPS);
+    constructDisplayOptionsWidget();
     constructRecordingOptionsWidget();
     constructSortedOperationWidget();
 
@@ -149,8 +151,11 @@ ControlWidget::ControlWidget(double itFPS, double updFPS, GraphWidget* graphWidg
 
     // Needed over morphoWidget
 
-    setAutoFillBackground(true);
-    setWindowFlags(Qt::SubWindow);
+    // setAutoFillBackground(true);
+    // setWindowFlags(Qt::SubWindow);
+
+    setWindowTitle("Fosforo");
+    setWindowIcon(QIcon(QPixmap(":/icons/logo-small.png")));
 }
 
 
@@ -171,6 +176,8 @@ void ControlWidget::closeEvent(QCloseEvent* event)
 {
     displayOptionsWidget->close();
     recordingOptionsWidget->close();
+
+    emit closing();
 
     QWidget::closeEvent(event);
 }
@@ -379,7 +386,7 @@ void ControlWidget::about()
     aboutBox->setWindowTitle("About");
 
     QStringList lines;
-    lines.append("<img src=\":/icons/logo.png\"/>");
+    lines.append("<img src=\":/icons/logo.png\" width=\"300\"/>");
     lines.append(QString("<h2>F&oacute;sforo %1</h2>").arg(mNodeManager->version));
     lines.append("<h4>Videofeedback simulation software.</h4>");
     lines.append("<h5>Let the pixels come alive!</h5><br>");
@@ -631,21 +638,14 @@ void ControlWidget::constructMultipleNodesToolBar()
 
 // Display
 
-void ControlWidget::constructDisplayOptionsWidget(double itsFPS, double updFPS)
+void ControlWidget::constructDisplayOptionsWidget()
 {
     FocusLineEdit* itsFPSLineEdit = new FocusLineEdit;
     itsFPSLineEdit->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-    QDoubleValidator* itsFPSDoubleValidator = new QDoubleValidator(1.0, 1000.0, 3, itsFPSLineEdit);
+    QDoubleValidator* itsFPSDoubleValidator = new QDoubleValidator(0.0, 99999.9, 3, itsFPSLineEdit);
     itsFPSDoubleValidator->setLocale(QLocale::English);
     itsFPSLineEdit->setValidator(itsFPSDoubleValidator);
-    itsFPSLineEdit->setText(QString::number(itsFPS));
-
-    FocusLineEdit* updFPSLineEdit = new FocusLineEdit;
-    updFPSLineEdit->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-    QDoubleValidator* updFPSDoubleValidator = new QDoubleValidator(1.0, 1000.0, 3, updFPSLineEdit);
-    updFPSDoubleValidator->setLocale(QLocale::English);
-    updFPSLineEdit->setValidator(updFPSDoubleValidator);
-    updFPSLineEdit->setText(QString::number(updFPS));
+    itsFPSLineEdit->setText(QString::number(0));
 
     windowWidthLineEdit = new QLineEdit;
     windowWidthLineEdit->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -668,7 +668,6 @@ void ControlWidget::constructDisplayOptionsWidget(double itsFPS, double updFPS)
 
     QFormLayout* formLayout = new QFormLayout;
     formLayout->addRow("Its FPS:", itsFPSLineEdit);
-    formLayout->addRow("Upd FPS:", updFPSLineEdit);
     formLayout->addRow("Update:", updateCheckBox);
     formLayout->addRow("Width (px):", windowWidthLineEdit);
     formLayout->addRow("Height (px):", windowHeightLineEdit);
@@ -686,12 +685,6 @@ void ControlWidget::constructDisplayOptionsWidget(double itsFPS, double updFPS)
     {
         double fps = itsFPSLineEdit->text().toDouble();
         emit iterationFPSChanged(fps);
-    });
-
-    connect(updFPSLineEdit, &FocusLineEdit::editingFinished, this, [=, this]()
-    {
-        double fps = updFPSLineEdit->text().toDouble();
-        emit updateFPSChanged(fps);
     });
 
     connect(updateCheckBox, &QCheckBox::checkStateChanged, this, [=, this](Qt::CheckState state){

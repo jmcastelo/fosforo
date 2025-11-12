@@ -22,11 +22,10 @@
 
 
 
-#include "mainwindow.h"
+#include "applicationcontroller.h"
 
 #include <QApplication>
 #include <QSurfaceFormat>
-
 
 
 int main(int argc, char* argv[])
@@ -35,17 +34,14 @@ int main(int argc, char* argv[])
     format.setRenderableType(QSurfaceFormat::OpenGL);
     format.setProfile(QSurfaceFormat::CoreProfile);
     format.setVersion(4, 5);
-    format.setSwapInterval(0);
+    format.setSwapInterval(1);
     QSurfaceFormat::setDefaultFormat(format);
-
-    // MorphoWidget and RGBWidget must share OpenGL contexts
 
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
     QApplication app(argc, argv);
 
-    MainWindow window;
-    window.show();
+    ApplicationController appController;
 
     return app.exec();
 }

@@ -8,11 +8,13 @@ A videofeedback loop is a system that processes images iteratively. Given an ini
 
 It is an interactive tool to simulate videofeedback. It does not restrict itself to two image processing elements (camera and television), but tries to be more flexible by giving the user the possibility of selecting operations and connecting them as the user wants. These operations are represented by nodes in a graph. An image flows from node to node, being processed in each one before passing to the next one. The connections are represented by the edges of the graph and are unidirectional. Multiple inputs and outputs are possible.
 
-## Loops, edges and predges
+## The flow: loops, edges and predges
 
-A loop is formed whenever two or more nodes in a graph are connected forming a closed path. If we select any node from a loop and follow its connections through the loop, the process will bring us back to the starting node. In other words, the input of any node depends on the output of the same node. This forces us to make the question: given a graph with loops, how do we define an iteration of the system?
+Due to the discrete nature of computers, the image-processing flow of **fósforo** cannot be a continuous stream but must be performed in discrete steps known as iterations, which makes us think about how to treat loops.
 
-We solve this issue by cutting the loops. Once cut, a loop is no longer a loop but a chain of operations that can be sequentially carried out during an iteration. For this purpose we define two kinds of connections: edges and predges. During an iteration, an edge links the output of a node to the input of another node, whereas a predge links a node's previous iteration output to the input of another node. A predge corresponds to a loop's cut connection and any loop must have at least one predge.
+A _loop_ is formed whenever two or more nodes in a graph are connected forming a closed path. If we select any node from a loop and follow its connections through the loop, the process will bring us back to the starting node. In other words, the input of any node depends on the output of the same node. This forces us to make the question: given a graph with loops, how do we understand the flow of the system?
+
+We solve this issue by cutting the loops. Once cut, a loop is no longer a loop but a chain of operations that can be sequentially carried out during an iteration. For this purpose we define two kinds of connections: edges and _predges_. During an iteration, an edge links the output of a node to the input of another node, whereas a predge links a node's previous iteration output to the input of another node. A predge corresponds to a loop's cut connection and any loop must have at least one predge.
 
 We can visualize the iterated system as a set of parallel planes. Imagine the graph representing the system, without its predges, as laying on a plane N which corresponds to iteration N. A similar parallel plane corresponding to iteration N+1 is located above the first one. The predges of nodes from the graph on plane N connect to those of plane N+1. Once iteration N is carried out, all nodes with predges on plane N send their output images to their connected nodes of plane N+1 and iteration N+1 starts.
 

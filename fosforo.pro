@@ -35,6 +35,7 @@ QT += widgets openglwidgets multimedia opengl
 RESOURCES += resource.qrc
 
 HEADERS += \
+    src/applicationcontroller.h \
     src/colorpath.h \
     src/configparser.h \
     src/controlwidget.h \
@@ -49,7 +50,6 @@ HEADERS += \
     src/imageoperation.h \
     src/imageoperationnode.h \
     src/inputdata.h \
-    src/mainwindow.h \
     src/message.h \
     src/midicontrol.h \
     src/midilinkmanager.h \
@@ -75,7 +75,6 @@ HEADERS += \
     src/seed.h \
     src/seedwidget.h \
     src/texformat.h \
-    src/timerthread.h \
     src/videoinputcontrol.h \
     src/widgets/focuswidgets.h \
     src/widgets/layoutformat.h \
@@ -85,6 +84,7 @@ HEADERS += \
     src/widgets/uniformwidget.h
 
 SOURCES += \
+    src/applicationcontroller.cpp \
     src/colorpath.cpp \
     src/configparser.cpp \
     src/controlwidget.cpp \
@@ -99,7 +99,6 @@ SOURCES += \
     src/imageoperation.cpp \
     src/imageoperationnode.cpp \
     src/main.cpp \
-    src/mainwindow.cpp \
     src/message.cpp \
     src/midicontrol.cpp \
     src/midilinkmanager.cpp \
@@ -121,7 +120,6 @@ SOURCES += \
     src/rgbwidget.cpp \
     src/seed.cpp \
     src/seedwidget.cpp \
-    src/timerthread.cpp \
     src/videoinputcontrol.cpp \
     src/widgets/uniformmat4widget.cpp \
     src/widgets/uniformwidget.cpp

@@ -40,7 +40,6 @@
 #include <QObject>
 #include <QList>
 #include <QString>
-#include <QOpenGLContext>
 #include <QUuid>
 #include <QMap>
 

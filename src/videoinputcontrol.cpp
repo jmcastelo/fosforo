@@ -116,10 +116,10 @@ void VideoInputControl::unuseCamera(QByteArray camId)
 
 
 
-QImage* VideoInputControl::frameImage(QByteArray camId)
+/*QImage* VideoInputControl::frameImage(QByteArray camId)
 {
     return &mFrameImageMap[camId];
-}
+}*/
 
 
 
@@ -147,7 +147,7 @@ void VideoInputControl::setVideoInputs()
             mVideoInMap.remove(id);
             mCameraDescMap.remove(id);
             mNumUsedCamerasMap.remove(id);
-            mFrameImageMap.remove(id);
+            // mFrameImageMap.remove(id);
         }
         else
         {
@@ -161,12 +161,14 @@ void VideoInputControl::setVideoInputs()
         mVideoInMap.insert(id, videoInput);
         mCameraDescMap.insert(id, device.description());
         mNumUsedCamerasMap.insert(id, 0);
-        mFrameImageMap.insert(id, QImage());
+        // mFrameImageMap.insert(id, QImage());
 
         connect(videoInput, &VideoInput::videoFrameChanged, [=, this](const QVideoFrame& videoFrame) {
-            // emit newFrameImage(id, videoFrame.toImage());
+            if (mNumUsedCamerasMap[id] > 0) {
+                emit newFrameImage(id, videoFrame.toImage());
+            }
             // mFrameImageMap[id] = videoFrame.toImage().convertToFormat(QImage::Format_RGB888);
-            mFrameImageMap[id] = videoFrame.toImage();
+            // mFrameImageMap[id] = videoFrame.toImage();
         });
     }
 }

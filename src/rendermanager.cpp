@@ -30,36 +30,81 @@
 
 
 
-RenderManager::RenderManager(Factory *factory, VideoInputControl *videoInCtrl)
-    : mFactory { factory },
-    mVideoInputControl { videoInCtrl }
+RenderManager::RenderManager(Factory *factory, QObject *parent)
+    : QThread { parent },
+    mFactory { factory }
 {
+    mTimer.setTimerType(Qt::PreciseTimer);
+    mTimer.setSingleShot(true);
+
     setOutputImage();
 
-    connect(mFactory, &Factory::newOperationCreated, this, &RenderManager::initOperation);
-    connect(mFactory, &Factory::replaceOpCreated, this, &RenderManager::initOperation);
-    connect(mFactory, &Factory::newSeedCreated, this, &RenderManager::initSeed);
-
-    connect(mVideoInputControl, &VideoInputControl::cameraUsed, this, &RenderManager::genImageTexture);
-    connect(mVideoInputControl, &VideoInputControl::cameraUnused, this, &RenderManager::delImageTexture);
-    connect(mVideoInputControl, &VideoInputControl::numUsedCamerasChanged, this, &RenderManager::setVideoTextures);
-    // connect(mVideoInputControl, &VideoInputControl::newFrameImage, this, &RenderManager::setImageTexture);
+    connect(&mTimer, &QChronoTimer::timeout, this, &RenderManager::iterate);
+    connect(&mTimer, &QChronoTimer::timeout, &mTimer, &QChronoTimer::start);
 }
 
 
 
-void RenderManager::init(QOpenGLContext* shareContext)
+void RenderManager::run()
+{
+    exec();
+}
+
+
+
+void RenderManager::stop()
+{
+    mTimer.stop();
+    quit();
+    wait();
+}
+
+
+
+void RenderManager::setTargetFps(double fps)
+{
+    QMutexLocker locker(&mutex);
+
+    mFrequency = fps;
+    mTimerNs = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(fps >= 1.0 ? 1.0 / fps: 0));
+
+    mTimer.setInterval(mTimerNs);
+}
+
+
+
+void RenderManager::adjustTimerInterval(long stepTimeNs)
+{
+    double correction = (mTimerNs.count() - stepTimeNs) / 1'000'000'000.0;
+
+    if (mFrequency > 0)
+    {
+        double correctedTime = 1.0 / mFrequency + correction;
+        if (correctedTime < 0) {
+            correctedTime = 0;
+        }
+
+        mTimerNs = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(correctedTime));
+        mTimer.setInterval(mTimerNs);
+    }
+}
+
+
+
+void RenderManager::init(QOpenGLContext* context)
 {
     // Create context
 
     mContext = new QOpenGLContext();
-    mContext->setFormat(shareContext->format());
-    mContext->setShareContext(shareContext);
+    mContext->setFormat(context->format());
+    mContext->setShareContext(context);
     mContext->create();
 
     mSurface = new QOffscreenSurface();
-    mSurface->setFormat(shareContext->format());
+    mSurface->setFormat(context->format());
     mSurface->create();
+
+    // mContext = context;
 
     mContext->makeCurrent(mSurface);
 
@@ -154,7 +199,7 @@ RenderManager::~RenderManager()
 
     delete mOutputImage;
 
-    delete mContext;
+    // delete mContext;
     delete mSurface;
 }
 
@@ -170,32 +215,45 @@ bool RenderManager::active() const
 void RenderManager::setActive(bool set)
 {
     mActive = set;
+
+    if (mActive) {
+        mTimer.start();
+    } else {
+        mTimer.stop();
+    }
 }
 
 
 
 void RenderManager::iterate()
 {
-    for (auto [id, texId] : mVideoTextures.asKeyValueRange()) {
-        setImageTexture(texId, mVideoInputControl->frameImage(id));
-    }
-
-    if (!mSortedOperations.isEmpty())
+    if (mActive)
     {
         mContext->makeCurrent(mSurface);
 
-        copyTextures();
-        shiftCopyArrayTextures();
-        render();
+        setImageTextures();
+
+        if (!mSortedOperations.isEmpty())
+        {
+            copyTextures();
+            shiftCopyArrayTextures();
+            render();
+        }
+
+        foreach (Seed* seed, mFactory->seeds()) {
+            seed->setClearTexture();
+        }
+
+        glFlush();
+        GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+        glFlush();
 
         mContext->doneCurrent();
-    }
 
-    foreach (Seed* seed, mFactory->seeds()) {
-        seed->setClearTexture();
-    }
+        emit frameReady(reinterpret_cast<quintptr>(fence));
 
-    mIterationNumber++;
+        mIterationNumber++;
+    }
 }
 
 
@@ -555,8 +613,12 @@ void RenderManager::genImageTexture(QByteArray devId)
     if (!mVideoTextures.contains(devId))
     {
         GLuint newTexId = 0;
+        mContext->makeCurrent(mSurface);
         genTexture(&newTexId, mTexFormat);
+        mContext->doneCurrent();
+
         mVideoTextures.insert(devId, newTexId);
+        mFrameImageMap.insert(devId, QImage());
     }
 }
 
@@ -571,6 +633,7 @@ void RenderManager::delImageTexture(QByteArray devId)
         mContext->doneCurrent();
 
         mVideoTextures.remove(devId);
+        mFrameImageMap.remove(devId);
     }
 }
 
@@ -586,39 +649,49 @@ void RenderManager::setVideoTextures()
 
 
 
-void RenderManager::setImageTexture(GLuint texId, QImage* image)
+void RenderManager::setFrameImage(QByteArray devId, QImage image)
 {
-    if (!image->isNull())
+    mFrameImageMap[devId] = image;
+}
+
+
+
+void RenderManager::setImageTextures()
+{
+    for (auto [devId, image] : mFrameImageMap.asKeyValueRange())
     {
-        qreal sx = static_cast<qreal>(mTexWidth)  / image->width();
-        qreal sy = static_cast<qreal>(mTexHeight) / image->height();
-        qreal scale = qMin(1.0, qMin(sx, sy));
+        if (!image.isNull() && mVideoTextures.contains(devId))
+        {
+            qreal sx = static_cast<qreal>(mTexWidth)  / image.width();
+            qreal sy = static_cast<qreal>(mTexHeight) / image.height();
+            qreal scale = qMin(1.0, qMin(sx, sy));
 
-        int displayWidth = qRound(image->width() * scale);
-        int displayHeight = qRound(image->height() * scale);
+            int displayWidth = qRound(image.width() * scale);
+            int displayHeight = qRound(image.height() * scale);
 
-        int offsetX = (mTexWidth  - displayWidth) / 2;
-        int offsetY = (mTexHeight - displayHeight) / 2;
+            int offsetX = (mTexWidth  - displayWidth) / 2;
+            int offsetY = (mTexHeight - displayHeight) / 2;
 
-        QImage scaled = image->scaled(displayWidth, displayHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+            QImage scaled = image.scaled(displayWidth, displayHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-        QImage buffer(mTexWidth, mTexHeight, QImage::Format_RGBA8888);
-        buffer.fill(Qt::black);
+            QImage buffer(mTexWidth, mTexHeight, QImage::Format_RGBA8888);
+            buffer.fill(Qt::black);
 
-        QPainter painter(&buffer);
-        painter.drawImage(offsetX, offsetY, scaled);
+            QPainter painter(&buffer);
+            painter.drawImage(offsetX, offsetY, scaled);
 
-        mContext->makeCurrent(mSurface);
+            // mContext->makeCurrent(mSurface);
 
-        glBindTexture(GL_TEXTURE_2D, texId);
+            glBindTexture(GL_TEXTURE_2D, mVideoTextures[devId]);
 
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mTexWidth, mTexHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer.constBits());
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mTexWidth, mTexHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer.constBits());
 
-        glBindTexture(GL_TEXTURE_2D, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
 
-        mContext->doneCurrent();
+            // mContext->doneCurrent();
+        }
     }
 }
 

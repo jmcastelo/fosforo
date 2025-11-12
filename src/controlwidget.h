@@ -73,7 +73,7 @@ class ControlWidget : public QWidget
     Q_OBJECT
 
 public:
-    ControlWidget(double itFPS, double updFPS, GraphWidget* graphWidget, NodeManager* nodeManager, RenderManager* renderManager, PlotsWidget* plotsWidget, QWidget *parent = nullptr);
+    ControlWidget(GraphWidget* graphWidget, NodeManager* nodeManager, RenderManager* renderManager, PlotsWidget* plotsWidget, QWidget *parent = nullptr);
     ~ControlWidget();
 
 signals:
@@ -98,6 +98,8 @@ signals:
 
     void readConfig(QString filename);
     void writeConfig(QString filename);
+
+    void closing();
 
 public slots:
     void reset();
@@ -146,7 +148,7 @@ private:
     QAction* loadConfigAction;
 
     qreal framesPerSecond = 60.0;
-    QString outputDir = QDir::currentPath();
+    QString outputDir;
     QMediaFormat format;
     QList<QMediaFormat::VideoCodec> supportedVideoCodecs;
     QList<QMediaFormat::FileFormat> supportedFileFormats;
@@ -185,7 +187,7 @@ private:
     //QHBoxLayout* scrollLayout;
 
     void constructSystemToolBar();
-    void constructDisplayOptionsWidget(double itsFPS, double updFPS);
+    void constructDisplayOptionsWidget();
     void constructRecordingOptionsWidget();
     void constructSortedOperationWidget();
 

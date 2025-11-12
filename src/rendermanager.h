@@ -33,29 +33,35 @@
 #include "factory.h"
 #include "videoinputcontrol.h"
 
-#include <QObject>
+#include <QThread>
 #include <QOpenGLFunctions_4_5_Core>
 #include <QOpenGLContext>
 #include <QOffscreenSurface>
 #include <QOpenGLShaderProgram>
 #include <QImage>
+#include <QChronoTimer>
+#include <QMutex>
+#include <QQueue>
 
 
 
-class RenderManager : public QObject, protected QOpenGLFunctions_4_5_Core
+class RenderManager : public QThread, protected QOpenGLFunctions_4_5_Core
 {
     Q_OBJECT
 
 public:
-    RenderManager(Factory* factory, VideoInputControl* videoInCtrl);
+    RenderManager(Factory* factory, QObject* parent = nullptr);
     ~RenderManager();
 
-    void init(QOpenGLContext* shareContext);
+    void run() override;
+    void stop();
+    void setTargetFps(double fps);
+    void adjustTimerInterval(long stepTimeNs);
+
+    void init(QOpenGLContext* context);
 
     bool active() const;
     void setActive(bool set);
-
-    void iterate();
 
     QImage outputImage();
     QList<float> rgbPixel(QPoint pos);
@@ -75,8 +81,10 @@ public:
 
 signals:
     void texturesChanged();
+    void frameReady(quintptr fence);
 
 public slots:
+    void iterate();
     void resize(GLuint width, GLuint height);
     void setOutputTextureId(GLuint* pTexId);
     void initOperation(QUuid id, ImageOperation* operation);
@@ -87,11 +95,16 @@ public slots:
     void genImageTexture(QByteArray devId);
     void delImageTexture(QByteArray devId);
     void setVideoTextures();
-    void setImageTexture(GLuint texId, QImage *image);
+    void setFrameImage(QByteArray devId, QImage image);
 
 private:
     Factory* mFactory;
-    VideoInputControl* mVideoInputControl;
+
+    QChronoTimer mTimer;
+    QMutex mutex;
+
+    double mFrequency;
+    std::chrono::nanoseconds mTimerNs;
 
     QOpenGLContext* mContext = nullptr;
     QOffscreenSurface* mSurface = nullptr;
@@ -133,11 +146,13 @@ private:
 
     const int mPboCount = 3;
     QList<GLuint> mPbos;
+
     int mSubmitIndex = 0;
     int mReadIndex = 0;
     QList<GLsync> mFences;
 
     QMap<QByteArray, GLuint> mVideoTextures;
+    QMap<QByteArray, QImage> mFrameImageMap;
 
     void setPbos();
     void setOutputImage();
@@ -169,6 +184,8 @@ private:
     void blend(ImageOperation* operation);
     void renderOperation(ImageOperation* operation);
     void render();
+
+    void setImageTextures();
 };
 
 

@@ -56,7 +56,7 @@ signals:
     void cameraUnused(QByteArray camId);
     void numUsedCamerasChanged();
 
-    void newFrameImage(QByteArray devId, const QImage& image);
+    void newFrameImage(QByteArray devId, const QImage image);
 
 private slots:
     void setVideoInputs();
@@ -66,7 +66,7 @@ private:
     QMap<QByteArray, QString> mCameraDescMap;
     QMap<QByteArray, VideoInput*> mVideoInMap;
     QMap<QByteArray, int> mNumUsedCamerasMap;
-    QMap<QByteArray, QImage> mFrameImageMap;
+    // QMap<QByteArray, QImage> mFrameImageMap;
 };
 
 

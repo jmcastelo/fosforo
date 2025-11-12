@@ -25,14 +25,13 @@
 #include "morphowidget.h"
 
 #include <QSurfaceFormat>
-#include <QOpenGLFunctions>
 #include <QPainter>
+#include <QMutexLocker>
 
 
 
-MorphoWidget::MorphoWidget(int w, int h, Overlay* overlay_, QWidget* parent)
-    : QOpenGLWidget(parent),
-    overlay { overlay_ }
+MorphoWidget::MorphoWidget(int w, int h, Overlay* overlay_)
+    : overlay { overlay_ }
 {
     image = QRect(0, 0, w, h);
     frame = image;
@@ -41,8 +40,6 @@ MorphoWidget::MorphoWidget(int w, int h, Overlay* overlay_, QWidget* parent)
     cursor = QPointF(0.0, 0.0);
 
     overlay->setViewportRect(w, h);
-
-    setUpdatesEnabled(true);
 }
 
 
@@ -50,9 +47,11 @@ MorphoWidget::MorphoWidget(int w, int h, Overlay* overlay_, QWidget* parent)
 MorphoWidget::~MorphoWidget()
 {
     makeCurrent();
+
     glDeleteFramebuffers(1, &fbo);
     vao->destroy();
     vbo->destroy();
+
     doneCurrent();
 
     delete vao;
@@ -64,7 +63,7 @@ MorphoWidget::~MorphoWidget()
 
 void MorphoWidget::setUpdate(bool state)
 {
-    setUpdatesEnabled(state);
+    // setUpdatesEnabled(state);
 }
 
 
@@ -160,8 +159,6 @@ void MorphoWidget::mousePressEvent(QMouseEvent* event)
 {
     if (event->buttons() == Qt::LeftButton)
     {
-        setFocus();
-
         if (event->modifiers() == Qt::ControlModifier)
         {
             prevPos = event->position();
@@ -174,6 +171,15 @@ void MorphoWidget::mousePressEvent(QMouseEvent* event)
     }
 
     event->accept();
+}
+
+
+
+void MorphoWidget::closeEvent(QCloseEvent* event)
+{
+    emit closing();
+
+    QOpenGLWindow::closeEvent(event);
 }
 
 
@@ -373,22 +379,17 @@ void MorphoWidget::initializeGL()
 
 void MorphoWidget::paintGL()
 {
-    QPainter painter;
-
-    painter.begin(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    painter.beginNativePainting();
-
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Bind fbo as read frame buffer
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
-    if (pOutTexId)
+    if (pOutTexId) {
         glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *pOutTexId, 0);
-    else
+    }
+    else {
         glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+    }
 
     // Render to default frame buffer (screen) from fbo
 
@@ -413,11 +414,20 @@ void MorphoWidget::paintGL()
     }
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+}
 
-    painter.endNativePainting();
 
-    if (overlay->isEnabled())
+
+void MorphoWidget::paintOverGL()
+{
+    QPainter painter;
+
+    painter.begin(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    if (overlay->isEnabled()) {
         overlay->paint(&painter);
+    }
 
     painter.end();
 }
@@ -429,4 +439,31 @@ void MorphoWidget::resizeGL(int w, int h)
     resetZoom(w, h);
     overlay->setViewportRect(w, h);
     emit sizeChanged(w, h);
+}
+
+
+
+void MorphoWidget::render(quintptr fence)
+{
+    QMutexLocker locker(&mutex);
+
+    context()->makeCurrent(this);
+
+    GLsync pendingFence = reinterpret_cast<GLsync>(fence);
+
+    if (pendingFence) {
+        glWaitSync(pendingFence, 0, GL_TIMEOUT_IGNORED);
+        glDeleteSync(pendingFence);
+        pendingFence = 0;
+    }
+
+    paintGL();
+    paintOverGL();
+
+    glFlush();
+    context()->swapBuffers(this);
+
+    context()->doneCurrent();
+
+    emit renderDone();
 }
