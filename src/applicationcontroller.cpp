@@ -37,10 +37,6 @@ ApplicationController::ApplicationController()
 
     configParser = new ConfigurationParser(factory, nodeManager, renderManager, graphWidget, &midiLinkManager);
 
-    controlWidget = new ControlWidget(graphWidget, nodeManager, renderManager, plotsWidget);
-    controlWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    controlWidget->setMinimumSize(0, 0);
-
     midiListWidget = new MidiListWidget();
 
     connect(&midiControl, &MidiControl::inputPortsChanged, midiListWidget, &MidiListWidget::populatePortsTable);
@@ -55,6 +51,10 @@ ApplicationController::ApplicationController()
     connect(&midiLinkManager, &MidiLinkManager::midiEnabled, factory, &Factory::setMidiEnabled);
 
     midiControl.setInputPorts();
+
+    controlWidget = new ControlWidget(graphWidget, renderManager, midiListWidget, plotsWidget);
+    controlWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    controlWidget->setMinimumSize(0, 0);
 
     // connect(iterationTimer, &TimerThread::timeout, this, &ApplicationController::beat);
     // connect(iterationTimer, &TimerThread::stepTimeMeasured, controlWidget, &ControlWidget::updateIterationMetricsLabels);
@@ -110,6 +110,7 @@ ApplicationController::ApplicationController()
     connect(nodeManager, &NodeManager::parameterValueChanged, overlay, &Overlay::addMessage);
     connect(nodeManager, &NodeManager::midiSignalsCreated, &midiLinkManager, &MidiLinkManager::addMidiSignals);
     connect(nodeManager, &NodeManager::midiSignalsRemoved, &midiLinkManager, &MidiLinkManager::removeMidiSignals);
+    connect(nodeManager, &NodeManager::sortedOpsDataChanged, controlWidget, &ControlWidget::populateSortedOperationsTable);
 
     connect(controlWidget, &ControlWidget::iterationFPSChanged, this, &ApplicationController::setIterationTimerInterval);
     connect(controlWidget, &ControlWidget::startRecording, this, &ApplicationController::startRecording);
@@ -149,7 +150,6 @@ ApplicationController::~ApplicationController()
     delete renderManager;
     delete morphoWidget;
     delete overlay;
-    delete midiListWidget;
     delete videoInControl;
     // delete iterationTimer;
     // delete updateTimer;

@@ -25,10 +25,10 @@
 
 
 
-#include "nodemanager.h"
 #include "rendermanager.h"
 #include "operationwidget.h"
 #include "graphwidget.h"
+#include "midilistwidget.h"
 #include "plotswidget.h"
 
 #include <QWidget>
@@ -73,7 +73,7 @@ class ControlWidget : public QWidget
     Q_OBJECT
 
 public:
-    ControlWidget(GraphWidget* graphWidget, NodeManager* nodeManager, RenderManager* renderManager, PlotsWidget* plotsWidget, QWidget *parent = nullptr);
+    ControlWidget(GraphWidget* graphWidget, RenderManager* renderManager, MidiListWidget* midiWidget, PlotsWidget* plotsWidget, QWidget *parent = nullptr);
     ~ControlWidget();
 
 signals:
@@ -107,6 +107,8 @@ public slots:
 
     void populateTexFormatComboBox(QList<TextureFormat> formats);
 
+    void populateSortedOperationsTable(QList<QPair<QUuid, QString>> sortedData);
+
     void updateIterationNumberLabel();
     void updateIterationMetricsLabels(double mSpf, double fps);
 
@@ -119,7 +121,7 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
-    NodeManager* mNodeManager;
+    GraphWidget* mGraphWidget;
     RenderManager* mRenderManager;
     PlotsWidget* mPlotsWidget;
 
@@ -129,18 +131,16 @@ private:
     QToolBar* systemToolBar;
     //QToolBar* nodesToolBar;
 
+    QTabWidget* optionsWidget;
     QWidget* displayOptionsWidget;
     QWidget* recordingOptionsWidget;
-    QWidget* sortedOperationWidget;
 
+    QWidget* sortedOperationWidget;
     QTableWidget* sortedOperationsTable;
     QList<QPair<QUuid, QString>> sortedOperationsData;
 
     QAction* iterateAction;
     QAction* recordAction;
-    QAction* screenshotAction;
-    QAction* displayOptionsAction;
-    QAction* recordingOptionsAction;
     QAction* sortedOperationsAction;
     QAction* saveConfigAction;
     QAction* loadConfigAction;
@@ -168,50 +168,32 @@ private:
 
     QMap<QUuid, OperationWidget*> operationsWidgets;
 
-    QMap<QString, QMap<int, Number<float>*>> midiFloatLinks;
-    QMap<QString, QMap<int, Number<int>*>> midiIntLinks;
-    Number<float>* linkingFloat = nullptr;
-    Number<int>* linkingInt = nullptr;
-    bool anyMidiPortOpen = false;
-
-    //QMap<QUuid, BlendFactorWidget*> blendFactorWidgets;
-
     bool overlayEnabled = false;
 
-    //QScrollArea* scrollArea;
-    //QWidget* scrollWidget;
-    //QHBoxLayout* scrollLayout;
-
-    void constructSystemToolBar();
     void constructDisplayOptionsWidget();
     void constructRecordingOptionsWidget();
     void constructSortedOperationWidget();
+    void constructOptionsWidget(MidiListWidget* midiOptionsWidget);
+    void constructSystemToolBar();
 
     QString textureFormatToString(TextureFormat format);
 
     void populateFileFormatsComboBox();
     void populateVideoCodecsComboBox();
 
-    //void updateScrollLayout(QWidget* widget);
-    //void updateScrollArea();
-
 private slots:
     void iterate();
     void record();
     void setScreenshotFilename();
     void setOutputDir();
-    void toggleDisplayOptionsWidget();
-    void toggleRecordingOptionsWidget();
-    //void toggleSortedOperationWidget();
     void plotsActionTriggered();
     void loadConfig();
     void saveConfig();
     void toggleOverlay();
     void about();
 
-    void populateSortedOperationsTable(QList<QPair<QUuid, QString>> sortedData, QList<QUuid> unsortedData);
     //void populateScrollLayout(QList<QPair<QUuid, QString>> data, QList<QUuid> unsortedData);
-    //void selectNodesToMark();
+    void selectNodesToMark();
 
     //void createParametersWidget(QUuid id);
     //void setUpBlendFactorWidget(BlendFactorWidget* widget);

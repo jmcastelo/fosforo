@@ -79,6 +79,8 @@ public:
     void resetIterationNumer();
     int iterationNumber();
 
+    QString version();
+
 signals:
     void texturesChanged();
     void frameReady(quintptr fence);
@@ -98,6 +100,8 @@ public slots:
     void setFrameImage(QByteArray devId, QImage image);
 
 private:
+    QString mVersion = "1.0 alpha";
+
     Factory* mFactory;
 
     QChronoTimer mTimer;

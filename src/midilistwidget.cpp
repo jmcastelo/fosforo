@@ -18,19 +18,17 @@ MidiListWidget::MidiListWidget(QWidget *parent): QWidget{parent}
     QPushButton* clearLinksButton = new QPushButton("Clear assignments");
     clearLinksButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-    portsTable = new QListWidget();
+    portsTable = new QListWidget;
 
     QHBoxLayout* hLayout = new QHBoxLayout;
     hLayout->addWidget(multiLinkButton);
     hLayout->addWidget(clearLinksButton);
 
-    QVBoxLayout* layout = new QVBoxLayout();
+    QVBoxLayout* layout = new QVBoxLayout;
     layout->addLayout(hLayout);
     layout->addWidget(portsTable);
 
     setLayout(layout);
-
-    setWindowTitle("MIDI Controller");
 
     connect(clearLinksButton, &QPushButton::clicked, this, &MidiListWidget::clearLinksButtonClicked);
     connect(multiLinkButton, &QPushButton::clicked, this, &MidiListWidget::multiLinkButtonChecked);

@@ -20,22 +20,20 @@
 *  along with Fosforo.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+
+
 //#include "node.h"
 //#include "blendfactorwidget.h"
 #include "controlwidget.h"
 
-#include <QTimer>
-#include <QActionGroup>
 #include <QHeaderView>
-#include <QScrollBar>
-#include <QSplitter>
-#include <QDebug>
+#include <QTabWidget>
 
 
 
-ControlWidget::ControlWidget(GraphWidget* graphWidget, NodeManager* nodeManager, RenderManager* renderManager, PlotsWidget* plotsWidget, QWidget* parent) :
+ControlWidget::ControlWidget(GraphWidget* graphWidget, RenderManager* renderManager, MidiListWidget *midiWidget, PlotsWidget* plotsWidget, QWidget* parent) :
     QWidget(parent),
-    mNodeManager { nodeManager },
+    mGraphWidget { graphWidget },
     mRenderManager { renderManager },
     mPlotsWidget { plotsWidget }
 {
@@ -64,10 +62,11 @@ ControlWidget::ControlWidget(GraphWidget* graphWidget, NodeManager* nodeManager,
 
     outputDir = QDir::toNativeSeparators(QDir::currentPath() + "/output");
 
-    constructSystemToolBar();
     constructDisplayOptionsWidget();
     constructRecordingOptionsWidget();
     constructSortedOperationWidget();
+    constructOptionsWidget(midiWidget);
+    constructSystemToolBar();
 
     //updateScrollArea();
 
@@ -158,10 +157,8 @@ ControlWidget::ControlWidget(GraphWidget* graphWidget, NodeManager* nodeManager,
 
 ControlWidget::~ControlWidget()
 {
-    delete displayOptionsWidget;
-    delete recordingOptionsWidget;
+    delete optionsWidget;
 
-    delete sortedOperationWidget;
     // qDeleteAll(operationsWidgets);
     //qDeleteAll(blendFactorWidgets);
 }
@@ -170,8 +167,7 @@ ControlWidget::~ControlWidget()
 
 void ControlWidget::closeEvent(QCloseEvent* event)
 {
-    displayOptionsWidget->close();
-    recordingOptionsWidget->close();
+    optionsWidget->close();
 
     emit closing();
 
@@ -201,7 +197,7 @@ void ControlWidget::constructSystemToolBar()
 
     systemToolBar->addSeparator();
 
-    screenshotAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/digikam.png")), "Take screenshot");
+    QAction* screenshotAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/digikam.png")), "Take screenshot");
     screenshotAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
     recordAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/media-record.png")), "Record video");
@@ -210,9 +206,8 @@ void ControlWidget::constructSystemToolBar()
 
     systemToolBar->addSeparator();
 
-    displayOptionsAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/video-display.png")), "Display options");
-
-    recordingOptionsAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/emblem-videos.png")), "Recording options");
+    QAction* optionsAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/applications-system.png")), "Options");
+    optionsAction->setCheckable(true);
 
     //systemToolBar->addSeparator();
 
@@ -220,7 +215,8 @@ void ControlWidget::constructSystemToolBar()
 
     systemToolBar->addSeparator();
 
-    systemToolBar->addAction(QIcon(QPixmap(":/icons/office-chart-area-stacked.png")), "Show plots", this, &ControlWidget::plotsActionTriggered);
+    QAction* plotsAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/office-chart-area-stacked.png")), "Plots");
+    plotsAction->setCheckable(true);
 
     systemToolBar->addSeparator();
 
@@ -229,7 +225,6 @@ void ControlWidget::constructSystemToolBar()
 
     systemToolBar->addSeparator();
 
-    QAction* midiAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/control-knob.png")), "MIDI Controller");
     QAction* overlayAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/align-horizontal-left.png")), "Overlay");
 
     systemToolBar->addSeparator();
@@ -241,11 +236,10 @@ void ControlWidget::constructSystemToolBar()
     connect(screenshotAction, &QAction::triggered, this, &ControlWidget::setScreenshotFilename);
     connect(recordAction, &QAction::triggered, this, &ControlWidget::record);
     //connect(displayOptionsAction, &QAction::toggled, displayOptionsWidget, &QWidget::setVisible);
-    connect(displayOptionsAction, &QAction::triggered, this, &ControlWidget::toggleDisplayOptionsWidget);
-    connect(recordingOptionsAction, &QAction::triggered, this, &ControlWidget::toggleRecordingOptionsWidget);
+    connect(optionsAction, &QAction::triggered, optionsWidget, &QTabWidget::setVisible);
+    connect(plotsAction, &QAction::triggered, mPlotsWidget, &QWidget::setVisible);
     connect(loadConfigAction, &QAction::triggered, this, &ControlWidget::loadConfig);
     connect(saveConfigAction, &QAction::triggered, this, &ControlWidget::saveConfig);
-    connect(midiAction, &QAction::triggered, this, &ControlWidget::showMidiWidget);
     connect(overlayAction, &QAction::triggered, this, &ControlWidget::toggleOverlay);
     connect(aboutAction, &QAction::triggered, this, &ControlWidget::about);
 }
@@ -295,20 +289,6 @@ void ControlWidget::setScreenshotFilename()
 {   
     QString filename = QDir::toNativeSeparators(outputDir + '/' + QDateTime::currentDateTime().toString(Qt::ISODate) + ".png");
     emit takeScreenshot(filename);
-}
-
-
-
-void ControlWidget::toggleDisplayOptionsWidget()
-{
-    displayOptionsWidget->setVisible(!displayOptionsWidget->isVisible());
-}
-
-
-
-void ControlWidget::toggleRecordingOptionsWidget()
-{
-    recordingOptionsWidget->setVisible(!recordingOptionsWidget->isVisible());
 }
 
 
@@ -382,7 +362,7 @@ void ControlWidget::about()
 
     QStringList lines;
     lines.append("<img src=\":/icons/logo.png\" width=\"300\"/>");
-    lines.append(QString("<h2>F&oacute;sforo %1</h2>").arg(mNodeManager->version));
+    lines.append(QString("<h2>F&oacute;sforo %1</h2>").arg(mRenderManager->version()));
     lines.append("<h4>Videofeedback simulation software.</h4>");
     lines.append("<h5>Let the pixels come alive!</h5><br>");
     lines.append("Looking for help? Please visit:<br>");
@@ -623,16 +603,15 @@ void ControlWidget::constructMultipleNodesToolBar()
 */
 
 
-// Display
 
 void ControlWidget::constructDisplayOptionsWidget()
 {
-    FocusLineEdit* itsFPSLineEdit = new FocusLineEdit;
-    itsFPSLineEdit->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-    QDoubleValidator* itsFPSDoubleValidator = new QDoubleValidator(0.0, 99999.9, 3, itsFPSLineEdit);
-    itsFPSDoubleValidator->setLocale(QLocale::English);
-    itsFPSLineEdit->setValidator(itsFPSDoubleValidator);
-    itsFPSLineEdit->setText(QString::number(0));
+    FocusLineEdit* fpsLineEdit = new FocusLineEdit;
+    fpsLineEdit->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    QDoubleValidator* fpsDoubleValidator = new QDoubleValidator(0.0, 99999.9, 3, fpsLineEdit);
+    fpsDoubleValidator->setLocale(QLocale::English);
+    fpsLineEdit->setValidator(fpsDoubleValidator);
+    fpsLineEdit->setText(QString::number(0));
 
     windowWidthLineEdit = new QLineEdit;
     windowWidthLineEdit->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -654,23 +633,21 @@ void ControlWidget::constructDisplayOptionsWidget()
     updateCheckBox->setChecked(true);
 
     QFormLayout* formLayout = new QFormLayout;
-    formLayout->addRow("Its FPS:", itsFPSLineEdit);
+    formLayout->setFormAlignment(Qt::AlignCenter);
+    formLayout->addRow("FPS:", fpsLineEdit);
     formLayout->addRow("Update:", updateCheckBox);
     formLayout->addRow("Width (px):", windowWidthLineEdit);
     formLayout->addRow("Height (px):", windowHeightLineEdit);
     formLayout->addRow("Format:", texFormatComboBox);
 
     displayOptionsWidget = new QWidget;
-    displayOptionsWidget->setWindowTitle("Display options");
     displayOptionsWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    displayOptionsWidget->setVisible(false);
     displayOptionsWidget->setLayout(formLayout);
 
     // Signals + Slots
 
-    connect(itsFPSLineEdit, &FocusLineEdit::editingFinished, this, [=, this]()
-    {
-        double fps = itsFPSLineEdit->text().toDouble();
+    connect(fpsLineEdit, &FocusLineEdit::editingFinished, this, [=, this]() {
+        double fps = fpsLineEdit->text().toDouble();
         emit iterationFPSChanged(fps);
     });
 
@@ -678,17 +655,14 @@ void ControlWidget::constructDisplayOptionsWidget()
         emit updateStateChanged(state == Qt::Checked);
     });
 
-    connect(windowWidthLineEdit, &FocusLineEdit::editingFinished, this, [=, this]()
-    {
+    connect(windowWidthLineEdit, &FocusLineEdit::editingFinished, this, [=, this]() {
         emit imageSizeChanged(windowWidthLineEdit->text().toInt(), windowHeightLineEdit->text().toInt());
     });
-    connect(windowHeightLineEdit, &FocusLineEdit::editingFinished, this, [=, this]()
-    {
+    connect(windowHeightLineEdit, &FocusLineEdit::editingFinished, this, [=, this]() {
         emit imageSizeChanged(windowWidthLineEdit->text().toInt(), windowHeightLineEdit->text().toInt());
     });
 
-    connect(texFormatComboBox, &QComboBox::activated, this, [&](int index)
-    {
+    connect(texFormatComboBox, &QComboBox::activated, this, [&](int index) {
         int selectedValue = texFormatComboBox->itemData(index).toInt();
         TextureFormat selectedFormat = static_cast<TextureFormat>(selectedValue);
         mRenderManager->setTextureFormat(selectedFormat);
@@ -739,8 +713,8 @@ void ControlWidget::populateTexFormatComboBox(QList<TextureFormat> formats)
 
 void ControlWidget::constructRecordingOptionsWidget()
 {
-    QPushButton* videoFilenamePushButton = new QPushButton(QIcon(QPixmap(":/icons/document-open.png")), "Select output dir");
-    videoFilenamePushButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    QPushButton* outputDirButton = new QPushButton(QIcon(QPixmap(":/icons/document-open.png")), "");
+    outputDirButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
     fileFormatsComboBox = new QComboBox;
     fileFormatsComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -760,51 +734,36 @@ void ControlWidget::constructRecordingOptionsWidget()
     videoCaptureElapsedTimeLabel = new QLabel("00:00:00.000");
     videoCaptureElapsedTimeLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
-    QFormLayout* videoFormLayout = new QFormLayout;
-    videoFormLayout->addRow("File format:", fileFormatsComboBox);
-    videoFormLayout->addRow("Codec:", videoCodecsComboBox);
-    videoFormLayout->addRow("FPS:", fpsVideoLineEdit);
-    videoFormLayout->addRow("Elapsed time:", videoCaptureElapsedTimeLabel);
-
-    QVBoxLayout* videoVBoxLayout = new QVBoxLayout;
-    videoVBoxLayout->addWidget(videoFilenamePushButton);
-    videoVBoxLayout->addLayout(videoFormLayout);
-
-    QGroupBox* videoGroupBox = new QGroupBox("Capture options");
-    videoGroupBox->setLayout(videoVBoxLayout);
-
-    QVBoxLayout* mainLayout = new QVBoxLayout;
-    mainLayout->setAlignment(Qt::AlignCenter);
-    mainLayout->setSizeConstraint(QLayout::SetFixedSize);
-    mainLayout->addWidget(videoGroupBox);
+    QFormLayout* formLayout = new QFormLayout;
+    formLayout->setFormAlignment(Qt::AlignCenter);
+    formLayout->addRow("Output dir:", outputDirButton);
+    formLayout->addRow("File format:", fileFormatsComboBox);
+    formLayout->addRow("Codec:", videoCodecsComboBox);
+    formLayout->addRow("FPS:", fpsVideoLineEdit);
+    formLayout->addRow("Elapsed time:", videoCaptureElapsedTimeLabel);
 
     recordingOptionsWidget = new QWidget;
-    recordingOptionsWidget->setWindowTitle("Recording options");
-    recordingOptionsWidget->setLayout(mainLayout);
+    recordingOptionsWidget->setLayout(formLayout);
     recordingOptionsWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    recordingOptionsWidget->setVisible(false);
 
     // Signals + Slots
 
-    connect(videoFilenamePushButton, &QPushButton::clicked, this, &ControlWidget::setOutputDir);
-    connect(fileFormatsComboBox, &QComboBox::activated, this, [=, this](int index)
-    {
+    connect(outputDirButton, &QPushButton::clicked, this, &ControlWidget::setOutputDir);
+    connect(fileFormatsComboBox, &QComboBox::activated, this, [=, this](int index) {
         if (index >= 0)
         {
             format.setFileFormat(supportedFileFormats[index]);
             populateVideoCodecsComboBox();
         }
     });
-    connect(videoCodecsComboBox, &QComboBox::activated, this, [=, this](int index)
-    {
+    connect(videoCodecsComboBox, &QComboBox::activated, this, [=, this](int index) {
         if (index >= 0)
         {
             format.setVideoCodec(supportedVideoCodecs[index]);
             populateFileFormatsComboBox();
         }
     });
-    connect(fpsVideoLineEdit, &FocusLineEdit::editingFinished, this, [=, this]()
-    {
+    connect(fpsVideoLineEdit, &FocusLineEdit::editingFinished, this, [=, this]() {
         framesPerSecond = fpsVideoLineEdit->text().toDouble();
     });
 }
@@ -917,19 +876,16 @@ void ControlWidget::constructSortedOperationWidget()
     sortedOperationWidget = new QWidget;
     sortedOperationWidget->setLayout(layout);
     sortedOperationWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    sortedOperationWidget->setVisible(false);
 
     //connect(mNodeManager, &NodeManager::sortedOperationsChanged, this, &ControlWidget::populateSortedOperationsTable);
     //connect(generator, &NodeManager::sortedOperationsChanged, this, &ControlWidget::populateScrollLayout);
-    //connect(sortedOperationsTable, &QTableWidget::itemSelectionChanged, this, &ControlWidget::selectNodesToMark);
+    connect(sortedOperationsTable, &QTableWidget::itemSelectionChanged, this, &ControlWidget::selectNodesToMark);
 }
 
 
 
-void ControlWidget::populateSortedOperationsTable(QList<QPair<QUuid, QString>> sortedData, QList<QUuid> unsortedData)
+void ControlWidget::populateSortedOperationsTable(QList<QPair<QUuid, QString>> sortedData)
 {
-    Q_UNUSED(unsortedData);
-
     sortedOperationsTable->clearContents();
     sortedOperationsTable->setRowCount(sortedData.size());
 
@@ -945,15 +901,32 @@ void ControlWidget::populateSortedOperationsTable(QList<QPair<QUuid, QString>> s
 
 
 
-/*void ControlWidget::selectNodesToMark()
+void ControlWidget::selectNodesToMark()
 {
-    QVector<QUuid> nodeIds;
+    QList<QUuid> nodeIds;
 
     foreach (QTableWidgetItem* item, sortedOperationsTable->selectedItems())
-        nodeIds.push_back(sortedOperationsData[item->row()].first);
+        nodeIds.append(sortedOperationsData[item->row()].first);
 
-    graphWidget->markNodes(nodeIds);
-}*/
+    mGraphWidget->markNodes(nodeIds);
+}
+
+
+
+void ControlWidget::constructOptionsWidget(MidiListWidget *midiOptionsWidget)
+{
+    optionsWidget = new QTabWidget;
+    optionsWidget->setWindowTitle("General options");
+    optionsWidget->setWindowIcon(QIcon(QPixmap(":/icons/applications-system.png")));
+    optionsWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    optionsWidget->setUsesScrollButtons(false);
+    optionsWidget->setVisible(false);
+
+    optionsWidget->addTab(displayOptionsWidget, QIcon(QPixmap(":/icons/video-display.png")), "Display");
+    optionsWidget->addTab(recordingOptionsWidget, QIcon(QPixmap(":/icons/emblem-videos.png")), "Output");
+    optionsWidget->addTab(midiOptionsWidget, QIcon(QPixmap(":/icons/control-knob.png")), "MIDI");
+    optionsWidget->addTab(sortedOperationWidget, QIcon(QPixmap(":/icons/format-list-ordered.png")), "Sorted ops.");
+}
 
 
 

@@ -42,7 +42,7 @@ void ConfigurationParser::write(QString filename)
 
         mStream.writeStartElement("fosforo");
 
-        mStream.writeAttribute("version", mNodeManager->version);
+        mStream.writeAttribute("version", mRenderManager->version());
 
         // Display
 

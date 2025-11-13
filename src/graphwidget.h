@@ -90,7 +90,7 @@ public:
     //void loadOperationNode(QUuid id, QString name, QPointF position);
     //void connectNodes(QMap<QUuid, QMap<QUuid, InputData*>> connections);
 
-    //void markNodes(QVector<QUuid> ids);
+    void markNodes(QList<QUuid> ids);
 
     //void closeWidgets();
 

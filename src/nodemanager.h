@@ -108,13 +108,11 @@ public:
 
     bool isNode(QUuid id) { return mOperationNodesMap.contains(id) || mSeedsMap.contains(id); }
 
-    QString version = "1.0 alpha";
-
 signals:
     void outputNodeChanged(QUuid id);
     void outputFBOChanged(GLuint fbo);
     void outputTextureChanged(GLuint* pTexId);
-    // void sortedOperationsChanged(QList<QPair<QUuid, QString>> sortedData, QList<QUuid> unsortedData);
+    void sortedOpsDataChanged(QList<QPair<QUuid, QString>> sortedData);
     void sortedOperationsChanged(QList<ImageOperation*> operations);
     void nodesConnected(QUuid srcId, QUuid dstId, InputType type, EdgeWidget* widget);
     void nodeRemoved(QUuid id);

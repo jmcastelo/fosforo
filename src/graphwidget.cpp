@@ -1001,28 +1001,30 @@ void GraphWidget::connectNodes(QMap<QUuid, QMap<QUuid, InputData*>> connections)
 
     searchElementaryCycles();
 }
+*/
 
 
-
-void GraphWidget::markNodes(QVector<QUuid> ids)
+void GraphWidget::markNodes(QList<QUuid> ids)
 {
     const QList<QGraphicsItem*> items = scene()->items();
 
     for (QGraphicsItem* item : items)
     {
-        if (OperationNode* node = qgraphicsitem_cast<OperationNode*>(item))
+        if (Node* node = qgraphicsitem_cast<Node*>(item))
         {
-            node->marked = false;
+            node->setSelected(false);
 
-            for (QUuid id : ids)
-                if (node->id == id)
-                    node->marked = true;
+            foreach (QUuid id, ids) {
+                if (node->id() == id) {
+                    node->setSelected(true);
+                }
+            }
 
             node->update();
         }
     }
 }
-*/
+
 
 
 /*void GraphWidget::contextMenuEvent(QContextMenuEvent *event)

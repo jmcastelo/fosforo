@@ -83,7 +83,7 @@ void NodeManager::sortOperations()
 
     QList<ImageOperation*> sortedOperations;
 
-    //QList<QPair<QUuid, QString>> sortedOperationsData;
+    QList<QPair<QUuid, QString>> sortedOperationsData;
     //QList<QUuid> unsortedOperationsIds;
 
     QMap<QUuid, ImageOperationNode*> pendingNodes = mOperationNodesMap;
@@ -108,7 +108,7 @@ void NodeManager::sortOperations()
         else if ((node->numInputs() == 0 && node->numOutputs() > 0) || (node->numInputs() > 0 && node->numNonNormalInputs() == node->numInputs()))
         {
             sortedOperations.append(node->operation());
-            //sortedOperationsData.append(QPair<QUuid, QString>(node->id, node->operation->name()));
+            sortedOperationsData.append(QPair<QUuid, QString>(node->id(), node->operation()->name()));
             pendingNodes.remove(node->id());
             node->setComputed(true);
         }
@@ -125,7 +125,7 @@ void NodeManager::sortOperations()
             if (node->allInputsComputed())
             {
                 sortedOperations.append(node->operation());
-                //sortedOperationsData.push_back(QPair<QUuid, QString>(node->id, node->operation->name()));
+                sortedOperationsData.push_back(QPair<QUuid, QString>(node->id(), node->operation()->name()));
                 computedNodes.append(node);
                 node->setComputed(true);
             }
@@ -145,6 +145,7 @@ void NodeManager::sortOperations()
 
     // mRenderManager->setSortedOperations(sortedOperations);
     emit sortedOperationsChanged(sortedOperations);
+    emit sortedOpsDataChanged(sortedOperationsData);
 }
 
 

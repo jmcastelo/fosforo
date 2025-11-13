@@ -523,6 +523,12 @@ int RenderManager::iterationNumber()
 
 
 
+QString RenderManager::version()
+{
+    return mVersion;
+}
+
+
 void RenderManager::resize(GLuint width, GLuint height)
 {
     mOldTexWidth = mTexWidth;
