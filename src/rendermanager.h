@@ -31,7 +31,7 @@
 #include "imageoperation.h"
 #include "seed.h"
 #include "factory.h"
-#include "videoinputcontrol.h"
+#include "recorder.h"
 
 #include <QThread>
 #include <QOpenGLFunctions_4_5_Core>
@@ -63,7 +63,7 @@ public:
     bool active() const;
     void setActive(bool set);
 
-    QImage outputImage();
+    void sendOutputImage(bool set);
     QList<float> rgbPixel(QPoint pos);
 
     TextureFormat texFormat();
@@ -83,6 +83,7 @@ public:
 
 signals:
     void texturesChanged();
+    void frameRecorded(int number);
     void frameReady(quintptr fence);
 
 public slots:
@@ -98,6 +99,11 @@ public slots:
     void delImageTexture(QByteArray devId);
     void setVideoTextures();
     void setFrameImage(QByteArray devId, QImage image);
+
+    void startRecording(QString recordFilename, int framesPerSecond, QMediaFormat format);
+    void stopRecording();
+
+    void takeScreenshot(QString filename);
 
 private:
     QString mVersion = "1.0 alpha";
@@ -127,6 +133,7 @@ private:
 
     TextureFormat mTexFormat = TextureFormat::RGBA8;
 
+    bool mSendOutputImage = false;
     QImage* mOutputImage = nullptr;
     QImage::Format mOutputImageFormat = QImage::Format_RGBA8888;
 
@@ -147,19 +154,21 @@ private:
     unsigned int mIterationNumber = 0;
 
     GLuint mFrameTexId = 0;
-
-    const int mPboCount = 3;
-    QList<GLuint> mPbos;
-
-    int mSubmitIndex = 0;
-    int mReadIndex = 0;
-    QList<GLsync> mFences;
+    GLuint mPbo = 0;
+    GLsync mFence = 0;
+    bool mGrabOutputTexture = false;
+    bool mTakeScreenshot = false;
+    QString mScreenshotFilename;
 
     QMap<QByteArray, GLuint> mVideoTextures;
     QMap<QByteArray, QImage> mFrameImageMap;
 
-    void setPbos();
+    void setPbo();
     void setOutputImage();
+    void readOutputTexture();
+    void grabOutputImage();
+
+    Recorder* recorder = nullptr;
 
     void setBlenderProgram();
     // void setIdentityProgram();

@@ -150,7 +150,7 @@ ControlWidget::ControlWidget(GraphWidget* graphWidget, RenderManager* renderMana
     // setWindowFlags(Qt::SubWindow);
 
     setWindowTitle("Fosforo");
-    setWindowIcon(QIcon(QPixmap(":/icons/logo-small.png")));
+    setWindowIcon(QIcon(QPixmap(":/icons/logo.png")));
 }
 
 
@@ -195,7 +195,7 @@ void ControlWidget::constructSystemToolBar()
 
     QAction* resetAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/view-refresh.png")), "Reset");
 
-    systemToolBar->addSeparator();
+    // systemToolBar->addSeparator();
 
     QAction* screenshotAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/digikam.png")), "Take screenshot");
     screenshotAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
@@ -204,30 +204,28 @@ void ControlWidget::constructSystemToolBar()
     recordAction->setCheckable(true);
     recordAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_R));
 
-    systemToolBar->addSeparator();
-
-    QAction* optionsAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/applications-system.png")), "Options");
-    optionsAction->setCheckable(true);
-
-    //systemToolBar->addSeparator();
+    // systemToolBar->addSeparator();
 
     //systemToolBar->addAction(QIcon(QPixmap(":/icons/format-list-ordered.png")), "List sorted operations", this, &ControlWidget::toggleSortedOperationWidget);
 
-    systemToolBar->addSeparator();
+    // systemToolBar->addSeparator();
 
-    QAction* plotsAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/office-chart-area-stacked.png")), "Plots");
+    QAction* plotsAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/development-gtk.png")), "RGB Plot");
     plotsAction->setCheckable(true);
+
+    // systemToolBar->addSeparator();
+
+    QAction* overlayAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/align-horizontal-left.png")), "Overlay");
 
     systemToolBar->addSeparator();
 
     loadConfigAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/document-open.png")), "Load configuration");
     saveConfigAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/document-save.png")), "Save configuration");
 
-    systemToolBar->addSeparator();
+    QAction* optionsAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/applications-system.png")), "Options");
+    optionsAction->setCheckable(true);
 
-    QAction* overlayAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/align-horizontal-left.png")), "Overlay");
-
-    systemToolBar->addSeparator();
+    // systemToolBar->addSeparator();
 
     QAction* aboutAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/help-about.png")), "About");
 
@@ -628,14 +626,9 @@ void ControlWidget::constructDisplayOptionsWidget()
     texFormatComboBox = new QComboBox;
     texFormatComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
-    QCheckBox* updateCheckBox = new QCheckBox;
-    updateCheckBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-    updateCheckBox->setChecked(true);
-
     QFormLayout* formLayout = new QFormLayout;
     formLayout->setFormAlignment(Qt::AlignCenter);
     formLayout->addRow("FPS:", fpsLineEdit);
-    formLayout->addRow("Update:", updateCheckBox);
     formLayout->addRow("Width (px):", windowWidthLineEdit);
     formLayout->addRow("Height (px):", windowHeightLineEdit);
     formLayout->addRow("Format:", texFormatComboBox);
@@ -649,10 +642,6 @@ void ControlWidget::constructDisplayOptionsWidget()
     connect(fpsLineEdit, &FocusLineEdit::editingFinished, this, [=, this]() {
         double fps = fpsLineEdit->text().toDouble();
         emit iterationFPSChanged(fps);
-    });
-
-    connect(updateCheckBox, &QCheckBox::checkStateChanged, this, [=, this](Qt::CheckState state){
-        emit updateStateChanged(state == Qt::Checked);
     });
 
     connect(windowWidthLineEdit, &FocusLineEdit::editingFinished, this, [=, this]() {
@@ -716,13 +705,13 @@ void ControlWidget::constructRecordingOptionsWidget()
     QPushButton* outputDirButton = new QPushButton(QIcon(QPixmap(":/icons/document-open.png")), "");
     outputDirButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-    fileFormatsComboBox = new QComboBox;
-    fileFormatsComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-    populateFileFormatsComboBox();
-
     videoCodecsComboBox = new QComboBox;
     videoCodecsComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-    populateVideoCodecsComboBox();
+    populateVideoCodecsComboBox(QMediaFormat::VideoCodec::H264);
+
+    fileFormatsComboBox = new QComboBox;
+    fileFormatsComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    populateFileFormatsComboBox(QMediaFormat::FileFormat::AVI);
 
     FocusLineEdit* fpsVideoLineEdit = new FocusLineEdit;
     fpsVideoLineEdit->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -737,8 +726,8 @@ void ControlWidget::constructRecordingOptionsWidget()
     QFormLayout* formLayout = new QFormLayout;
     formLayout->setFormAlignment(Qt::AlignCenter);
     formLayout->addRow("Output dir:", outputDirButton);
-    formLayout->addRow("File format:", fileFormatsComboBox);
     formLayout->addRow("Codec:", videoCodecsComboBox);
+    formLayout->addRow("File format:", fileFormatsComboBox);
     formLayout->addRow("FPS:", fpsVideoLineEdit);
     formLayout->addRow("Elapsed time:", videoCaptureElapsedTimeLabel);
 
@@ -750,17 +739,21 @@ void ControlWidget::constructRecordingOptionsWidget()
 
     connect(outputDirButton, &QPushButton::clicked, this, &ControlWidget::setOutputDir);
     connect(fileFormatsComboBox, &QComboBox::activated, this, [=, this](int index) {
-        if (index >= 0)
-        {
+        if (index >= 0) {
             format.setFileFormat(supportedFileFormats[index]);
-            populateVideoCodecsComboBox();
         }
     });
     connect(videoCodecsComboBox, &QComboBox::activated, this, [=, this](int index) {
         if (index >= 0)
         {
             format.setVideoCodec(supportedVideoCodecs[index]);
-            populateFileFormatsComboBox();
+
+            int index = fileFormatsComboBox->currentIndex();
+            if (index >= 0) {
+                populateFileFormatsComboBox(supportedFileFormats[index]);
+            } else {
+                populateFileFormatsComboBox(QMediaFormat::FileFormat::UnspecifiedFormat);
+            }
         }
     });
     connect(fpsVideoLineEdit, &FocusLineEdit::editingFinished, this, [=, this]() {
@@ -770,30 +763,28 @@ void ControlWidget::constructRecordingOptionsWidget()
 
 
 
-void ControlWidget::populateFileFormatsComboBox()
+void ControlWidget::populateFileFormatsComboBox(QMediaFormat::FileFormat fileFormat)
 {
-    QString previousFormat = fileFormatsComboBox->currentText();
-
     fileFormatsComboBox->clear();
 
     format.resolveForEncoding(QMediaFormat::RequiresVideo);
 
+    int index = 0;
+
     supportedFileFormats = format.supportedFileFormats(QMediaFormat::Encode);
-    foreach (QMediaFormat::FileFormat fileFormat, supportedFileFormats)
-        fileFormatsComboBox->addItem(QMediaFormat::fileFormatName(fileFormat));
+
+    for (int i = 0; i < supportedFileFormats.size(); i++)
+    {
+        fileFormatsComboBox->addItem(QMediaFormat::fileFormatName(supportedFileFormats.at(i)));
+        if (supportedFileFormats.at(i) == fileFormat) {
+            index = i;
+        }
+    }
 
     if (!supportedFileFormats.isEmpty())
     {
-        int index = fileFormatsComboBox->findText(previousFormat);
-        if (index == -1)
-        {
-            fileFormatsComboBox->setCurrentIndex(0);
-            format.setFileFormat(supportedFileFormats[0]);
-        }
-        else
-        {
-            fileFormatsComboBox->setCurrentIndex(index);
-        }
+        fileFormatsComboBox->setCurrentIndex(index);
+        format.setFileFormat(supportedFileFormats[index]);
     }
     else
     {
@@ -804,30 +795,28 @@ void ControlWidget::populateFileFormatsComboBox()
 
 
 
-void ControlWidget::populateVideoCodecsComboBox()
+void ControlWidget::populateVideoCodecsComboBox(QMediaFormat::VideoCodec videoCodec)
 {
-    QString previousCodec = videoCodecsComboBox->currentText();
-
     videoCodecsComboBox->clear();
 
     format.resolveForEncoding(QMediaFormat::RequiresVideo);
 
+    int index = 0;
+
     supportedVideoCodecs = format.supportedVideoCodecs(QMediaFormat::Encode);
-    foreach (QMediaFormat::VideoCodec videoCodec, supportedVideoCodecs)
-        videoCodecsComboBox->addItem(QMediaFormat::videoCodecName(videoCodec));
+
+    for (int i = 0; i < supportedVideoCodecs.size(); i++)
+    {
+        videoCodecsComboBox->addItem(QMediaFormat::videoCodecName(supportedVideoCodecs.at(i)));
+        if (supportedVideoCodecs.at(i) == videoCodec) {
+            index = i;
+        }
+    }
 
     if (!supportedVideoCodecs.isEmpty())
     {
-        int index = videoCodecsComboBox->findText(previousCodec);
-        if (index == -1)
-        {
-            videoCodecsComboBox->setCurrentIndex(0);
-            format.setVideoCodec(supportedVideoCodecs[0]);
-        }
-        else
-        {
-            videoCodecsComboBox->setCurrentIndex(index);
-        }
+        videoCodecsComboBox->setCurrentIndex(index);
+        format.setVideoCodec(supportedVideoCodecs[index]);
     }
     else
     {

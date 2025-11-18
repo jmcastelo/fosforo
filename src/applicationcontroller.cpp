@@ -86,6 +86,7 @@ ApplicationController::ApplicationController()
         renderManager->start();
     });
     connect(morphoWidget, &MorphoWidget::renderDone, this, &ApplicationController::measureFps);
+    connect(morphoWidget, &MorphoWidget::renderDone, plotsWidget, &PlotsWidget::updatePlots);
     connect(morphoWidget, &MorphoWidget::supportedTexFormats, controlWidget, &ControlWidget::populateTexFormatComboBox);
     connect(morphoWidget, &MorphoWidget::scaleTransformChanged, plotsWidget, &PlotsWidget::transformSources);
     connect(morphoWidget, &MorphoWidget::selectedPointChanged, plotsWidget, &PlotsWidget::setSelectedPoint);
@@ -97,10 +98,10 @@ ApplicationController::ApplicationController()
     connect(morphoWidget, &MorphoWidget::sizeChanged, plotsWidget, &PlotsWidget::setSize);
 
     connect(controlWidget, &ControlWidget::iterateStateChanged, this, &ApplicationController::setIterationState);
-    connect(controlWidget, &ControlWidget::updateStateChanged, morphoWidget, &MorphoWidget::setUpdate);
     connect(controlWidget, &ControlWidget::closing, this, &ApplicationController::closeAll);
 
     connect(renderManager, &RenderManager::texturesChanged, nodeManager, &NodeManager::onTexturesChanged);
+    connect(renderManager, &RenderManager::frameRecorded, controlWidget, &ControlWidget::setVideoCaptureElapsedTimeLabel);
 
     connect(nodeManager, &NodeManager::outputTextureChanged, renderManager, &RenderManager::setOutputTextureId);
     connect(nodeManager, &NodeManager::outputTextureChanged, morphoWidget, &MorphoWidget::setOutputTextureId);
@@ -113,9 +114,9 @@ ApplicationController::ApplicationController()
     connect(nodeManager, &NodeManager::sortedOpsDataChanged, controlWidget, &ControlWidget::populateSortedOperationsTable);
 
     connect(controlWidget, &ControlWidget::iterationFPSChanged, this, &ApplicationController::setIterationTimerInterval);
-    connect(controlWidget, &ControlWidget::startRecording, this, &ApplicationController::startRecording);
-    connect(controlWidget, &ControlWidget::stopRecording, this, &ApplicationController::stopRecording);
-    connect(controlWidget, &ControlWidget::takeScreenshot, this, &ApplicationController::takeScreenshot);
+    connect(controlWidget, &ControlWidget::startRecording, renderManager, &RenderManager::startRecording);
+    connect(controlWidget, &ControlWidget::stopRecording, renderManager, &RenderManager::stopRecording);
+    connect(controlWidget, &ControlWidget::takeScreenshot, renderManager, &RenderManager::takeScreenshot);
     connect(controlWidget, &ControlWidget::imageSizeChanged, this, &ApplicationController::setSize);
     connect(controlWidget, &ControlWidget::showMidiWidget, this, &ApplicationController::showMidiWidget);
     connect(controlWidget, &ControlWidget::overlayToggled, overlay, &Overlay::enable);
@@ -138,10 +139,6 @@ ApplicationController::ApplicationController()
 
 ApplicationController::~ApplicationController()
 {
-    if (recorder) {
-        delete recorder;
-    }
-
     delete plotsWidget;
     delete controlWidget;
     delete configParser;
@@ -180,18 +177,6 @@ ApplicationController::~ApplicationController()
     // qint64 cpuTimeNs = timer.nsecsElapsed();
     // qDebug() << "CPU time (ms):" << cpuTimeNs / 1'000'000.0;
 }*/
-
-
-
-void ApplicationController::iterate()
-{
-    if (renderManager->active())
-    {
-        renderManager->iterate();
-        plotsWidget->updatePlots();
-        // update();
-    }
-}
 
 
 
@@ -281,52 +266,6 @@ void ApplicationController::setIterationState(bool state)
 void ApplicationController::setIterationTimerInterval(double fps)
 {
     renderManager->setTargetFps(fps);
-}
-
-
-
-void ApplicationController::setUpdateTimerInterval(double fps)
-{
-    // updateFPS = newFPS;
-
-    // numUpdates = 0;
-    // updateStart = std::chrono::steady_clock::now();
-
-    // updateTimer->setTimerInterval(newFPS);
-}
-
-
-
-void ApplicationController::startRecording(QString recordFilename, int framesPerSecond, QMediaFormat format)
-{
-    recorder = new Recorder(recordFilename, framesPerSecond, format);
-    connect(recorder, &Recorder::frameRecorded, controlWidget, &ControlWidget::setVideoCaptureElapsedTimeLabel);
-    recorder->startRecording();
-}
-
-
-
-void ApplicationController::stopRecording()
-{
-    recorder->stopRecording();
-    disconnect(recorder, &Recorder::frameRecorded, controlWidget, &ControlWidget::setVideoCaptureElapsedTimeLabel);
-    delete recorder;
-    recorder = nullptr;
-}
-
-
-
-int ApplicationController::getFrameCount()
-{
-    return recorder ? recorder->frameNumber : 0;
-}
-
-
-
-void ApplicationController::takeScreenshot(QString filename)
-{
-    QImage screenshot = morphoWidget->grabFramebuffer();
-    screenshot.save(filename);
 }
 
 

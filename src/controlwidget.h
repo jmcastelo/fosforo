@@ -81,8 +81,6 @@ signals:
 
     void seedDrawn();
 
-    void updateStateChanged(bool state);
-
     void showMidiWidget();
 
     void overlayToggled(bool show);
@@ -178,8 +176,8 @@ private:
 
     QString textureFormatToString(TextureFormat format);
 
-    void populateFileFormatsComboBox();
-    void populateVideoCodecsComboBox();
+    void populateFileFormatsComboBox(QMediaFormat::FileFormat fileFormat);
+    void populateVideoCodecsComboBox(QMediaFormat::VideoCodec videoCodec);
 
 private slots:
     void iterate();

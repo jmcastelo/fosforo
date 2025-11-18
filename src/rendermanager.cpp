@@ -157,14 +157,11 @@ void RenderManager::init(QOpenGLContext* context)
 
     genTexture(&mFrameTexId, TextureFormat::RGBA8);
 
-    // Pixel buffer objects: generate and set up
+    // Pixel buffer object: generate and set up
 
-    mPbos.resize(mPboCount, 0);
-    mFences.resize(mPboCount, 0);
+    glGenBuffers(1, &mPbo);
 
-    glGenBuffers(mPboCount, mPbos.data());
-
-    setPbos();
+    setPbo();
 
     mContext->doneCurrent();
 }
@@ -173,6 +170,10 @@ void RenderManager::init(QOpenGLContext* context)
 
 RenderManager::~RenderManager()
 {
+    if (recorder) {
+        delete recorder;
+    }
+
     mContext->makeCurrent(mSurface);
 
     glDeleteFramebuffers(1, &mOutFbo);
@@ -193,13 +194,13 @@ RenderManager::~RenderManager()
     delete mBlenderProgram;
     // delete mIdentityProgram;
 
-    glDeleteBuffers(mPboCount, mPbos.data());
+    glDeleteBuffers(1, &mPbo);
 
     mContext->doneCurrent();
 
     delete mOutputImage;
 
-    // delete mContext;
+    delete mContext;
     delete mSurface;
 }
 
@@ -244,13 +245,20 @@ void RenderManager::iterate()
             seed->setClearTexture();
         }
 
-        glFlush();
-        GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-        glFlush();
+        if (mGrabOutputTexture || mTakeScreenshot) {
+            readOutputTexture();
+        }
+
+        glDeleteSync(mFence);
+        mFence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+
+        if (mGrabOutputTexture || mTakeScreenshot) {
+            grabOutputImage();
+        }
 
         mContext->doneCurrent();
 
-        emit frameReady(reinterpret_cast<quintptr>(fence));
+        emit frameReady(reinterpret_cast<quintptr>(mFence));
 
         mIterationNumber++;
     }
@@ -258,14 +266,10 @@ void RenderManager::iterate()
 
 
 
-void RenderManager::setPbos()
+void RenderManager::setPbo()
 {
-    foreach (GLuint pbo, mPbos)
-    {
-        glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
-        glBufferData(GL_PIXEL_PACK_BUFFER, GLsizeiptr(mOutputImage->sizeInBytes()), nullptr, GL_STREAM_READ);
-    }
-
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, mPbo);
+    glBufferData(GL_PIXEL_PACK_BUFFER, GLsizeiptr(mOutputImage->sizeInBytes()), nullptr, GL_STREAM_READ);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 }
 
@@ -318,25 +322,18 @@ void RenderManager::setOutputImage()
 
 
 
-QImage RenderManager::outputImage()
+void RenderManager::sendOutputImage(bool set)
+{
+    mSendOutputImage = set;
+}
+
+
+
+void RenderManager::readOutputTexture()
 {
     if (mOutputTexId)
     {
-        mContext->makeCurrent(mSurface);
-
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
-
-        // Ensure previous fence for the PBO we're about to reuse is complete.
-        if (mFences[mSubmitIndex])
-        {
-            // Wait until GPU finished writing into pbos[submitIndex] from its previous use.
-            // Block here until signaled to guarantee we can reuse the PBO safely.
-            glClientWaitSync(mFences[mSubmitIndex], GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(-1));
-
-            // It's acceptable to ignore the return because we used infinite timeout.
-            glDeleteSync(mFences[mSubmitIndex]);
-            mFences[mSubmitIndex] = 0;
-        }
 
         GLuint* pReadTexId = mOutputTexId;
 
@@ -346,39 +343,44 @@ QImage RenderManager::outputImage()
             pReadTexId = &mFrameTexId;
         }
 
-        // Bind PBO and issue async read into it
-        glBindBuffer(GL_PIXEL_PACK_BUFFER, mPbos[mSubmitIndex]);
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, mPbo);
 
-        // Issue read into PBO (offset 0)
         glGetTextureSubImage(*pReadTexId, 0, 0, 0, 0, mTexWidth, mTexHeight, 1, GL_RGBA, GL_UNSIGNED_BYTE, GLsizei(mOutputImage->sizeInBytes()), 0);
 
-        // Insert fence for this PBO transfer to know when it's done
-        mFences[mSubmitIndex] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+    }
+}
 
-        // Advance submitIndex (we will map the oldest PBO next)
-        mSubmitIndex = (mSubmitIndex + 1) % mPboCount;
 
-        // Map/read the oldest PBO (readIndex). Wait for its fence if present.
-        if (mFences[mReadIndex])
+void RenderManager::grabOutputImage()
+{
+    if (mOutputTexId)
+    {
+        mContext->makeCurrent(mSurface);
+
+        if (mFence)
         {
-            // Blocking wait until readIndex's transfer completes
-            glClientWaitSync(mFences[mReadIndex], GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(-1));
-            glDeleteSync(mFences[mReadIndex]);
-            mFences[mReadIndex] = 0;
+            while (true)
+            {
+                GLenum syncRes = glClientWaitSync(mFence, GL_SYNC_FLUSH_COMMANDS_BIT, 1000);
+                /*switch (syncRes)
+                {
+                case GL_ALREADY_SIGNALED: qDebug() << "RM: ALREADY_SIGNALED"; break;
+                case GL_CONDITION_SATISFIED: qDebug() << "RM: CONDITION_SATISFIED"; break;
+                case GL_TIMEOUT_EXPIRED: qDebug() << "RM: TIMEOUT_EXPIRED"; break;
+                case GL_WAIT_FAILED: qDebug() << "RM: WAIT_FAILED"; break;
+                }*/
+                if (syncRes == GL_CONDITION_SATISFIED || syncRes == GL_ALREADY_SIGNALED) break;
+            }
         }
 
-        // If there's no fence, the buffer was never used; still safe to map (it contains allocated but undefined bytes).
-
-        // Bind and map readIndex PBO
-        glBindBuffer(GL_PIXEL_PACK_BUFFER, mPbos[mReadIndex]);
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, mPbo);
 
         void* mapped = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, GLsizeiptr(mOutputImage->sizeInBytes()), GL_MAP_READ_BIT);
 
         if (mapped)
         {
             std::memcpy(mOutputImage->bits(), mapped, mOutputImage->sizeInBytes());
-
-            // Unmap after copying
             glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
         }
         else
@@ -386,11 +388,7 @@ QImage RenderManager::outputImage()
             mOutputImage->fill(Qt::black);
         }
 
-        // Unbind PBO
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-
-        // Advance readIndex to next oldest buffer
-        mReadIndex = (mReadIndex + 1) % mPboCount;
 
         mContext->doneCurrent();
     }
@@ -399,7 +397,51 @@ QImage RenderManager::outputImage()
         mOutputImage->fill(Qt::black);
     }
 
-    return *mOutputImage;
+    // emit outputImageReady(*mOutputImage);
+
+    if (mTakeScreenshot) {
+        mOutputImage->save(mScreenshotFilename);
+        mTakeScreenshot = false;
+    }
+
+    if (mGrabOutputTexture && recorder) {
+        recorder->sendVideoFrame(mOutputImage);
+    }
+}
+
+
+
+void RenderManager::takeScreenshot(QString filename)
+{
+    mScreenshotFilename = filename;
+    mTakeScreenshot = true;
+}
+
+
+
+void RenderManager::startRecording(QString recordFilename, int framesPerSecond, QMediaFormat format)
+{
+    recorder = new Recorder(recordFilename, framesPerSecond, format);
+
+    connect(recorder, &Recorder::frameRecorded, this, &RenderManager::frameRecorded);
+
+    mGrabOutputTexture = true;
+
+    recorder->startRecording();
+}
+
+
+
+void RenderManager::stopRecording()
+{
+    recorder->stopRecording();
+
+    mGrabOutputTexture = false;
+
+    disconnect(recorder, &Recorder::frameRecorded, this, &RenderManager::frameRecorded);
+
+    delete recorder;
+    recorder = nullptr;
 }
 
 
@@ -548,7 +590,7 @@ void RenderManager::resize(GLuint width, GLuint height)
             seed->setVao(width, height);
         }
 
-        setPbos();
+        setPbo();
 
         glViewport(0, 0, mTexWidth, mTexHeight);
 

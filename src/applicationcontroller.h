@@ -11,7 +11,6 @@
 #include "configparser.h"
 #include "controlwidget.h"
 #include "plotswidget.h"
-#include "recorder.h"
 #include "midicontrol.h"
 #include "midilistwidget.h"
 #include "midilinkmanager.h"
@@ -35,10 +34,6 @@ public:
     ApplicationController();
     ~ApplicationController();
 
-    void startRecording(QString recordFilename, int framesPerSecond, QMediaFormat format);
-    void stopRecording();
-    int getFrameCount();
-
 signals:
     void outputTextureChanged(GLuint id);
 
@@ -60,7 +55,6 @@ private:
     ConfigurationParser* configParser;
     ControlWidget* controlWidget;
     PlotsWidget* plotsWidget;
-    Recorder* recorder = nullptr;
     MidiControl midiControl;
     MidiListWidget* midiListWidget;
     MidiLinkManager midiLinkManager;
@@ -93,20 +87,14 @@ private:
     // QQueue<qint64> timestamps;
 
 private slots:
-    // void beat();
-    void iterate();
-
     // void computeUpdateFPS();
     // void computeIterationFPS();
 
-    void setUpdateTimerInterval(double fps);
     void setIterationTimerInterval(double fps);
 
     void measureFps();
 
     void setIterationState(bool state);
-
-    void takeScreenshot(QString filename);
 
     void setSize(int with, int height);
 

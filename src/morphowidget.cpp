@@ -40,6 +40,9 @@ MorphoWidget::MorphoWidget(int w, int h, Overlay* overlay_)
     cursor = QPointF(0.0, 0.0);
 
     overlay->setViewportRect(w, h);
+
+    setTitle("Fosforo");
+    setIcon(QIcon(QPixmap(":/icons/logo.png")));
 }
 
 
@@ -57,13 +60,6 @@ MorphoWidget::~MorphoWidget()
     delete vao;
     delete vbo;
     delete program;
-}
-
-
-
-void MorphoWidget::setUpdate(bool state)
-{
-    // setUpdatesEnabled(state);
 }
 
 
@@ -443,24 +439,33 @@ void MorphoWidget::resizeGL(int w, int h)
 
 
 
-void MorphoWidget::render(quintptr fence)
+void MorphoWidget::render(quintptr pFence)
 {
     QMutexLocker locker(&mutex);
 
     context()->makeCurrent(this);
 
-    GLsync pendingFence = reinterpret_cast<GLsync>(fence);
+    GLsync fence = reinterpret_cast<GLsync>(pFence);
 
-    if (pendingFence) {
-        glWaitSync(pendingFence, 0, GL_TIMEOUT_IGNORED);
-        glDeleteSync(pendingFence);
-        pendingFence = 0;
+    if (fence)
+    {
+        while (true)
+        {
+            GLenum syncRes = glClientWaitSync(fence, GL_SYNC_FLUSH_COMMANDS_BIT, 1000);
+            /*switch (syncRes)
+            {
+            case GL_ALREADY_SIGNALED: qDebug() << "GL: ALREADY_SIGNALED"; break;
+            case GL_CONDITION_SATISFIED: qDebug() << "GL: CONDITION_SATISFIED"; break;
+            case GL_TIMEOUT_EXPIRED: qDebug() << "GL: TIMEOUT_EXPIRED"; break;
+            case GL_WAIT_FAILED: qDebug() << "GL: WAIT_FAILED"; break;
+            }*/
+            if (syncRes == GL_CONDITION_SATISFIED || syncRes == GL_ALREADY_SIGNALED) break;
+        }
     }
 
     paintGL();
     paintOverGL();
 
-    glFlush();
     context()->swapBuffers(this);
 
     context()->doneCurrent();

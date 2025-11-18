@@ -37,10 +37,16 @@ SeedWidget::SeedWidget(QUuid id, Seed* seed, VideoInputControl* videoInCtrl, QWi
     grayScaleAction->setCheckable(true);
     grayScaleAction->setData(QVariant(1));
 
+    headerToolBar->addSeparator();
+
     imageAction = headerToolBar->addAction(QIcon(QPixmap(":/icons/image-x-generic.png")), "Image", this, &SeedWidget::setSeedType);
     imageAction->setEnabled(mSeed->type() == 2);
     imageAction->setCheckable(true);
     imageAction->setData(QVariant(2));
+
+    headerToolBar->addAction(QIcon(QPixmap(":/icons/folder-image.png")), "Load image", this, &SeedWidget::loadSeedImage);
+
+    headerToolBar->addSeparator();
 
     videoAction = headerToolBar->addAction(QIcon(QPixmap(":/icons/camera-web.png")), "Video", this, &SeedWidget::populateAvailVideoMenu);
     mAvailVideoMenu = new QMenu("Inputs");
@@ -56,12 +62,6 @@ SeedWidget::SeedWidget(QUuid id, Seed* seed, VideoInputControl* videoInCtrl, QWi
     colorAction->setChecked(mSeed->type() == 0);
     grayScaleAction->setChecked(mSeed->type() == 1);
     imageAction->setChecked(mSeed->type() == 2);
-
-    headerToolBar->addSeparator();
-
-    // Load seed image action
-
-    headerToolBar->addAction(QIcon(QPixmap(":/icons/folder-image.png")), "Load image", this, &SeedWidget::loadSeedImage);
 
     headerToolBar->addSeparator();
 

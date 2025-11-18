@@ -46,7 +46,6 @@ public:
 
     // void init(QOpenGLContext* mainContext);
     bool isEnabled(){ return enabled; }
-    void updatePlots();
 
 signals:
     void selectedPointChanged(QPoint point);
@@ -58,6 +57,7 @@ public slots:
     void setSize(int width, int height);
     void setSelectedPoint(QPoint point);
     void transformSources(QTransform transform);
+    void updatePlots();
 
 private:
     RenderManager* mRenderManager;

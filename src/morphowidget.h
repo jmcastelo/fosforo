@@ -31,7 +31,7 @@
 #include "overlay.h"
 
 #include <QOpenGLWindow>
-#include <QOpenGLExtraFunctions>
+#include <QOpenGLFunctions_4_5_Core>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
@@ -47,7 +47,7 @@
 
 
 
-class MorphoWidget : public QOpenGLWindow, protected QOpenGLExtraFunctions
+class MorphoWidget : public QOpenGLWindow, protected QOpenGLFunctions_4_5_Core
 {
     Q_OBJECT
 
@@ -60,19 +60,22 @@ public:
     void paintOverGL() override;
     void resizeGL(int width, int height) override;
 
+    void setGrabOutputTexture(bool set);
+
 signals:
     void supportedTexFormats(QList<TextureFormat> formats);
     void openGLInitialized();
     void sizeChanged(int width, int height);
     void selectedPointChanged(QPoint point);
     void scaleTransformChanged(QTransform transform);
+
     void closing();
+
     void renderDone();
 
 public slots:
     void setOutputTextureId(GLuint* pTexId);
     void resetZoom(int width, int height);
-    void setUpdate(bool state);
     void setDrawingCursor(bool on){ drawingCursor = on; }
     void setCursor(QPoint point);
     void render(quintptr fence);

@@ -91,5 +91,6 @@
         <file>icons/camera-web.png</file>
         <file>icons/logo.png</file>
         <file>icons/logo-small.png</file>
+        <file>icons/development-gtk.png</file>
     </qresource>
 </RCC>

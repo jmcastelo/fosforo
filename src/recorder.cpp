@@ -18,15 +18,6 @@ Recorder::Recorder(QString filename, qreal framesPerSecond, QMediaFormat format)
     session.setVideoFrameInput(&videoInput);
 
     connect(&videoInput, &QVideoFrameInput::readyToSendVideoFrame, this, &Recorder::setVideoFrameInputReady);
-
-    //recorder.record();
-}
-
-
-
-Recorder::~Recorder()
-{
-    //recorder.stop();
 }
 
 
@@ -48,18 +39,17 @@ void Recorder::stopRecording()
 void Recorder::setVideoFrameInputReady()
 {
     videoFrameInputReady = true;
-    //qDebug() << "Ready";
 }
 
 
 
-void Recorder::sendVideoFrame(const QImage& image)
+void Recorder::sendVideoFrame(QImage* image)
 {
-    QVideoFrame frame(image.convertToFormat(QImage::Format_RGB888));
+    QVideoFrame frame(image->convertToFormat(QImage::Format_RGB888));
 
     frame.setStreamFrameRate(fps);
-    qint64 start = static_cast<qint64>(frameNumber * 1000000 / fps);
-    qint64 end = static_cast<qint64>((frameNumber + 1) * 1000000 / fps);
+    qint64 start = static_cast<qint64>(frameNumber * 1'000'000.0 / fps);
+    qint64 end = static_cast<qint64>((frameNumber + 1) * 1'000'000.0 / fps);
     frame.setStartTime(start);
     frame.setEndTime(end);
 
@@ -68,11 +58,8 @@ void Recorder::sendVideoFrame(const QImage& image)
     {
         frameNumber++;
         emit frameRecorded(frameNumber);
-        //qDebug() << frameNumber;
     }
-    else
-    {
+    else {
         videoFrameInputReady = false;
-        //qDebug() << "Busy";
     }
 }

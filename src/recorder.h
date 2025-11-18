@@ -1,12 +1,16 @@
 #ifndef RECORDER_H
 #define RECORDER_H
 
+
+
 #include <QObject>
 #include <QVideoFrameInput>
 #include <QMediaCaptureSession>
 #include <QMediaRecorder>
 #include <QMediaFormat>
 #include <QImage>
+
+
 
 class Recorder : public QObject
 {
@@ -18,12 +22,13 @@ public:
     QVideoFrameInput videoInput;
 
     Recorder(QString filename, qreal framesPerSecond, QMediaFormat format);
-    ~Recorder();
 
     void startRecording();
     void stopRecording();
     bool isRecording(){ return recorder.recorderState() == QMediaRecorder::RecordingState && videoFrameInputReady; }
-    void sendVideoFrame(const QImage &image);
+
+public slots:
+    void sendVideoFrame(QImage* image);
 
 signals:
     void frameRecorded(int number);
