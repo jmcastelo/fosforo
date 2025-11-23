@@ -77,6 +77,7 @@ signals:
     void connectTo();
     void remove(QUuid id);
     void equalizeBlendFactors(QUuid id);
+    void copy(QUuid id);
 
 public slots:
     void recreate();

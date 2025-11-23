@@ -36,7 +36,8 @@ public:
     void addAvailableOperation(int index, QUuid& id);
 
     void addOperation(QUuid id, ImageOperation* operation, QPointF position);
-    void addSeed(QUuid id, Seed* operation);
+
+    void addSeed(QUuid id, Seed* seed);
 
     ImageOperation* createReplaceOp(QUuid id, ImageOperation* oldOperation, int index);
 

@@ -106,7 +106,8 @@ public slots:
     //void removeSelectedNodes();
 
 
-//signals:
+signals:
+    void selectedNodesChanged(QList<QUuid> selNodeIds);
     /*void singleNodeSelected(Node*);
     void operationNodeSelected(QUuid id);
     void multipleNodesSelected();
@@ -150,8 +151,14 @@ private:
     QAction* mAddSeedAction;
     QAction* mBuildNewOpAction;
     QList<QAction*> mAvailOpsActions;
+    QAction* mPasteNodesAction;
+
+    QMap<QUuid, ImageOperation*> mCopiedOperations;
+    QMap<QUuid, Seed*> mCopiedSeeds;
+    QMap<QUuid, QPointF> mCopiedNodePositions;
 
     void populateAvailOpsMenu();
+    void enablePasteAction();
 
     //void copyNodes(bool connectionA);
     bool pointIntersectsItem(QPointF point);
@@ -162,9 +169,11 @@ private:
     Node* getNode(QUuid id);
     Edge* getEdge(QUuid srcId, QUuid dstId);
 
+    void pasteNodes();
+
 private slots:
     void onActionTriggered(QAction* action);
-    //void newSelectedNodes();
+    void newSelectedNodes();
     //void addOperationNodeUnderCursor(QAction* action);
     // void addSeedNode();
     //void pasteCopiedNodes();
@@ -175,6 +184,7 @@ private slots:
     void removeNode(QUuid id);
     void removeEdge(QUuid srcId, QUuid dstId);
     void centerNodeBetween(QUuid srcId, QUuid dstId, QUuid opId);
+    void setCopiedNodes(QMap<QUuid, ImageOperation*> opsMap, QMap<QUuid, Seed*> seedsMap);
 };
 
 

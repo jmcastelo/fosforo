@@ -479,11 +479,14 @@ void MidiLinkManager::connectMidiSignals(QUuid id)
 
 void MidiLinkManager::disconnectMidiSignals(QUuid id)
 {
-    disconnect(mMidiSignalsMap.value(id), QOverload<Number<float>*>::of(&MidiSignals::linkWait), this, nullptr);
-    disconnect(mMidiSignalsMap.value(id), QOverload<Number<int>*>::of(&MidiSignals::linkWait), this, nullptr);
-    disconnect(mMidiSignalsMap.value(id), QOverload<Number<unsigned int>*>::of(&MidiSignals::linkWait), this, nullptr);
+    if (mMidiSignalsMap.contains(id))
+    {
+        disconnect(mMidiSignalsMap.value(id), QOverload<Number<float>*>::of(&MidiSignals::linkWait), this, nullptr);
+        disconnect(mMidiSignalsMap.value(id), QOverload<Number<int>*>::of(&MidiSignals::linkWait), this, nullptr);
+        disconnect(mMidiSignalsMap.value(id), QOverload<Number<unsigned int>*>::of(&MidiSignals::linkWait), this, nullptr);
 
-    disconnect(mMidiSignalsMap.value(id), QOverload<Number<float>*>::of(&MidiSignals::linkBreak), this, nullptr);
-    disconnect(mMidiSignalsMap.value(id), QOverload<Number<int>*>::of(&MidiSignals::linkBreak), this, nullptr);
-    disconnect(mMidiSignalsMap.value(id), QOverload<Number<unsigned int>*>::of(&MidiSignals::linkBreak), this, nullptr);
+        disconnect(mMidiSignalsMap.value(id), QOverload<Number<float>*>::of(&MidiSignals::linkBreak), this, nullptr);
+        disconnect(mMidiSignalsMap.value(id), QOverload<Number<int>*>::of(&MidiSignals::linkBreak), this, nullptr);
+        disconnect(mMidiSignalsMap.value(id), QOverload<Number<unsigned int>*>::of(&MidiSignals::linkBreak), this, nullptr);
+    }
 }

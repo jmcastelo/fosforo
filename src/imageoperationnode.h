@@ -17,9 +17,11 @@ class ImageOperationNode
 public:
     ImageOperationNode(QUuid id);
     ImageOperationNode(QUuid id, ImageOperation* operation);
+    ImageOperationNode(const ImageOperationNode& opNode);
     ~ImageOperationNode();
 
     QUuid id() const;
+    void setId(QUuid newId);
 
     ImageOperation* operation() const;
 

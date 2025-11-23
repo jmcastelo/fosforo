@@ -28,6 +28,8 @@ signals:
     void seedDrawn();
     void connectTo();
     void remove(QUuid id);
+    void copy(QUuid id);
+
 
 public slots:
     void toggleOutputAction(QUuid id);

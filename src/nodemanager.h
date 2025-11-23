@@ -58,10 +58,9 @@ public:
     void connectOperations(QUuid srcId, QUuid dstId, float blendFactor);
 
     void connectOperations(QMap<QUuid, QMap<QUuid, InputData*>> conections);
-
-    void connectCopiedOperationsA(QUuid srcId0, QUuid dstId0, QUuid srcId1, QUuid dstId1);
-    void connectCopiedOperationsB(QUuid srcId0, QUuid dstId0, QUuid srcId1, QUuid dstId1);
     void disconnectOperations(QUuid srcId, QUuid dstId);
+
+    void connectPastedNodes(QMap<QUuid, QUuid> isomorphism);
 
     void setOperationInputType(QUuid srcId, QUuid dstId, InputType type);
 
@@ -73,14 +72,14 @@ public:
     ImageOperation* getOperation(QUuid id);
     // QPair<QUuid, OperationWidget*> addNewOperation();
     // QUuid addOperation(QString operationName);
-    QUuid copyOperation(QUuid srcId);
+
     // void setOperation(QUuid id, QString operationName);
 
     // void enableOperation(QUuid id, bool enabled);
     // bool isOperationEnabled(QUuid id);
 
     // QPair<QUuid, SeedWidget*> addSeed();
-    QUuid copySeed(QUuid srcId);
+
 
     int getSeedType(QUuid id);
     void setSeedType(QUuid id, int set);
@@ -94,7 +93,7 @@ public:
     GLuint getOUtputFBO() { return outputFBO; }
     // GLuint outputTextureID() { return *mOutputTextureId; }
 
-    void pasteOperations();
+    // void pasteOperations();
 
     void swapTwoOperations(QUuid id1, QUuid id2);
 
@@ -112,12 +111,15 @@ signals:
     void outputNodeChanged(QUuid id);
     void outputFBOChanged(GLuint fbo);
     void outputTextureChanged(GLuint* pTexId);
+
     void sortedOpsDataChanged(QList<QPair<QUuid, QString>> sortedData);
     void sortedOperationsChanged(QList<ImageOperation*> operations);
+
     void nodesConnected(QUuid srcId, QUuid dstId, InputType type, EdgeWidget* widget);
     void nodeRemoved(QUuid id);
     void nodesDisconnected(QUuid srcId, QUuid dstId);
     void nodeInserted(QUuid srcId, QUuid dstId, QUuid opId);
+    void nodesCopied(QMap<QUuid, ImageOperation*> opsMap, QMap<QUuid, Seed*> seedsMap);
 
     void midiSignalsCreated(QUuid id, MidiSignals* midisSignals);
     void midiSignalsRemoved(QUuid id);
@@ -129,22 +131,32 @@ signals:
 public slots:
     void setOutput(QUuid id);
     void onTexturesChanged();
+    void setSelectedNodeIds(QList<QUuid> selNodeIds);
 
 private:
     // RenderManager* mRenderManager;
     Factory* mFactory;
 
     QMap<QUuid, ImageOperationNode*> mOperationNodesMap;
-    QMap<QUuid, ImageOperationNode*> copiedOperationNodes[2];
-
     QMap<QUuid, Seed*> mSeedsMap;
-    QMap<QUuid, Seed*> copiedSeeds[2];
+
+    QMap<QUuid, ImageOperation*> mCopiedOperations;
+    QMap<QUuid, Seed*> mCopiedSeeds;
+    QMap<QUuid, QMap<QUuid, InputData*>> mCopiedInputData;
 
     QUuid connSrcId;
 
     GLuint outputFBO;
     QUuid mOutputId;
     GLuint* pOutputTextureId = nullptr;
+
+    QList<QUuid> mSelectedNodeIds;
+
+    void copyNode(QUuid id);
+    void copyOperation(QUuid srcId);
+    void copySeed(QUuid srcId);
+
+    // void connectCopiedOperations(QUuid srcId0, QUuid srcId1, QUuid dstId1, InputData* inData);
 
 private slots:
     void addOperationNode(QUuid id, ImageOperation* operation);
@@ -158,6 +170,9 @@ private slots:
 
     void removeOperationNode(QUuid id);
     void removeSeedNode(QUuid id);
+
+    void copySelectedNodes(QUuid id);
+    void removeSelectedNodes(QUuid id);
 
     void removeAllNodes();
 

@@ -89,6 +89,12 @@ OperationWidget::OperationWidget(QUuid id, ImageOperation* operation, bool midiE
 
     headerToolBar->addSeparator();
 
+    // Copy action
+
+    headerToolBar->addAction(QIcon(QPixmap(":/icons/edit-copy.png")), "Copy", this, [=, this]() {
+        emit copy(mId);
+    });
+
     // Delete action
 
     headerToolBar->addAction(QIcon(QPixmap(":/icons/dialog-close.png")), "Delete", this, [=, this]() {

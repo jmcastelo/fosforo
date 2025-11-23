@@ -261,39 +261,36 @@ void NodeManager::connectOperations(QMap<QUuid, QMap<QUuid, InputData*>> connect
 
 
 
-void NodeManager::connectCopiedOperationsA(QUuid srcId0, QUuid dstId0, QUuid srcId1, QUuid dstId1)
+/*void NodeManager::connectCopiedOperations(QUuid srcId0, QUuid srcId1, QUuid dstId1, InputData* inData)
 {
     if (mOperationNodesMap.contains(srcId0))
     {
-        float factor = mOperationNodesMap.value(dstId0)->blendFactor(srcId0)->value();
-
-        copiedOperationNodes[0].value(dstId1)->addInput(copiedOperationNodes[0].value(srcId1), new InputData(InputType::Normal, copiedOperationNodes[0].value(srcId1)->pOutTextureId(), factor));
-        copiedOperationNodes[0].value(srcId1)->addOutput(copiedOperationNodes[0].value(dstId1));
+        mCopiedOperationNodes.value(dstId1)->addInput(mCopiedOperationNodes.value(srcId1), new InputData(inData->type(), mCopiedOperationNodes.value(srcId1)->pOutTextureId(), inData->blendFactor()->value()));
+        mCopiedOperationNodes.value(srcId1)->addOutput(mCopiedOperationNodes.value(dstId1));
     }
     else if (mSeedsMap.contains(srcId0))
     {
-        float factor = mOperationNodesMap.value(dstId0)->blendFactor(srcId0)->value();
-        copiedOperationNodes[0].value(dstId1)->addSeedInput(srcId1, new InputData(InputType::Seed, mSeedsMap.value(srcId0)->pOutTextureId(), factor));
+        mCopiedOperationNodes.value(dstId1)->addSeedInput(srcId1, new InputData(inData->type(), mSeedsMap.value(srcId0)->pOutTextureId(), inData->blendFactor()->value()));
     }
-}
+}*/
 
 
 
-void NodeManager::connectCopiedOperationsB(QUuid srcId0, QUuid dstId0, QUuid srcId1, QUuid dstId1)
+/*void NodeManager::connectCopiedOperationsB(QUuid srcId0, QUuid dstId0, QUuid srcId1, QUuid dstId1)
 {
-    if (copiedOperationNodes[1].contains(srcId0))
+    if (mCopiedOperationNodes[1].contains(srcId0))
     {
-        float factor = copiedOperationNodes[1].value(dstId0)->blendFactor(srcId0)->value();
+        float factor = mCopiedOperationNodes[1].value(dstId0)->blendFactor(srcId0)->value();
 
-        copiedOperationNodes[0].value(dstId1)->addInput(copiedOperationNodes[0].value(srcId1), new InputData(InputType::Normal, copiedOperationNodes[0].value(srcId1)->pOutTextureId(), factor));
-        copiedOperationNodes[0].value(srcId1)->addOutput(copiedOperationNodes[0].value(dstId1));
+        mCopiedOperationNodes[0].value(dstId1)->addInput(mCopiedOperationNodes[0].value(srcId1), new InputData(InputType::Normal, mCopiedOperationNodes[0].value(srcId1)->pOutTextureId(), factor));
+        mCopiedOperationNodes[0].value(srcId1)->addOutput(mCopiedOperationNodes[0].value(dstId1));
     }
-    else if (copiedSeeds[1].contains(srcId0))
+    else if (mCopiedSeeds[1].contains(srcId0))
     {
-        float factor = copiedOperationNodes[1].value(dstId0)->blendFactor(srcId0)->value();
-        copiedOperationNodes[0].value(dstId1)->addSeedInput(srcId1, new InputData(InputType::Seed, copiedSeeds[0].value(srcId1)->pOutTextureId(), factor));
+        float factor = mCopiedOperationNodes[1].value(dstId0)->blendFactor(srcId0)->value();
+        mCopiedOperationNodes[0].value(dstId1)->addSeedInput(srcId1, new InputData(InputType::Seed, mCopiedSeeds[0].value(srcId1)->pOutTextureId(), factor));
     }
-}
+}*/
 
 
 
@@ -314,6 +311,39 @@ void NodeManager::disconnectOperations(QUuid srcId, QUuid dstId)
 
 
 
+void NodeManager::connectPastedNodes(QMap<QUuid, QUuid> isomorphism)
+{
+    for (auto [dstId0, dstId1] : isomorphism.asKeyValueRange())
+    {
+        auto dstNode1 = mOperationNodesMap.value(dstId1);
+
+        for (auto [srcId0, inputData] : mCopiedInputData.value(dstId0).asKeyValueRange())
+        {
+            if (mCopiedOperations.contains(srcId0))
+            {
+                QUuid srcId1 = isomorphism.value(srcId0);
+                auto srcNode1 = mOperationNodesMap.value(srcId1);
+                InputData* newInputData = new InputData(inputData->type(), srcNode1->pOutTextureId(), inputData->blendFactor()->value());
+
+                dstNode1->addInput(srcNode1, newInputData);
+                srcNode1->addOutput(dstNode1);
+                emit nodesConnected(srcId1, dstId1, inputData->type(), addEdgeWidget(srcId1, dstId1, newInputData->blendFactor()));
+            }
+            else if (mCopiedSeeds.contains(srcId0))
+            {
+                QUuid srcId1 = isomorphism.value(srcId0);
+                InputData* newInputData = new InputData(inputData->type(), mSeedsMap.value(srcId1)->pOutTextureId(), inputData->blendFactor()->value());
+                dstNode1->addSeedInput(srcId1, newInputData);
+                emit nodesConnected(srcId1, dstId1, inputData->type(), addEdgeWidget(srcId1, dstId1, newInputData->blendFactor()));
+            }
+        }
+    }
+
+    sortOperations();
+}
+
+
+
 void NodeManager::setOperationInputType(QUuid srcId, QUuid dstId, InputType type)
 {
     if (mOperationNodesMap.contains(srcId))
@@ -321,27 +351,29 @@ void NodeManager::setOperationInputType(QUuid srcId, QUuid dstId, InputType type
         mOperationNodesMap.value(dstId)->setInputType(srcId, type);
         sortOperations();
     }
-    else if (copiedOperationNodes[0].contains(srcId))
+    /*else if (mCopiedOperationNodes.contains(srcId))
     {
-        copiedOperationNodes[0].value(dstId)->setInputType(srcId, type);
-    }
+        mCopiedOperationNodes.value(dstId)->setInputType(srcId, type);
+    }*/
 }
 
 
 
-void NodeManager::pasteOperations()
+/*void NodeManager::pasteOperations()
 {
-    mOperationNodesMap.insert(copiedOperationNodes[0]);
-    mSeedsMap.insert(copiedSeeds[0]);
+    foreach (auto copiedNode, mCopiedOperationNodes) {
+        ImageOperationNode* node = new ImageOperationNode(*copiedNode);
+        mOperationNodesMap.insert(node->id(), node);
+    }
 
-    copiedOperationNodes[1] = copiedOperationNodes[0];
-    copiedSeeds[1] = copiedSeeds[0];
-
-    copiedOperationNodes[0].clear();
-    copiedSeeds[0].clear();
+    foreach (auto copiedSeed, mCopiedSeeds) {
+        Seed* seed = new Seed(*copiedSeed);
+        QUuid id = QUuid::createUuid();
+        mCopiedSeeds.insert(id, seed);
+    }
 
     sortOperations();
-}
+}*/
 
 
 
@@ -414,19 +446,16 @@ ImageOperation* NodeManager::getOperation(QUuid id)
 
 
 
-QUuid NodeManager::copyOperation(QUuid srcId)
+void NodeManager::copyOperation(QUuid srcId)
 {
-    //ImageOperation* operation = operationNodes.value(srcId)->operation->clone();
-    //operation->setParameters();
+    ImageOperation *op = new ImageOperation(*mOperationNodesMap.value(srcId)->operation());
+    mCopiedOperations.insert(srcId, op);
 
-    ImageOperation* operation = new ImageOperation(*mOperationNodesMap.value(srcId)->operation());
-
-    QUuid id = QUuid::createUuid();
-
-    ImageOperationNode *node = new ImageOperationNode(id, operation);
-    copiedOperationNodes[0].insert(id, node);
-
-    return id;
+    QMap<QUuid, InputData*> inputData;
+    for (auto [id, inData] : mOperationNodesMap.value(srcId)->inputs().asKeyValueRange()) {
+        inputData.insert(id, new InputData(inData->type(), inData->pTextureId(), inData->blendFactor()->value()));
+    }
+    mCopiedInputData.insert(srcId, inputData);
 }
 
 
@@ -449,20 +478,23 @@ QUuid NodeManager::copyOperation(QUuid srcId)
 
 void NodeManager::removeOperationNode(QUuid id)
 {
-    // Delete operation
+    if (mOperationNodesMap.contains(id))
+    {
+        // Delete operation
 
-    mFactory->deleteOperation(mOperationNodesMap.value(id)->operation());
+        mFactory->deleteOperation(mOperationNodesMap.value(id)->operation());
 
-    // Delete node
+        // Delete node
 
-    delete mOperationNodesMap.value(id);
-    mOperationNodesMap.remove(id);
+        delete mOperationNodesMap.value(id);
+        mOperationNodesMap.remove(id);
 
-    if (id == mOutputId) {
-        setOutput(QUuid());
+        if (id == mOutputId) {
+            setOutput(QUuid());
+        }
+
+        sortOperations();
     }
-
-    sortOperations();
 }
 
 
@@ -592,6 +624,9 @@ void NodeManager::connectOperationWidget(OperationWidget* widget)
     connect(widget, &OperationWidget::remove, this, &NodeManager::nodeRemoved);
     connect(widget, &OperationWidget::remove, this, &NodeManager::midiSignalsRemoved);
     connect(widget, &OperationWidget::remove, this, &NodeManager::removeOperationNode);
+    connect(widget, &OperationWidget::remove, this, &NodeManager::removeSelectedNodes);
+
+    connect(widget, &OperationWidget::copy, this, &NodeManager::copySelectedNodes);
 
     connect(widget, &OperationWidget::outputChanged, this, &NodeManager::setOutput);
     connect(this, &NodeManager::outputNodeChanged, widget, &OperationWidget::toggleOutputAction);
@@ -600,7 +635,6 @@ void NodeManager::connectOperationWidget(OperationWidget* widget)
         if (connSrcId.isNull())
         {
             // Set id of source node
-
             connSrcId = widget->id();
         }
         else
@@ -786,6 +820,9 @@ void NodeManager::connectSeedWidget(QUuid id, SeedWidget* widget)
 
     connect(widget, &SeedWidget::remove, this, &NodeManager::nodeRemoved);
     connect(widget, &SeedWidget::remove, this, &NodeManager::removeSeedNode);
+    connect(widget, &SeedWidget::remove, this, &NodeManager::removeSelectedNodes);
+
+    connect(widget, &SeedWidget::copy, this, &NodeManager::copySelectedNodes);
 
     connect(widget, &SeedWidget::outputChanged, this, &NodeManager::setOutput);
 
@@ -875,14 +912,14 @@ void NodeManager::connectSeedWidget(QUuid id, SeedWidget* widget)
 
 
 
-QUuid NodeManager::copySeed(QUuid srcId)
+void NodeManager::copySeed(QUuid srcId)
 {
-    Seed* seed = new Seed(*mSeedsMap.value(srcId));
+    // QUuid id = QUuid::createUuid();
+    Seed* seed = mSeedsMap.value(srcId);
+    Seed* newSeed = new Seed(seed->type(), seed->fixed(), seed->imageFilename());
 
-    QUuid id = QUuid::createUuid();
-    copiedSeeds[0].insert(id, seed);
-
-    return id;
+    mCopiedSeeds.insert(srcId, newSeed);
+    // mIsomorphism.insert(srcId, id);
 }
 
 
@@ -950,6 +987,59 @@ void NodeManager::setSeedFixed(QUuid id, bool fixed)
 void NodeManager::onTexturesChanged()
 {
     setOutput(mOutputId);
+}
+
+
+
+void NodeManager::setSelectedNodeIds(QList<QUuid> selNodeIds)
+{
+    mSelectedNodeIds = selNodeIds;
+}
+
+
+
+void NodeManager::copyNode(QUuid id)
+{
+    if (mOperationNodesMap.contains(id)) {
+        copyOperation(id);
+    }
+    else if (mSeedsMap.contains(id)) {
+        copySeed(id);
+    }
+}
+
+
+void NodeManager::copySelectedNodes(QUuid id)
+{
+    mCopiedOperations.clear();
+    mCopiedSeeds.clear();
+    mCopiedInputData.clear();
+
+    if (!mSelectedNodeIds.contains(id) || (mSelectedNodeIds.contains(id) && mSelectedNodeIds.size() == 1)) {
+        copyNode(id);
+    }
+    else
+    {
+        foreach (QUuid selId, mSelectedNodeIds) {
+            copyNode(selId);
+        }
+    }
+
+    emit nodesCopied(mCopiedOperations, mCopiedSeeds);
+}
+
+
+
+void NodeManager::removeSelectedNodes(QUuid id)
+{
+    foreach (QUuid selId, mSelectedNodeIds) {
+        if (selId != id) {
+            emit nodeRemoved(selId);
+            emit midiSignalsRemoved(selId);
+            removeOperationNode(selId);
+            removeSeedNode(selId);
+        }
+    }
 }
 
 

@@ -47,7 +47,7 @@ Node::Node(QUuid id, QWidget *widget, QGraphicsItem* parent) :
 {
     setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges);
     setAcceptedMouseButtons(Qt::AllButtons);
-    setCacheMode(DeviceCoordinateCache);
+    // setCacheMode(DeviceCoordinateCache);
 
     setZValue(-1);
 

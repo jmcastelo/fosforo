@@ -32,8 +32,9 @@ ApplicationController::ApplicationController()
     plotsWidget->setVisible(false);
 
     graphWidget = new GraphWidget(factory, nodeManager);
-    graphWidget->setMinimumSize(0, 0);
     graphWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    connect(graphWidget, &GraphWidget::selectedNodesChanged, nodeManager, &NodeManager::setSelectedNodeIds);
 
     configParser = new ConfigurationParser(factory, nodeManager, renderManager, graphWidget, &midiLinkManager);
 

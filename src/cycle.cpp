@@ -60,7 +60,7 @@ Cycle::Cycle(QList<Node*> nodes, QGraphicsItem *parent) :
     }
 
     setAcceptedMouseButtons(Qt::NoButton);
-    setCacheMode(DeviceCoordinateCache);
+    // setCacheMode(DeviceCoordinateCache);
     setZValue(-3);
 }
 

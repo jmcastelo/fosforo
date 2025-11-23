@@ -86,6 +86,12 @@ SeedWidget::SeedWidget(QUuid id, Seed* seed, VideoInputControl* videoInCtrl, QWi
 
     headerToolBar->addSeparator();
 
+    // Copy action
+
+    headerToolBar->addAction(QIcon(QPixmap(":/icons/edit-copy.png")), "Copy", this, [=, this]() {
+        emit copy(mId);
+    });
+
     // Remove action
 
     headerToolBar->addAction(QIcon(QPixmap(":/icons/dialog-close.png")), "Delete", this, [=, this]() {

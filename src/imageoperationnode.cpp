@@ -18,6 +18,14 @@ ImageOperationNode::ImageOperationNode(QUuid id, ImageOperation* operation)
 
 
 
+ImageOperationNode::ImageOperationNode(const ImageOperationNode& opNode)
+{
+    mId = QUuid::createUuid();
+    mOperation = new ImageOperation(*opNode.operation());
+}
+
+
+
 ImageOperationNode::~ImageOperationNode()
 {
     foreach (ImageOperationNode* input, mInputNodes) {
@@ -40,6 +48,13 @@ ImageOperationNode::~ImageOperationNode()
 QUuid ImageOperationNode::id() const
 {
     return mId;
+}
+
+
+
+void ImageOperationNode::setId(QUuid newId)
+{
+    mId = newId;
 }
 
 

@@ -29,7 +29,6 @@
 #include "cycle.h"
 #include "cyclesearch.h"
 
-#include <cmath>
 #include <QKeyEvent>
 #include <QRandomGenerator>
 #include <QMenu>
@@ -40,7 +39,7 @@
 
 
 GraphWidget::GraphWidget(Factory *factory, NodeManager* nodeManager, QWidget *parent) :
-    QGraphicsView(parent),
+    QGraphicsView { parent },
     mFactory { factory },
     mNodeManager { nodeManager }
 {
@@ -52,7 +51,7 @@ GraphWidget::GraphWidget(Factory *factory, NodeManager* nodeManager, QWidget *pa
     scene->setSceneRect(0.0, 0.0, 10'000.0, 10'000.0);
     setScene(scene);
 
-    //connect(scene, &QGraphicsScene::selectionChanged, this, &GraphWidget::newSelectedNodes);
+    connect(scene, &QGraphicsScene::selectionChanged, this, &GraphWidget::newSelectedNodes);
 
     setDragMode(RubberBandDrag);
     setRubberBandSelectionMode(Qt::ContainsItemShape);
@@ -61,7 +60,7 @@ GraphWidget::GraphWidget(Factory *factory, NodeManager* nodeManager, QWidget *pa
 
     setCacheMode(CacheBackground);
     // setViewportUpdateMode(BoundingRectViewportUpdate);
-    // setViewportUpdateMode(FullViewportUpdate);
+    setViewportUpdateMode(FullViewportUpdate);
     // setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     setRenderHints(QPainter::Antialiasing);
     setTransformationAnchor(AnchorUnderMouse);
@@ -90,6 +89,8 @@ GraphWidget::GraphWidget(Factory *factory, NodeManager* nodeManager, QWidget *pa
     mBuildNewOpAction = new QAction("Build new operation");
     mMainMenu->addActions({mBuildNewOpAction});
 
+    mPasteNodesAction = new QAction("Paste nodes");
+
     // Connections
 
     connect(mFactory, QOverload<QUuid, OperationWidget*>::of(&Factory::newOpWidgetCreated), this, &GraphWidget::addNewNode);
@@ -101,6 +102,7 @@ GraphWidget::GraphWidget(Factory *factory, NodeManager* nodeManager, QWidget *pa
     connect(mNodeManager, &NodeManager::nodeRemoved, this, &GraphWidget::removeNode);
     connect(mNodeManager, &NodeManager::nodesDisconnected, this, &GraphWidget::removeEdge);
     connect(mNodeManager, &NodeManager::nodeInserted, this, &GraphWidget::centerNodeBetween);
+    connect(mNodeManager, &NodeManager::nodesCopied, this, &GraphWidget::setCopiedNodes);
 
     connect(mMainMenu, &QMenu::triggered, this, &GraphWidget::onActionTriggered);
 }
@@ -136,6 +138,18 @@ void GraphWidget::populateAvailOpsMenu()
     }
 
     mAvailOpsMenu->addActions(mAvailOpsActions);
+}
+
+
+
+void GraphWidget::enablePasteAction()
+{
+    if (!mCopiedOperations.isEmpty() || !mCopiedSeeds.isEmpty()) {
+        mMainMenu->addAction(mPasteNodesAction);
+    }
+    else {
+        mMainMenu->removeAction(mPasteNodesAction);
+    }
 }
 
 
@@ -190,6 +204,10 @@ void GraphWidget::onActionTriggered(QAction* action)
     {
         int index = mAvailOpsActions.indexOf(action);
         mFactory->addAvailableOperation(index);
+    }
+    else if (action == mPasteNodesAction)
+    {
+        pasteNodes();
     }
 }
 
@@ -258,6 +276,20 @@ void GraphWidget::onActionTriggered(QAction* action)
         emit noOperationNodesSelected();
 }*/
 
+void GraphWidget::newSelectedNodes()
+{
+    QList<QUuid> selNodeIds;
+
+    const QList<QGraphicsItem*> items = scene()->selectedItems();
+
+    for (QGraphicsItem* item : items) {
+        if (Node* node = qgraphicsitem_cast<Node*>(item)) {
+            selNodeIds.append(node->id());
+        }
+    }
+
+    emit selectedNodesChanged(selNodeIds);
+}
 
 
 /*void GraphWidget::addOperationNodeUnderCursor(QAction *action)
@@ -913,6 +945,57 @@ void GraphWidget::centerNodeBetween(QUuid srcId, QUuid dstId, QUuid opId)
 
 
 
+void GraphWidget::setCopiedNodes(QMap<QUuid, ImageOperation*> opsMap, QMap<QUuid, Seed*> seedsMap)
+{
+    mCopiedOperations = opsMap;
+    mCopiedSeeds = seedsMap;
+
+    mCopiedNodePositions.clear();
+
+    QPointF center;
+    foreach (QUuid id, mCopiedOperations.keys()) {
+        center += nodePosition(id);
+    }
+    foreach (QUuid id, mCopiedSeeds.keys()) {
+        center += nodePosition(id);
+    }
+    center /= (mCopiedOperations.size() + mCopiedSeeds.size());
+
+    foreach (QUuid id, mCopiedOperations.keys()) {
+        mCopiedNodePositions.insert(id, nodePosition(id)- center);
+    }
+    foreach (QUuid id, mCopiedSeeds.keys()) {
+        mCopiedNodePositions.insert(id, nodePosition(id) - center);
+    }
+}
+
+
+
+void GraphWidget::pasteNodes()
+{
+    QMap<QUuid, QUuid> isomorphism;
+
+    for (auto [id, operation] : mCopiedOperations.asKeyValueRange())
+    {
+        QUuid newId = QUuid::createUuid();
+        ImageOperation* newOperation = new ImageOperation(*operation);
+        mFactory->addOperation(newId, newOperation, mClickPoint + mCopiedNodePositions.value(id));
+        isomorphism.insert(id, newId);
+    }
+    for (auto [id, seed] : mCopiedSeeds.asKeyValueRange())
+    {
+        QUuid newId = QUuid::createUuid();
+        Seed* newSeed = new Seed(seed->type(), seed->fixed(), seed->imageFilename());
+        mFactory->addSeed(newId, newSeed);
+        newSeed->draw();
+        setNodePosition(newId, mClickPoint + mCopiedNodePositions.value(id));
+        isomorphism.insert(id, newId);
+    }
+
+    mNodeManager->connectPastedNodes(isomorphism);
+}
+
+
 void GraphWidget::clearScene()
 {
     scene()->clear();
@@ -1100,6 +1183,7 @@ void GraphWidget::contextMenuEvent(QContextMenuEvent *event)
         //menu.exec(event->globalPos());
         mClickPoint = mapToScene(mapFromGlobal(event->globalPos()));
         populateAvailOpsMenu();
+        enablePasteAction();
         mMainMenu->exec(event->globalPos());
     }
     else
@@ -1139,7 +1223,7 @@ bool GraphWidget::pointIntersectsItem(QPointF point)
 
 void GraphWidget::wheelEvent(QWheelEvent *event)
 {
-    qreal factor = pow(2.0, -event->angleDelta().y() / 880.0);
+    qreal factor = qPow(2.0, -event->angleDelta().y() / 2000.0);
     scaleFactor = transform().scale(factor, factor).mapRect(QRectF(0, 0, 1, 1)).width();
 
     scale(factor, factor);
