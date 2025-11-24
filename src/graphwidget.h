@@ -90,12 +90,11 @@ public:
     //void loadOperationNode(QUuid id, QString name, QPointF position);
     //void connectNodes(QMap<QUuid, QMap<QUuid, InputData*>> connections);
 
-    void markNodes(QList<QUuid> ids);
-
     //void closeWidgets();
 
 public slots:
     void clearScene();
+    void markNodes(QList<QUuid> ids);
     //void drawSelectedSeeds();
     //void enableSelectedOperations();
     //void disableSelectedOperations();

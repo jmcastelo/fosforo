@@ -53,9 +53,11 @@ ApplicationController::ApplicationController()
 
     midiControl.setInputPorts();
 
-    controlWidget = new ControlWidget(graphWidget, renderManager, midiListWidget, plotsWidget);
+    controlWidget = new ControlWidget(graphWidget, renderManager, midiListWidget);
     controlWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     controlWidget->setMinimumSize(0, 0);
+
+    connect(graphWidget, &GraphWidget::selectedNodesChanged, controlWidget, &ControlWidget::selectOpsTableRows);
 
     // connect(iterationTimer, &TimerThread::timeout, this, &ApplicationController::beat);
     // connect(iterationTimer, &TimerThread::stepTimeMeasured, controlWidget, &ControlWidget::updateIterationMetricsLabels);
@@ -120,9 +122,11 @@ ApplicationController::ApplicationController()
     connect(controlWidget, &ControlWidget::takeScreenshot, renderManager, &RenderManager::takeScreenshot);
     connect(controlWidget, &ControlWidget::imageSizeChanged, this, &ApplicationController::setSize);
     connect(controlWidget, &ControlWidget::showMidiWidget, this, &ApplicationController::showMidiWidget);
+    connect(controlWidget, &ControlWidget::showPlotsWidget, plotsWidget, &QWidget::show);
     connect(controlWidget, &ControlWidget::overlayToggled, overlay, &Overlay::enable);
     connect(controlWidget, &ControlWidget::readConfig, configParser, &ConfigurationParser::read);
     connect(controlWidget, &ControlWidget::writeConfig, configParser, &ConfigurationParser::write);
+    connect(controlWidget, &ControlWidget::nodesSelected, graphWidget, &GraphWidget::markNodes);
 
     connect(configParser, &ConfigurationParser::newImageSizeRead, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
     connect(configParser, &ConfigurationParser::newImageSizeRead, this, &ApplicationController::setSize);

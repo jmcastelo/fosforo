@@ -31,11 +31,9 @@
 
 
 
-ControlWidget::ControlWidget(GraphWidget* graphWidget, RenderManager* renderManager, MidiListWidget *midiWidget, PlotsWidget* plotsWidget, QWidget* parent) :
-    QWidget(parent),
-    mGraphWidget { graphWidget },
-    mRenderManager { renderManager },
-    mPlotsWidget { plotsWidget }
+ControlWidget::ControlWidget(GraphWidget* graphWidget, RenderManager* renderManager, MidiListWidget *midiWidget, QWidget* parent) :
+    QWidget { parent },
+    mRenderManager { renderManager }
 {
     // Scroll area
 
@@ -112,7 +110,7 @@ ControlWidget::ControlWidget(GraphWidget* graphWidget, RenderManager* renderMana
     iterationFPSLabel = new QLabel("FPS: 0");
     timePerIterationLabel = new QLabel("mSPF: 0");
 
-    statusBar->insertWidget(0, iterationNumberLabel, 6);
+    statusBar->insertWidget(0, iterationNumberLabel, 1);
     statusBar->insertWidget(1, iterationFPSLabel, 1);
     statusBar->insertWidget(2, timePerIterationLabel, 1);
 
@@ -211,7 +209,6 @@ void ControlWidget::constructSystemToolBar()
     // systemToolBar->addSeparator();
 
     QAction* plotsAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/development-gtk.png")), "RGB Plot");
-    plotsAction->setCheckable(true);
 
     // systemToolBar->addSeparator();
 
@@ -223,7 +220,6 @@ void ControlWidget::constructSystemToolBar()
     saveConfigAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/document-save.png")), "Save configuration");
 
     QAction* optionsAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/applications-system.png")), "Options");
-    optionsAction->setCheckable(true);
 
     // systemToolBar->addSeparator();
 
@@ -233,9 +229,8 @@ void ControlWidget::constructSystemToolBar()
     connect(resetAction, &QAction::triggered, mRenderManager, &RenderManager::reset);
     connect(screenshotAction, &QAction::triggered, this, &ControlWidget::setScreenshotFilename);
     connect(recordAction, &QAction::triggered, this, &ControlWidget::record);
-    //connect(displayOptionsAction, &QAction::toggled, displayOptionsWidget, &QWidget::setVisible);
-    connect(optionsAction, &QAction::triggered, optionsWidget, &QTabWidget::setVisible);
-    connect(plotsAction, &QAction::triggered, mPlotsWidget, &QWidget::setVisible);
+    connect(optionsAction, &QAction::triggered, optionsWidget, &QTabWidget::show);
+    connect(plotsAction, &QAction::triggered, this, &ControlWidget::showPlotsWidget);
     connect(loadConfigAction, &QAction::triggered, this, &ControlWidget::loadConfig);
     connect(saveConfigAction, &QAction::triggered, this, &ControlWidget::saveConfig);
     connect(overlayAction, &QAction::triggered, this, &ControlWidget::toggleOverlay);
@@ -252,15 +247,6 @@ void ControlWidget::iterate()
         iterateAction->setIcon(QIcon(QPixmap(":/icons/media-playback-start.png")));
 
     emit iterateStateChanged(iterateAction->isChecked());
-}
-
-
-
-void ControlWidget::reset()
-{
-    mRenderManager->clearAllOpsTextures();
-    mRenderManager->drawAllSeeds();
-    mRenderManager->resetIterationNumer();
 }
 
 
@@ -305,13 +291,6 @@ void ControlWidget::setScreenshotFilename()
 
     updateScrollArea();
 }*/
-
-
-
-void ControlWidget::plotsActionTriggered()
-{
-    mPlotsWidget->setVisible(!mPlotsWidget->isVisible());
-}
 
 
 
@@ -897,9 +876,23 @@ void ControlWidget::selectNodesToMark()
     foreach (QTableWidgetItem* item, sortedOperationsTable->selectedItems())
         nodeIds.append(sortedOperationsData[item->row()].first);
 
-    mGraphWidget->markNodes(nodeIds);
+    emit nodesSelected(nodeIds);
 }
 
+
+
+void ControlWidget::selectOpsTableRows(QList<QUuid> selNodeIds)
+{
+    disconnect(sortedOperationsTable, &QTableWidget::itemSelectionChanged, this, &ControlWidget::selectNodesToMark);
+
+    int row = 0;
+    foreach (auto opData, sortedOperationsData) {
+        sortedOperationsTable->item(row, 0)->setSelected(selNodeIds.contains(opData.first));
+        row++;
+    }
+
+    connect(sortedOperationsTable, &QTableWidget::itemSelectionChanged, this, &ControlWidget::selectNodesToMark);
+}
 
 
 void ControlWidget::constructOptionsWidget(MidiListWidget *midiOptionsWidget)

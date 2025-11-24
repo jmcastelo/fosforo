@@ -73,7 +73,7 @@ class ControlWidget : public QWidget
     Q_OBJECT
 
 public:
-    ControlWidget(GraphWidget* graphWidget, RenderManager* renderManager, MidiListWidget* midiWidget, PlotsWidget* plotsWidget, QWidget *parent = nullptr);
+    ControlWidget(GraphWidget* graphWidget, RenderManager* renderManager, MidiListWidget* midiWidget, QWidget *parent = nullptr);
     ~ControlWidget();
 
 signals:
@@ -82,6 +82,7 @@ signals:
     void seedDrawn();
 
     void showMidiWidget();
+    void showPlotsWidget();
 
     void overlayToggled(bool show);
 
@@ -96,16 +97,17 @@ signals:
     void readConfig(QString filename);
     void writeConfig(QString filename);
 
+    void nodesSelected(QList<QUuid> nodeIds);
+
     void closing();
 
 public slots:
-    void reset();
-
     void updateWindowSizeLineEdits(int width, int height);
 
     void populateTexFormatComboBox(QList<TextureFormat> formats);
 
     void populateSortedOperationsTable(QList<QPair<QUuid, QString>> sortedData);
+    void selectOpsTableRows(QList<QUuid> selNodeIds);
 
     void updateIterationNumberLabel();
     void updateIterationMetricsLabels(double mSpf, double fps);
@@ -119,9 +121,7 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
-    GraphWidget* mGraphWidget;
     RenderManager* mRenderManager;
-    PlotsWidget* mPlotsWidget;
 
     //OperationNode* selectedOperationNode = nullptr;
     //SeedNode* selectedSeedNode = nullptr;
@@ -184,7 +184,6 @@ private slots:
     void record();
     void setScreenshotFilename();
     void setOutputDir();
-    void plotsActionTriggered();
     void loadConfig();
     void saveConfig();
     void toggleOverlay();
