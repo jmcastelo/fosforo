@@ -6,24 +6,20 @@
 #include "factory.h"
 
 #include <limits>
-#include <QPainterPath>
 
 
 
 OperationWidget::OperationWidget(QUuid id, ImageOperation* operation, bool midiEnabled, bool editMode, Factory *factory, QWidget* parent) :
-    QWidget{ parent },
+    QWidget { parent },
     mId { id },
     mOperation { operation },
     mFactory { factory },
     mMidiEnabled { midiEnabled }
 {
-    setAttribute(Qt::WA_DeleteOnClose, false);
-
     mMidiSignals = new MidiSignals(this);
 
     mOpBuilder = new OperationBuilder(mOperation);
     mOpBuilder->installEventFilter(this);
-    mOpBuilder->setVisible(false);
 
     connect(mOpBuilder, &OperationBuilder::operationSetUp, this, &OperationWidget::recreate);
 

@@ -299,6 +299,8 @@ void ApplicationController::closeAll()
     // iterationTimer->stop();
     // updateTimer->stop();
 
+    disconnect(graphWidget, &GraphWidget::selectedNodesChanged, controlWidget, &ControlWidget::selectOpsTableRows);
+
     renderManager->stop();
 
     if (morphoWidget->isVisible()) {

@@ -47,7 +47,7 @@ Node::Node(QUuid id, QWidget *widget, QGraphicsItem* parent) :
 {
     setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges);
     setAcceptedMouseButtons(Qt::AllButtons);
-    // setCacheMode(DeviceCoordinateCache);
+    setCacheMode(DeviceCoordinateCache);
 
     setZValue(-1);
 
@@ -55,6 +55,7 @@ Node::Node(QUuid id, QWidget *widget, QGraphicsItem* parent) :
 
     mProxyWidget = new QGraphicsProxyWidget(this);
     mProxyWidget->setWidget(mWidget);
+    mProxyWidget->setPos(QPointF(0, 0));
 
     resize(mProxyWidget->size());
 }
