@@ -67,7 +67,6 @@ public:
     QList<float> rgbPixel(QPoint pos);
 
     TextureFormat texFormat();
-    void setTextureFormat(TextureFormat format);
 
     GLuint texWidth();
     GLuint texHeight();
@@ -76,7 +75,6 @@ public:
 
     void drawAllSeeds();
 
-    void resetIterationNumer();
     int iterationNumber();
 
     QString version();
@@ -93,7 +91,9 @@ public slots:
     void initOperation(QUuid id, ImageOperation* operation);
     void initSeed(QUuid id, Seed* seed);
     void setSortedOperations(QList<ImageOperation*> sortedOperations);
+    void setTextureFormat(TextureFormat format);
     void reset();
+    void resetIterationNumer();
 
     void genImageTexture(QByteArray devId);
     void delImageTexture(QByteArray devId);

@@ -53,7 +53,7 @@ ApplicationController::ApplicationController()
 
     midiControl.setInputPorts();
 
-    controlWidget = new ControlWidget(graphWidget, renderManager, midiListWidget);
+    controlWidget = new ControlWidget(renderManager->version(), graphWidget, midiListWidget);
     controlWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     controlWidget->setMinimumSize(0, 0);
 
@@ -117,13 +117,16 @@ ApplicationController::ApplicationController()
     connect(nodeManager, &NodeManager::sortedOpsDataChanged, controlWidget, &ControlWidget::populateSortedOperationsTable);
 
     connect(controlWidget, &ControlWidget::iterationFPSChanged, this, &ApplicationController::setIterationTimerInterval);
+    connect(controlWidget, &ControlWidget::resetIterations, renderManager, &RenderManager::reset);
     connect(controlWidget, &ControlWidget::startRecording, renderManager, &RenderManager::startRecording);
     connect(controlWidget, &ControlWidget::stopRecording, renderManager, &RenderManager::stopRecording);
     connect(controlWidget, &ControlWidget::takeScreenshot, renderManager, &RenderManager::takeScreenshot);
+    connect(controlWidget, &ControlWidget::texFormatChanged, renderManager, &RenderManager::setTextureFormat);
     connect(controlWidget, &ControlWidget::imageSizeChanged, this, &ApplicationController::setSize);
     connect(controlWidget, &ControlWidget::showMidiWidget, this, &ApplicationController::showMidiWidget);
     connect(controlWidget, &ControlWidget::showPlotsWidget, plotsWidget, &QWidget::show);
     connect(controlWidget, &ControlWidget::overlayToggled, overlay, &Overlay::enable);
+    connect(controlWidget, &ControlWidget::configRead, renderManager, &RenderManager::resetIterationNumer);
     connect(controlWidget, &ControlWidget::readConfig, configParser, &ConfigurationParser::read);
     connect(controlWidget, &ControlWidget::writeConfig, configParser, &ConfigurationParser::write);
     connect(controlWidget, &ControlWidget::nodesSelected, graphWidget, &GraphWidget::markNodes);
@@ -204,7 +207,7 @@ void ApplicationController::measureFps()
         double fps = numSteps * 1'000.0 / multiStepTime.count();
 
         controlWidget->updateIterationMetricsLabels(mSpf, fps);
-        controlWidget->updateIterationNumberLabel();
+        controlWidget->updateIterationNumberLabel(renderManager->iterationNumber());
 
         numSteps = 0;
         multiStepStart = std::chrono::steady_clock::now();

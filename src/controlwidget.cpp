@@ -31,9 +31,9 @@
 
 
 
-ControlWidget::ControlWidget(GraphWidget* graphWidget, RenderManager* renderManager, MidiListWidget *midiWidget, QWidget* parent) :
+ControlWidget::ControlWidget(QString version, GraphWidget* graphWidget, MidiListWidget *midiWidget, QWidget* parent) :
     QWidget { parent },
-    mRenderManager { renderManager }
+    mVersion { version }
 {
     // Scroll area
 
@@ -226,7 +226,7 @@ void ControlWidget::constructSystemToolBar()
     QAction* aboutAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/help-about.png")), "About");
 
     connect(iterateAction, &QAction::triggered, this, &ControlWidget::iterate);
-    connect(resetAction, &QAction::triggered, mRenderManager, &RenderManager::reset);
+    connect(resetAction, &QAction::triggered, this, &ControlWidget::resetIterations);
     connect(screenshotAction, &QAction::triggered, this, &ControlWidget::setScreenshotFilename);
     connect(recordAction, &QAction::triggered, this, &ControlWidget::record);
     connect(optionsAction, &QAction::triggered, optionsWidget, &QTabWidget::show);
@@ -301,10 +301,9 @@ void ControlWidget::loadConfig()
     if (!filename.isEmpty())
     {
         emit readConfig(filename);
+        emit configRead();
 
-        mRenderManager->resetIterationNumer();
-
-        updateIterationNumberLabel();
+        updateIterationNumberLabel(0);
         updateIterationMetricsLabels(0, 0);
     }
 }
@@ -339,7 +338,7 @@ void ControlWidget::about()
 
     QStringList lines;
     lines.append("<img src=\":/icons/logo.png\" width=\"300\"/>");
-    lines.append(QString("<h2>F&oacute;sforo %1</h2>").arg(mRenderManager->version()));
+    lines.append(QString("<h2>F&oacute;sforo %1</h2>").arg(mVersion));
     lines.append("<h4>Videofeedback simulation software.</h4>");
     lines.append("<h5>Let the pixels come alive!</h5><br>");
     lines.append("Looking for help? Please visit:<br>");
@@ -361,9 +360,9 @@ void ControlWidget::about()
 
 
 
-void ControlWidget::updateIterationNumberLabel()
+void ControlWidget::updateIterationNumberLabel(int itNum)
 {
-    iterationNumberLabel->setText(QString("Frame: %1").arg(mRenderManager->iterationNumber()));
+    iterationNumberLabel->setText(QString("Frame: %1").arg(itNum));
 }
 
 
@@ -633,7 +632,7 @@ void ControlWidget::constructDisplayOptionsWidget()
     connect(texFormatComboBox, &QComboBox::activated, this, [&](int index) {
         int selectedValue = texFormatComboBox->itemData(index).toInt();
         TextureFormat selectedFormat = static_cast<TextureFormat>(selectedValue);
-        mRenderManager->setTextureFormat(selectedFormat);
+        emit texFormatChanged(selectedFormat);
     });
 }
 
@@ -671,7 +670,7 @@ void ControlWidget::populateTexFormatComboBox(QList<TextureFormat> formats)
     foreach (TextureFormat format, formats)
     {
         texFormatComboBox->addItem(textureFormatToString(format), QVariant(static_cast<int>(format)));
-        if (format == mRenderManager->texFormat())
+        if (format == TextureFormat::RGBA8)
             texFormatComboBox->setCurrentIndex(index);
         index++;
     }

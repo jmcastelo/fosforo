@@ -73,11 +73,13 @@ class ControlWidget : public QWidget
     Q_OBJECT
 
 public:
-    ControlWidget(GraphWidget* graphWidget, RenderManager* renderManager, MidiListWidget* midiWidget, QWidget *parent = nullptr);
+    ControlWidget(QString version, GraphWidget* graphWidget, MidiListWidget* midiWidget, QWidget *parent = nullptr);
     ~ControlWidget();
 
 signals:
     void iterateStateChanged(bool state);
+
+    void resetIterations();
 
     void seedDrawn();
 
@@ -88,12 +90,15 @@ signals:
 
     void imageSizeChanged(int width, int height);
 
+    void texFormatChanged(TextureFormat format);
+
     void startRecording(QString recordFilename, int framesPerSecond, QMediaFormat format);
     void stopRecording();
     void takeScreenshot(QString filename);
 
     void iterationFPSChanged(double newFPS);
 
+    void configRead();
     void readConfig(QString filename);
     void writeConfig(QString filename);
 
@@ -109,7 +114,7 @@ public slots:
     void populateSortedOperationsTable(QList<QPair<QUuid, QString>> sortedData);
     void selectOpsTableRows(QList<QUuid> selNodeIds);
 
-    void updateIterationNumberLabel();
+    void updateIterationNumberLabel(int itNum);
     void updateIterationMetricsLabels(double mSpf, double fps);
 
     void setVideoCaptureElapsedTimeLabel(int frameNumber);
@@ -121,7 +126,7 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
-    RenderManager* mRenderManager;
+    QString mVersion;
 
     //OperationNode* selectedOperationNode = nullptr;
     //SeedNode* selectedSeedNode = nullptr;
