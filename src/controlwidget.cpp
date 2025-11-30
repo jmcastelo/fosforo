@@ -257,7 +257,7 @@ void ControlWidget::record()
     {
         recordAction->setIcon(QIcon(QPixmap(":/icons/media-playback-stop.png")));
         videoCaptureElapsedTimeLabel->setText("00:00:00.000");
-        QString filename = QDir::toNativeSeparators(outputDir + '/' + QDateTime::currentDateTime().toString(Qt::ISODate));
+        QString filename = QDir::toNativeSeparators(outputDir + '/' + QDateTime::currentDateTime().toString("[yyyy-MM-dd][hh'h'mm'm'ss's'zzz'ms']"));
         emit startRecording(filename, framesPerSecond, format);
     }
     else
@@ -270,8 +270,9 @@ void ControlWidget::record()
 
 
 void ControlWidget::setScreenshotFilename()
-{   
-    QString filename = QDir::toNativeSeparators(outputDir + '/' + QDateTime::currentDateTime().toString(Qt::ISODate) + ".png");
+{
+    // QString filename = QDir::toNativeSeparators(outputDir + '/' + QDateTime::currentDateTime().toString(Qt::ISODate) + ".png");
+    QString filename = QDir::toNativeSeparators(outputDir + '/' + QDateTime::currentDateTime().toString("[yyyy-MM-dd][hh'h'mm'm'ss's'zzz'ms']") + ".png");
     emit takeScreenshot(filename);
 }
 
@@ -777,6 +778,7 @@ void ControlWidget::populateVideoCodecsComboBox(QMediaFormat::VideoCodec videoCo
 {
     videoCodecsComboBox->clear();
 
+    format.setAudioCodec(QMediaFormat::AudioCodec::Opus);
     format.resolveForEncoding(QMediaFormat::RequiresVideo);
 
     int index = 0;

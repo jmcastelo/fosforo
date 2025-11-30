@@ -75,6 +75,8 @@ void RenderManager::setTargetFps(double fps)
 
 void RenderManager::adjustTimerInterval(long stepTimeNs)
 {
+    QMutexLocker locker(&mutex);
+
     double correction = (mTimerNs.count() - stepTimeNs) / 1'000'000'000.0;
 
     if (mFrequency > 0)
@@ -356,7 +358,7 @@ void RenderManager::grabOutputImage()
 {
     if (mOutputTexId)
     {
-        mContext->makeCurrent(mSurface);
+        // mContext->makeCurrent(mSurface);
 
         if (mFence)
         {
@@ -390,7 +392,7 @@ void RenderManager::grabOutputImage()
 
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
-        mContext->doneCurrent();
+        // mContext->doneCurrent();
     }
     else
     {
