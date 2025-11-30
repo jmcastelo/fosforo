@@ -9,6 +9,7 @@
 
 #include <QObject>
 #include <QGroupBox>
+#include <QVBoxLayout>
 
 
 
@@ -41,7 +42,8 @@ public:
         mGroupBox = new FocusGroupBox;
         mGroupBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
         mGroupBox->setStyleSheet("QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top center; font-size: 18pt; margin: 7px; }");
-        mGroupBox->setCheckable(false);
+        // mGroupBox->setCheckable(false);
+        mGroupBox->setVisible(false);
 
         connect(mGroupBox, &FocusGroupBox::focusIn, this, &ParameterWidgetSignals::focusIn);
 
@@ -50,7 +52,7 @@ public:
         mPresetsComboBox->setEditable(false);
         mPresetsComboBox->setPlaceholderText("Presets");
         mPresetsComboBox->addItems(mParameter->presetNames());
-        mPresetsComboBox->setVisible(mPresetsComboBox->count() != 0);
+        mPresetsComboBox->setVisible(false);
 
         connect(mPresetsComboBox, &QComboBox::activated, this, [=, this](int index){
             if (index >= 0)
@@ -59,6 +61,11 @@ public:
                 mParameter->setPreset(name);
             }
         });
+
+        mMainLayout = new QVBoxLayout;
+        mGroupBox->setLayout(mMainLayout);
+
+        // mPresetsComboBox->setVisible(mPresetsComboBox->count() != 0);
     }
 
     Number<T>* selectedNumber() { return mSelectedNumber; }
@@ -82,7 +89,11 @@ public:
         }
     }
 
-    void toggleVisibility(bool visible) { mGroupBox->setVisible(visible); }
+    void setUpVisible()
+    {
+        mGroupBox->setVisible(true);
+        mPresetsComboBox->setVisible(mPresetsComboBox->count() != 0);
+    }
 
     void setRow(int i) { mParameter->setRow(i); }
     void setCol(int i) { mParameter->setCol(i); }
@@ -137,6 +148,7 @@ protected:
     QWidget* mLastFocusedWidget;
     FocusGroupBox* mGroupBox;
     QComboBox* mPresetsComboBox;
+    QVBoxLayout* mMainLayout;
 };
 
 

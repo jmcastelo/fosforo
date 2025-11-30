@@ -17,7 +17,7 @@ class OptionsParameterWidget : public ParameterWidgetSignals
 {
 public:
     OptionsParameterWidget(OptionsParameter<T>* theOptionsParameter, QObject* parent = nullptr) :
-        ParameterWidgetSignals(parent),
+        ParameterWidgetSignals { parent },
         mOptionsParameter { theOptionsParameter }
     {
         mGroupBox = new QGroupBox;
@@ -25,15 +25,17 @@ public:
         mGroupBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
         mGroupBox->setStyleSheet("QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top center; font-size: 18pt; margin: 7px; }");
         mGroupBox->setCheckable(false);
-        mGroupBox->setVisible(mOptionsParameter->editable());
+        // mGroupBox->setVisible(mOptionsParameter->editable());
+        mGroupBox->setVisible(false);
 
         // Set up combo box
 
         mComboBox = new FocusComboBox;
         mComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-        for (QString valueName : mOptionsParameter->valueNames())
+        for (QString valueName : mOptionsParameter->valueNames()) {
             mComboBox->addItem(valueName);
+        }
         mComboBox->setCurrentIndex(mOptionsParameter->indexOf());
 
         QVBoxLayout* layout = new QVBoxLayout;

@@ -55,6 +55,7 @@ compile_commands.json
 .qtc_clangd
 
 fosforo
+fosforo.exe
 
 build
 configs

@@ -19,7 +19,7 @@ template <typename T>
 class UniformParameterWidget : public ParameterWidget<T>
 {
 public:
-    UniformParameterWidget(UniformParameter<T>* theUniformParameter, QObject* parent = nullptr);
+    UniformParameterWidget(UniformParameter<T>* theUniformParameter, QWidget* parent = nullptr);
 
     QString name();
     void setName(QString theName);
@@ -57,11 +57,12 @@ private:
     QStackedLayout* mStackedLayout;
     QScrollBar* mScrollBar;
 
-    QList<QWidget*> mItemWidgets;
+    // QList<QWidget*> mItemWidgets;
+    QList<QGridLayout*> mItemLayouts;
 
-    QWidget* mColWidget;
-    QWidget* mRowWidget;
-    QWidget* mGridWidget;
+    QWidget* mColWidget = nullptr;
+    QWidget* mRowWidget = nullptr;
+    QWidget* mGridWidget = nullptr;
 
     int mLastIndex;
 

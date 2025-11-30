@@ -83,6 +83,7 @@ public slots:
     void recreate();
     void toggleOutputAction(QUuid id);
     void toggleMidiButton(bool show);
+    void toggleEditMode(bool mode);
 
 protected:
     // void closeEvent(QCloseEvent* event) override;
@@ -211,7 +212,6 @@ private:
 private slots:
     void updateWidgetRowCol(QWidget* widget, int row, int col);
     void toggleBody(bool visible);
-    void toggleEditMode(bool mode);
     void enableOperation(bool checked);
     void populateAvailOpsMenu();
     void replaceOperation(QAction* action);

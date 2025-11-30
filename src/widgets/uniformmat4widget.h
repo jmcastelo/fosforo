@@ -15,7 +15,7 @@
 class UniformMat4ParameterWidget : public ParameterWidget<float>
 {
 public:
-    UniformMat4ParameterWidget(UniformMat4Parameter* theUniformMat4Parameter, QObject* parent = nullptr);
+    UniformMat4ParameterWidget(UniformMat4Parameter* theUniformMat4Parameter, QWidget* parent = nullptr);
 
     QString name();
     void setName(QString theName);
@@ -33,7 +33,7 @@ public:
     UniformMat4Parameter* parameter() { return mUniformMat4Parameter; }
     int typeIndex() const;
 
-    QGroupBox* widget();
+    // QGroupBox* widget();
 
 private:
     UniformMat4Parameter* mUniformMat4Parameter;

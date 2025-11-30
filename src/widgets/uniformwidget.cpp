@@ -7,11 +7,12 @@
 
 
 template <typename T>
-UniformParameterWidget<T>::UniformParameterWidget(UniformParameter<T>* theUniformParameter, QObject* parent) :
-    ParameterWidget<T>(theUniformParameter, parent),
+UniformParameterWidget<T>::UniformParameterWidget(UniformParameter<T>* theUniformParameter, QWidget* parent) :
+    ParameterWidget<T> { theUniformParameter, parent },
     mUniformParameter { theUniformParameter }
 {
     ParameterWidget<T>::mGroupBox->setTitle(mUniformParameter->name());
+    // ParameterWidget<T>::setTitle(mUniformParameter->name());
 
     // Set up line edits
 
@@ -38,24 +39,21 @@ UniformParameterWidget<T>::UniformParameterWidget(UniformParameter<T>* theUnifor
     mScrollBar->setFocusPolicy(Qt::ClickFocus);
     mScrollBar->setVisible(false);
 
-    QVBoxLayout* layout = new QVBoxLayout;
+    /*QVBoxLayout* layout = new QVBoxLayout;
     layout->addLayout(mStackedLayout);
     layout->addWidget(mScrollBar);
-    layout->addWidget(ParameterWidget<T>::mPresetsComboBox);
+    layout->addWidget(ParameterWidget<T>::mPresetsComboBox);*/
 
-    mColWidget = new QWidget;
-    mColWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-
-    mRowWidget = new QWidget;
-    mRowWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-
-    mGridWidget = new QWidget;
-    mGridWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    ParameterWidget<T>::mMainLayout->addLayout(mStackedLayout);
+    ParameterWidget<T>::mMainLayout->addWidget(mScrollBar);
+    ParameterWidget<T>::mMainLayout->addWidget(ParameterWidget<T>::mPresetsComboBox);
 
     setItemsLayouts();
     setDefaultLayoutFormat();
-    ParameterWidget<T>::mGroupBox->setLayout(layout);
-    ParameterWidget<T>::mGroupBox->setVisible(mUniformParameter->editable());
+    // ParameterWidget<T>::mGroupBox->setLayout(layout);
+    // ParameterWidget<T>::mGroupBox->setVisible(mUniformParameter->editable());
+    // ParameterWidget<T>::setLayout(layout);
+    // ParameterWidget<T>::setVisible(mUniformParameter->editable());
 
     // Connections
 
@@ -282,10 +280,19 @@ void UniformParameterWidget<T>::setLayoutFormat(LayoutFormat format)
         gridLayout->setAlignment(Qt::AlignCenter);
 
         int row = 0;
-        foreach (QWidget* widget, mItemWidgets)
+        /*foreach (QWidget* widget, mItemWidgets)
         {
             gridLayout->addWidget(widget, row++, 0, Qt::AlignCenter);
             widget->show();
+        }*/
+        foreach (QGridLayout* layout, mItemLayouts) {
+            gridLayout->addLayout(layout, row++, 0, Qt::AlignCenter);
+        }
+
+        if (!mColWidget)
+        {
+            mColWidget = new QWidget;
+            mColWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
         }
 
         mColWidget->setLayout(gridLayout);
@@ -300,10 +307,19 @@ void UniformParameterWidget<T>::setLayoutFormat(LayoutFormat format)
         gridLayout->setAlignment(Qt::AlignCenter);
 
         int col = 0;
-        foreach (QWidget* widget, mItemWidgets)
+        /*foreach (QWidget* widget, mItemWidgets)
         {
             gridLayout->addWidget(widget, 0, col++, Qt::AlignCenter);
             widget->show();
+        }*/
+        foreach (QGridLayout* layout, mItemLayouts) {
+            gridLayout->addLayout(layout, 0, col++, Qt::AlignCenter);
+        }
+
+        if (!mRowWidget)
+        {
+            mRowWidget = new QWidget;
+            mRowWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
         }
 
         mRowWidget->setLayout(gridLayout);
@@ -322,10 +338,12 @@ void UniformParameterWidget<T>::setLayoutFormat(LayoutFormat format)
         int row = 0;
         int col = 0;
 
-        foreach (QWidget* widget, mItemWidgets)
+        // foreach (QWidget* widget, mItemWidgets)
+        foreach (QGridLayout* layout, mItemLayouts)
         {
-            gridLayout->addWidget(widget, row, col, Qt::AlignCenter);
-            widget->show();
+            // gridLayout->addWidget(widget, row, col, Qt::AlignCenter);
+            gridLayout->addLayout(layout, row, col, Qt::AlignCenter);
+            // widget->show();
 
             col++;
             if (col == dim)
@@ -335,16 +353,33 @@ void UniformParameterWidget<T>::setLayoutFormat(LayoutFormat format)
             }
         }
 
+        if (!mGridWidget)
+        {
+            mGridWidget = new QWidget;
+            mGridWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+        }
+
         mGridWidget->setLayout(gridLayout);
         mStackedLayout->addWidget(mGridWidget);
         mScrollBar->setVisible(false);
     }
     else if (format == LayoutFormat::Stacked)
     {
-        foreach (QWidget* widget, mItemWidgets)
+        /*foreach (QWidget* widget, mItemWidgets) {
             mStackedLayout->addWidget(widget);
+        }*/
 
-        mScrollBar->setRange(0, mItemWidgets.size() - 1);
+        foreach (QGridLayout* layout, mItemLayouts)
+        {
+            QWidget* widget = new QWidget;
+            widget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+            widget->setLayout(layout);
+
+            mStackedLayout->addWidget(widget);
+        }
+
+        // mScrollBar->setRange(0, mItemWidgets.size() - 1);
+        mScrollBar->setRange(0, mItemLayouts.size() - 1);
         mScrollBar->setValue(0);
         mScrollBar->setVisible(true);
     }
@@ -390,11 +425,12 @@ void UniformParameterWidget<T>::setItemsLayouts()
             row = 0;
             col = 0;
 
-            QWidget* widget = new QWidget;
+            /*QWidget* widget = new QWidget;
             widget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
             widget->setLayout(itemGridLayout);
 
-            mItemWidgets.append(widget);
+            mItemWidgets.append(widget);*/
+            mItemLayouts.append(itemGridLayout);
         }
     }
 
@@ -402,9 +438,11 @@ void UniformParameterWidget<T>::setItemsLayouts()
 
     mAvailFormats.clear();
 
-    if (mItemWidgets.size() == 2)
+    // if (mItemWidgets.size() == 2)
+    if (mItemLayouts.size() == 2)
         mAvailFormats = QList<LayoutFormat>({ LayoutFormat::Column, LayoutFormat::Row, LayoutFormat::Stacked });
-    else if (mItemWidgets.size() > 2)
+    // else if (mItemWidgets.size() > 2)
+    else if (mItemLayouts.size() > 2)
         mAvailFormats = QList<LayoutFormat>({ LayoutFormat::Column, LayoutFormat::Row, LayoutFormat::Grid, LayoutFormat::Stacked });
 }
 
@@ -417,13 +455,20 @@ void UniformParameterWidget<T>::clearLayouts()
     {
         int index = mStackedLayout->count() - 1;
         QWidget* widget = mStackedLayout->widget(index);
-        if (widget)
+        if (widget) {
             mStackedLayout->removeWidget(widget);
+        }
     }
 
-    removeLayout(mColWidget->layout());
-    removeLayout(mRowWidget->layout());
-    removeLayout(mGridWidget->layout());
+    if (mColWidget) {
+        removeLayout(mColWidget->layout());
+    }
+    if (mRowWidget) {
+        removeLayout(mRowWidget->layout());
+    }
+    if (mGridWidget) {
+        removeLayout(mGridWidget->layout());
+    }
 }
 
 

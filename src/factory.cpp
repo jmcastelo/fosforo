@@ -49,6 +49,7 @@ void Factory::createNewOperation()
     OperationWidget* widget = new OperationWidget(id, operation, mMidiEnabled, true, this);
     emit newOpWidgetCreated(widget);
     emit newOpWidgetCreated(id, widget);
+    widget->toggleEditMode(true);
 }
 
 
@@ -78,6 +79,7 @@ void Factory::addAvailableOperation(int index)
     OperationWidget* widget = new OperationWidget(id, operation, mMidiEnabled, false, this);
     emit newOpWidgetCreated(widget);
     emit newOpWidgetCreated(id, widget);
+    widget->toggleEditMode(false);
 }
 
 
@@ -93,6 +95,7 @@ void Factory::addAvailableOperation(int index, QUuid& id)
     OperationWidget* widget = new OperationWidget(id, operation, mMidiEnabled, false, this);
     emit newOpWidgetCreated(widget);
     emit newOpWidgetCreated(id, widget);
+    widget->toggleEditMode(false);
 }
 
 
@@ -105,6 +108,7 @@ void Factory::addOperation(QUuid id, ImageOperation* operation, QPointF position
     OperationWidget* widget = new OperationWidget(id, operation, mMidiEnabled, false, this);
     emit newOpWidgetCreated(widget);
     emit newOpWidgetCreated(id, widget, position);
+    widget->toggleEditMode(false);
 }
 
 

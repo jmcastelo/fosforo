@@ -20,6 +20,7 @@ OperationWidget::OperationWidget(QUuid id, ImageOperation* operation, bool midiE
 
     mOpBuilder = new OperationBuilder(mOperation);
     mOpBuilder->installEventFilter(this);
+    mOpBuilder->setVisible(false);
 
     connect(mOpBuilder, &OperationBuilder::operationSetUp, this, &OperationWidget::recreate);
 
@@ -261,7 +262,7 @@ OperationWidget::OperationWidget(QUuid id, ImageOperation* operation, bool midiE
 
     setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-    toggleEditMode(editMode);
+    // toggleEditMode(editMode);
 }
 
 
@@ -286,6 +287,7 @@ void OperationWidget::setup()
 
         if (mEditMode || (!mEditMode && parameter->editable())) {
             gridWidget->addWidget(widget->widget(), parameter->row(), parameter->col());
+            widget->setUpVisible();
         }
 
         widget->setCheckable(mEditMode);
@@ -302,6 +304,7 @@ void OperationWidget::setup()
 
         if (mEditMode || (!mEditMode && parameter->editable())) {
             gridWidget->addWidget(widget->widget(), parameter->row(), parameter->col());
+            widget->setUpVisible();
         }
 
         widget->setCheckable(mEditMode);
@@ -318,6 +321,7 @@ void OperationWidget::setup()
 
         if (mEditMode || (!mEditMode && parameter->editable())) {
             gridWidget->addWidget(widget->widget(), parameter->row(), parameter->col());
+            widget->setUpVisible();
         }
 
         widget->setCheckable(mEditMode);
@@ -334,6 +338,7 @@ void OperationWidget::setup()
 
         if (mEditMode || (!mEditMode && parameter->editable())) {
             gridWidget->addWidget(widget->widget(), parameter->row(), parameter->col());
+            widget->setUpVisible();
         }
 
         widget->setCheckable(mEditMode);
@@ -1167,6 +1172,7 @@ void OperationWidget::updateWidgetRowCol(QWidget* widget, int row, int col)
     foreach (auto paramWidget, floatParamWidgets)
     {
         if (paramWidget->widget() == widget)
+        // if (paramWidget == widget)
         {
             paramWidget->setRow(row);
             paramWidget->setCol(col);
@@ -1176,6 +1182,7 @@ void OperationWidget::updateWidgetRowCol(QWidget* widget, int row, int col)
     foreach (auto paramWidget, intParamWidgets)
     {
         if (paramWidget->widget() == widget)
+        // if (paramWidget == widget)
         {
             paramWidget->setRow(row);
             paramWidget->setCol(col);
@@ -1185,6 +1192,7 @@ void OperationWidget::updateWidgetRowCol(QWidget* widget, int row, int col)
     foreach (auto paramWidget, uintParamWidgets)
     {
         if (paramWidget->widget() == widget)
+        // if (paramWidget == widget)
         {
             paramWidget->setRow(row);
             paramWidget->setCol(col);
@@ -1194,6 +1202,7 @@ void OperationWidget::updateWidgetRowCol(QWidget* widget, int row, int col)
     foreach (auto paramWidget, mat4ParamWidgets)
     {
         if (paramWidget->widget() == widget)
+        // if (paramWidget == widget)
         {
             paramWidget->setRow(row);
             paramWidget->setCol(col);

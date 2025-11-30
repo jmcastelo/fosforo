@@ -5,11 +5,12 @@
 
 
 
-UniformMat4ParameterWidget::UniformMat4ParameterWidget(UniformMat4Parameter* theUniformMat4Parameter, QObject* parent) :
-    ParameterWidget<float>(theUniformMat4Parameter, parent),
+UniformMat4ParameterWidget::UniformMat4ParameterWidget(UniformMat4Parameter* theUniformMat4Parameter, QWidget* parent) :
+    ParameterWidget<float> { theUniformMat4Parameter, parent },
     mUniformMat4Parameter { theUniformMat4Parameter }
 {
     mGroupBox->setTitle(mUniformMat4Parameter->name());
+    // setTitle(mUniformMat4Parameter->name());
 
     // Set up line edits
 
@@ -31,6 +32,7 @@ UniformMat4ParameterWidget::UniformMat4ParameterWidget(UniformMat4Parameter* the
     else
     {
         ParameterWidget<float>::mLastFocusedWidget = ParameterWidget<float>::mGroupBox;
+        // ParameterWidget<float>::mLastFocusedWidget = this;
     }
 
     mLastIndex = 0;
@@ -40,16 +42,21 @@ UniformMat4ParameterWidget::UniformMat4ParameterWidget(UniformMat4Parameter* the
     QFormLayout* formLayout = new QFormLayout;
 
     int i = 0;
-    foreach (QString numberName, mUniformMat4Parameter->numberNames())
+    foreach (QString numberName, mUniformMat4Parameter->numberNames()) {
         formLayout->addRow(numberName, mLineEdits[i++]);
+    }
 
     // Layout
 
-    QVBoxLayout* layout = new QVBoxLayout;
+    /*QVBoxLayout* layout = new QVBoxLayout;
     layout->addLayout(formLayout);
     layout->addWidget(mPresetsComboBox);
 
-    mGroupBox->setLayout(layout);
+    mGroupBox->setLayout(layout);*/
+    // setLayout(layout);
+
+    mMainLayout->addLayout(formLayout);
+    mMainLayout->addWidget(mPresetsComboBox);
 
     // Connections
 
@@ -110,6 +117,7 @@ void UniformMat4ParameterWidget::setName(QString theName)
 {
     mUniformMat4Parameter->setName(theName);
     ParameterWidget<float>::mGroupBox->setTitle(theName);
+    // setTitle(theName);
 }
 
 
@@ -172,7 +180,7 @@ int UniformMat4ParameterWidget::typeIndex() const
 
 
 
-QGroupBox* UniformMat4ParameterWidget::widget()
+/*QGroupBox* UniformMat4ParameterWidget::widget()
 {
     return ParameterWidget<float>::mGroupBox;
-}
+}*/
