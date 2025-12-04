@@ -376,6 +376,8 @@ void OperationBuilder::parseShaders()
 {
     mOperation->enableUpdate(false);
 
+    mContext->makeCurrent(mSurface);
+
     if (linkProgram())
     {
         parseUniforms();
@@ -396,6 +398,8 @@ void OperationBuilder::parseShaders()
 
         setupOpAction->setEnabled(success);
     }
+
+    mContext->doneCurrent();
 }
 
 
