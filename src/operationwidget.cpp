@@ -22,7 +22,10 @@ OperationWidget::OperationWidget(QUuid id, ImageOperation* operation, bool midiE
     mOpBuilder->installEventFilter(this);
     mOpBuilder->setVisible(false);
 
-    connect(mOpBuilder, &OperationBuilder::operationSetUp, this, &OperationWidget::recreate);
+    connect(mOpBuilder, &OperationBuilder::operationSetUp, this, [=, this](){
+        gridWidget->setEditMode(true);
+        recreate();
+    });
 
     mainLayout = new QVBoxLayout;
     mainLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
