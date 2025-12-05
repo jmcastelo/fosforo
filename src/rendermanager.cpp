@@ -970,6 +970,8 @@ void RenderManager::blitTextures(GLuint srcTexId, GLuint srcTexWidth, GLuint src
 
 void RenderManager::resizeTextures()
 {
+    // Store old texture Ids, generate new textures and blit old to new ones
+
     QList<GLuint*> oldTexIds;
 
     foreach (Seed* seed, mFactory->seeds())
@@ -988,17 +990,6 @@ void RenderManager::resizeTextures()
         glDeleteTextures(1, oldTexId);
         *oldTexId = newTexId;
     }
-
-    foreach (Seed* seed, mFactory->seeds()) {
-        seed->resizeImage();
-        seed->setOutTextureId();
-    }
-
-    foreach (ImageOperation* operation, mFactory->operations()) {
-        operation->setOutTextureId();
-    }
-
-    emit texturesChanged();
 
     // Resize frame texture
 
@@ -1020,6 +1011,22 @@ void RenderManager::resizeTextures()
         glDeleteTextures(1, &texId);
         mVideoTextures[devId] = newTexId;
     }
+
+    setVideoTextures();
+
+    // Set output texture Ids
+
+    foreach (Seed* seed, mFactory->seeds())
+    {
+        seed->resizeImage();
+        seed->setOutTextureId();
+    }
+
+    foreach (ImageOperation* operation, mFactory->operations()) {
+        operation->setOutTextureId();
+    }
+
+    emit texturesChanged();
 }
 
 
