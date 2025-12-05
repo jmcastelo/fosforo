@@ -574,7 +574,9 @@ void NodeManager::connectOperation(QUuid id, ImageOperation* operation)
             if (parameter->numItems() > 1) {
                 paramName += "[" + QString::number(i) + "]";
             }
-            emit parameterValueChanged(id, operation->name(), paramName, QString::number(value.toFloat(), 'f', 6));
+            if (parameter->editable()) {
+                emit parameterValueChanged(id, operation->name(), paramName, QString::number(value.toFloat(), 'f', 6));
+            }
         });
     }
 
@@ -585,7 +587,9 @@ void NodeManager::connectOperation(QUuid id, ImageOperation* operation)
             if (parameter->numItems() > 1) {
                 paramName += "[" + QString::number(i) + "]";
             }
-            emit parameterValueChanged(id, operation->name(), parameter->name(), QString::number(value.toInt()));
+            if (parameter->editable()) {
+                emit parameterValueChanged(id, operation->name(), parameter->name(), QString::number(value.toInt()));
+            }
         });
     }
 
@@ -596,7 +600,9 @@ void NodeManager::connectOperation(QUuid id, ImageOperation* operation)
             if (parameter->numItems() > 1) {
                 paramName += "[" + QString::number(i) + "]";
             }
-            emit parameterValueChanged(id, operation->name(), parameter->name(), QString::number(value.toUInt()));
+            if (parameter->editable()) {
+                emit parameterValueChanged(id, operation->name(), parameter->name(), QString::number(value.toUInt()));
+            }
         });
     }
 
@@ -604,7 +610,9 @@ void NodeManager::connectOperation(QUuid id, ImageOperation* operation)
     {
         connect(parameter, QOverload<int, QVariant>::of(&Parameter::valueChanged), this, [=, this](int i, QVariant value) {
             QString numberName = parameter->numberNames().at(i);
-            emit parameterValueChanged(id, operation->name(), parameter->name() + " " + numberName, QString::number(value.toFloat(), 'f', 6));
+            if (parameter->editable()) {
+                emit parameterValueChanged(id, operation->name(), parameter->name() + " " + numberName, QString::number(value.toFloat(), 'f', 6));
+            }
         });
     }
 }

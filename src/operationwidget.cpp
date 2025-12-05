@@ -451,8 +451,9 @@ void OperationWidget::recreate()
 template <typename T>
 void OperationWidget::setFocusedWidget(ParameterWidget<T>* widget)
 {
-    if (widget->parameter() == lastFocusedParameter)
+    if (widget->parameter() == lastFocusedParameter) {
         lastFocusedWidget = widget->lastFocusedWidget();
+    }
 }
 
 
@@ -462,9 +463,11 @@ void OperationWidget::connectParamWidgets(QList<ParameterWidget<T>*> widgets)
 {
     foreach (auto widget, widgets)
     {
-        connect(widget, &ParameterWidget<T>::focusIn, this, [=, this](){
-            lastFocusedParameter = widget->parameter();
-            lastFocusedWidget = widget->lastFocusedWidget();
+        connect(widget, &ParameterWidget<T>::focusIn, this, [=, this]() {
+            if (widget->isEditable()) {
+                lastFocusedParameter = widget->parameter();
+                lastFocusedWidget = widget->lastFocusedWidget();
+            }
         });
     }
 }
@@ -476,26 +479,30 @@ void OperationWidget::connectUniformParamWidgets(QList<UniformParameterWidget<T>
 {
     foreach (auto widget, widgets)
     {
-        connect(widget, &UniformParameterWidget<T>::focusIn, this, [=, this](){
-            if (mEditMode) {
-                updateSelParamEditControls<T>(widget);
-            }
-            else {
-                updateSelParamControls<T>(widget);
-            }
+        connect(widget, &UniformParameterWidget<T>::focusIn, this, [=, this]() {
+            if (widget->isEditable())
+            {
+                if (mEditMode) {
+                    updateSelParamEditControls<T>(widget);
+                }
+                else {
+                    updateSelParamControls<T>(widget);
+                }
 
-            updateMidiButton<T>(widget);
+                updateMidiButton<T>(widget);
 
-            setSelParamNameWidgets<T>(widget);
+                setSelParamNameWidgets<T>(widget);
+            }
         });
 
-        connect(widget, &UniformParameterWidget<T>::focusIn, this, [=, this](){
-            if (mEditMode)
+        connect(widget, &UniformParameterWidget<T>::focusIn, this, [=, this]() {
+            if (widget->isEditable() && mEditMode)
             {
                 // Set up layout controller combo box
 
-                if (layoutComboBoxConn)
+                if (layoutComboBoxConn) {
                     disconnect(layoutComboBoxConn);
+                }
 
                 layoutComboBox->clear();
 
@@ -525,20 +532,21 @@ void OperationWidget::connectUniformFloatParamWidgets()
 {
     foreach (auto widget, uniformFloatParamWidgets)
     {
-        connect(widget, &UniformParameterWidget<float>::focusIn, this, [=, this](){
-            if (mEditMode)
+        connect(widget, &UniformParameterWidget<float>::focusIn, this, [=, this]() {
+            if (widget->isEditable() && mEditMode)
             {
                 // Set up Mat4 parameter switcher combo box
 
-                if (mat4TypeComboBoxConn)
+                if (mat4TypeComboBoxConn) {
                     disconnect(mat4TypeComboBoxConn);
+                }
 
                 if (widget->isMat4Equivalent())
                 {
                     mat4TypeComboBox->setVisible(true);
                     mat4TypeComboBox->setCurrentIndex(4);
 
-                    mat4TypeComboBoxConn = connect(mat4TypeComboBox, &QComboBox::currentIndexChanged, this, [=, this](int index){
+                    mat4TypeComboBoxConn = connect(mat4TypeComboBox, &QComboBox::currentIndexChanged, this, [=, this](int index) {
                         if (index >= 0 && index < 4)
                         {
                             UniformParameter<float>* parameter = widget->parameter();
@@ -569,31 +577,37 @@ void OperationWidget::connectUniformMat4ParamWidgets()
 {
     foreach (auto widget, uniformMat4ParamWidgets)
     {
-        connect(widget, &UniformMat4ParameterWidget::focusIn, this, [=, this](){
-            if (!widget->parameter()->empty())
+        connect(widget, &UniformMat4ParameterWidget::focusIn, this, [=, this]() {
+            if (widget->isEditable())
             {
-                if (mEditMode)
-                    updateSelParamEditControls<float>(widget);
+                if (!widget->parameter()->empty())
+                {
+                    if (mEditMode) {
+                        updateSelParamEditControls<float>(widget);
+                    }
+                    else {
+                        updateSelParamControls<float>(widget);
+                    }
+
+                    updateMidiButton<float>(widget);
+                }
                 else
-                    updateSelParamControls<float>(widget);
+                {
+                    toggleSelParamWidgets(false);
+                }
 
-                updateMidiButton<float>(widget);
+                setSelParamNameWidgets<float>(widget);
             }
-            else
-            {
-                toggleSelParamWidgets(false);
-            }
-
-            setSelParamNameWidgets<float>(widget);
         });
 
         connect(widget, &UniformMat4ParameterWidget::focusIn, this, [=, this](){
-            if (mEditMode)
+            if (widget->isEditable() && mEditMode)
             {
                 // Set up Mat4 parameter switcher combo box
 
-                if (mat4TypeComboBoxConn)
+                if (mat4TypeComboBoxConn) {
                     disconnect(mat4TypeComboBoxConn);
+                }
 
                 mat4TypeComboBox->setVisible(true);
                 mat4TypeComboBox->setCurrentIndex(widget->typeIndex());
@@ -606,10 +620,12 @@ void OperationWidget::connectUniformMat4ParamWidgets()
 
                         lastFocusedParameter = parameter;
 
-                        if (index < 3)
+                        if (index < 3) {
                             addInterpolation();
-                        else if (index == 3)
+                        }
+                        else if (index == 3) {
                             removeInterpolation();
+                        }
 
                         recreate();
                     }
@@ -639,9 +655,11 @@ void OperationWidget::addInterpolation()
 {
     bool interpolationExists = false;
 
-    foreach (auto optionsWidget, glenumOptionsWidgets)
-        if (optionsWidget->name() == "Interpolation")
+    foreach (auto optionsWidget, glenumOptionsWidgets) {
+        if (optionsWidget->name() == "Interpolation") {
             interpolationExists = true;
+        }
+    }
 
     if (!interpolationExists)
     {
@@ -656,8 +674,9 @@ void OperationWidget::removeInterpolation()
 {
     foreach (auto optionsWidget, glenumOptionsWidgets)
     {
-        if (optionsWidget->name() == "Interpolation")
+        if (optionsWidget->name() == "Interpolation") {
             mOperation->removeOptionsParameter<GLenum>(optionsWidget->parameter());
+        }
     }
 }
 
@@ -758,8 +777,9 @@ void OperationWidget::setSelParamNameWidgets(ParameterWidget<T>* widget)
     paramNameLineEdit->setText(widget->name());
     paramNameLineEdit->setFixedWidth(20 + paramNameLineEdit->fontMetrics().horizontalAdvance(widget->name()));
 
-    if (paramNameLineEditConn)
+    if (paramNameLineEditConn) {
         disconnect(paramNameLineEditConn);
+    }
 
     paramNameLineEditConn = connect(paramNameLineEdit, &QLineEdit::textEdited, this, [=, this](QString name){
         widget->setName(name);
@@ -1161,8 +1181,9 @@ void OperationWidget::updateMidiButton(ParameterWidget<T>* widget)
 
 void OperationWidget::focusInEvent(QFocusEvent *event)
 {
-    if (lastFocusedWidget)
+    if (lastFocusedWidget) {
         lastFocusedWidget->setFocus(Qt::MouseFocusReason);
+    }
     event->accept();
 }
 
