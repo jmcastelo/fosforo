@@ -11,7 +11,7 @@ EdgeWidget::EdgeWidget(Number<float>* blendFactor, bool srcIsOp, Factory *factor
     mBlendFactor { blendFactor },
     mFactory { factory }
 {
-    setAttribute(Qt::WA_DeleteOnClose, false);
+    // setAttribute(Qt::WA_DeleteOnClose, false);
 
     // Blend factor line edit
 
@@ -109,7 +109,7 @@ EdgeWidget::EdgeWidget(Number<float>* blendFactor, bool srcIsOp, Factory *factor
         mBlendFactor->setIndex();
     });
 
-    connect(lineEdit, &QLineEdit::editingFinished, this, [=, this](){
+    connect(lineEdit, &QLineEdit::returnPressed, this, [=, this](){
         mBlendFactor->setValue(lineEdit->text().toFloat());
         mBlendFactor->setIndex();
     });
