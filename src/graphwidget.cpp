@@ -213,9 +213,9 @@ void GraphWidget::onActionTriggered(QAction* action)
 
 
 
-/*void GraphWidget::closeEvent(QCloseEvent* event)
+void GraphWidget::closeEvent(QCloseEvent* event)
 {
-    QList<QPointer<Node>> watchers;
+    /*QList<QPointer<Node>> watchers;
 
     for (auto* item : scene()->items()) {
         if (Node* node = qgraphicsitem_cast<Node*>(item)) {
@@ -227,10 +227,16 @@ void GraphWidget::onActionTriggered(QAction* action)
         if (!wptr.isNull()) {
             wptr->close();
         }
+    }*/
+
+    foreach (auto* item, scene()->items()) {
+        if (Node* node = qgraphicsitem_cast<Node*>(item)) {
+            node->close();
+        }
     }
 
     QGraphicsView::closeEvent(event);
-}*/
+}
 
 
 

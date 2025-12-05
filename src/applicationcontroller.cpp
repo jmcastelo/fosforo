@@ -303,6 +303,9 @@ void ApplicationController::closeAll()
 
     renderManager->stop();
 
+    plotsWidget->close();
+    graphWidget->close();
+
     if (morphoWidget->isVisible()) {
         morphoWidget->close();
     }

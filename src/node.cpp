@@ -69,11 +69,11 @@ Node::Node(QUuid id, QWidget *widget, QGraphicsItem* parent) :
 }*/
 
 
-/*void Node::closeEvent(QCloseEvent* event)
+void Node::closeEvent(QCloseEvent* event)
 {
     mWidget->close();
-    event->accept();
-}*/
+    QGraphicsWidget::closeEvent(event);
+}
 
 
 

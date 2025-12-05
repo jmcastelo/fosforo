@@ -726,11 +726,11 @@ void OperationWidget::enableOperation(bool checked)
 
 
 
-/*void OperationWidget::closeEvent(QCloseEvent* event)
+void OperationWidget::closeEvent(QCloseEvent* event)
 {
     mOpBuilder->close();
-    event->accept();
-}*/
+    QWidget::closeEvent(event);
+}
 
 
 

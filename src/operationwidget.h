@@ -86,7 +86,7 @@ public slots:
     void toggleEditMode(bool mode);
 
 protected:
-    // void closeEvent(QCloseEvent* event) override;
+    void closeEvent(QCloseEvent* event) override;
     void focusInEvent(QFocusEvent *event) override;
     bool eventFilter(QObject *obj, QEvent *event) override;
 
