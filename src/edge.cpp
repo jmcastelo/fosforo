@@ -468,7 +468,7 @@ void Edge::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWid
 /*void Edge::closeEvent(QCloseEvent* event)
 {
     mWidget->close();
-    event->accept();
+    QGraphicsWidget::closeEvent(event);
 }*/
 
 

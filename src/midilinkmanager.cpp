@@ -55,8 +55,8 @@ void MidiLinkManager::addMidiSignals(QUuid id, MidiSignals* midiSignals)
 
 void MidiLinkManager::removeMidiSignals(QUuid id)
 {
-    mMidiSignalsMap.remove(id);
     disconnectMidiSignals(id);
+    mMidiSignalsMap.remove(id);
 }
 
 
