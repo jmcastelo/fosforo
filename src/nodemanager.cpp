@@ -569,51 +569,55 @@ void NodeManager::connectOperation(QUuid id, ImageOperation* operation)
 {
     foreach (auto parameter, operation->uniformParameters<float>())
     {
-        connect(parameter, QOverload<int, QVariant>::of(&Parameter::valueChanged), this, [=, this](int i, QVariant value) {
-            QString paramName = parameter->name();
-            if (parameter->numItems() > 1) {
-                paramName += "[" + QString::number(i) + "]";
-            }
-            if (parameter->editable()) {
+        if (parameter->editable())
+        {
+            connect(parameter, QOverload<int, QVariant>::of(&Parameter::valueChanged), this, [=, this](int i, QVariant value) {
+                QString paramName = parameter->name();
+                if (parameter->numItems() > 1) {
+                    paramName += "[" + QString::number(i) + "]";
+                }
                 emit parameterValueChanged(id, operation->name(), paramName, QString::number(value.toFloat(), 'f', 6));
-            }
-        });
+            });
+        }
     }
 
     foreach (auto parameter, operation->uniformParameters<int>())
     {
-        connect(parameter, QOverload<int, QVariant>::of(&Parameter::valueChanged), this, [=, this](int i, QVariant value) {
-            QString paramName = parameter->name();
-            if (parameter->numItems() > 1) {
-                paramName += "[" + QString::number(i) + "]";
-            }
-            if (parameter->editable()) {
+        if (parameter->editable())
+        {
+            connect(parameter, QOverload<int, QVariant>::of(&Parameter::valueChanged), this, [=, this](int i, QVariant value) {
+                QString paramName = parameter->name();
+                if (parameter->numItems() > 1) {
+                    paramName += "[" + QString::number(i) + "]";
+                }
                 emit parameterValueChanged(id, operation->name(), parameter->name(), QString::number(value.toInt()));
-            }
-        });
+            });
+        }
     }
 
     foreach (auto parameter, operation->uniformParameters<unsigned int>())
     {
-        connect(parameter, QOverload<int, QVariant>::of(&Parameter::valueChanged), this, [=, this](int i, QVariant value) {
-            QString paramName = parameter->name();
-            if (parameter->numItems() > 1) {
-                paramName += "[" + QString::number(i) + "]";
-            }
-            if (parameter->editable()) {
+        if (parameter->editable())
+        {
+            connect(parameter, QOverload<int, QVariant>::of(&Parameter::valueChanged), this, [=, this](int i, QVariant value) {
+                QString paramName = parameter->name();
+                if (parameter->numItems() > 1) {
+                    paramName += "[" + QString::number(i) + "]";
+                }
                 emit parameterValueChanged(id, operation->name(), parameter->name(), QString::number(value.toUInt()));
-            }
-        });
+            });
+        }
     }
 
     foreach (auto parameter, operation->mat4UniformParameters())
     {
-        connect(parameter, QOverload<int, QVariant>::of(&Parameter::valueChanged), this, [=, this](int i, QVariant value) {
-            QString numberName = parameter->numberNames().at(i);
-            if (parameter->editable()) {
+        if (parameter->editable())
+        {
+            connect(parameter, QOverload<int, QVariant>::of(&Parameter::valueChanged), this, [=, this](int i, QVariant value) {
+                QString numberName = parameter->numberNames().at(i);
                 emit parameterValueChanged(id, operation->name(), parameter->name() + " " + numberName, QString::number(value.toFloat(), 'f', 6));
-            }
-        });
+            });
+        }
     }
 }
 
