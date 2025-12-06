@@ -38,20 +38,21 @@ ApplicationController::ApplicationController()
 
     configParser = new ConfigurationParser(factory, nodeManager, renderManager, graphWidget, &midiLinkManager);
 
+    midiControl = new MidiControl();
     midiListWidget = new MidiListWidget();
 
-    connect(&midiControl, &MidiControl::inputPortsChanged, midiListWidget, &MidiListWidget::populatePortsTable);
-    connect(&midiControl, &MidiControl::inputPortOpen, &midiLinkManager, &MidiLinkManager::setupMidi);
-    connect(&midiControl, &MidiControl::ccInputMessageReceived, &midiLinkManager, &MidiLinkManager::updateMidiLinks);
-    connect(midiListWidget, &MidiListWidget::portSelected, &midiControl, &MidiControl::openPort);
+    connect(midiControl, &MidiControl::inputPortAdded, midiListWidget, &MidiListWidget::addPortName);
+    connect(midiControl, &MidiControl::inputPortRemoved, midiListWidget, &MidiListWidget::removePortName);
+    connect(midiControl, &MidiControl::inputPortOpen, &midiLinkManager, &MidiLinkManager::setupMidi);
+    connect(midiControl, &MidiControl::inputPortIdChanged, &midiLinkManager, &MidiLinkManager::remapMidiLinks);
+    connect(midiControl, &MidiControl::ccInputMessageReceived, &midiLinkManager, &MidiLinkManager::updateMidiLinks);
     connect(midiListWidget, &MidiListWidget::multiLinkButtonChecked, &midiLinkManager, &MidiLinkManager::setMultiLink);
     connect(midiListWidget, &MidiListWidget::clearLinksButtonClicked, &midiLinkManager, &MidiLinkManager::clearLinks);
     connect(&midiLinkManager, &MidiLinkManager::multiLinkSet, midiListWidget, &MidiListWidget::toggleMultiLinkButton);
-    connect(&midiLinkManager, &MidiLinkManager::midiLinkSet, midiListWidget, &MidiListWidget::checkPort);
     connect(&midiLinkManager, &MidiLinkManager::midiEnabled, nodeManager, &NodeManager::midiEnabled);
     connect(&midiLinkManager, &MidiLinkManager::midiEnabled, factory, &Factory::setMidiEnabled);
 
-    midiControl.setInputPorts();
+    midiControl->setObserver();
 
     controlWidget = new ControlWidget(renderManager->version(), graphWidget, midiListWidget);
     controlWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -156,6 +157,7 @@ ApplicationController::~ApplicationController()
     delete morphoWidget;
     delete overlay;
     delete videoInControl;
+    delete midiControl;
     // delete iterationTimer;
     // delete updateTimer;
 }

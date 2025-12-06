@@ -18,19 +18,19 @@ public:
     explicit MidiListWidget(QWidget *parent = nullptr);
 
 signals:
-    void portSelected(QString portName, bool state);
     void multiLinkButtonChecked(bool checked);
     void clearLinksButtonClicked();
 
 public slots:
-    void populatePortsTable(QList<QString> portNames);
-    void portChecked(QListWidgetItem* item);
-    void checkPort(QString portName);
+    void addPortName(QPair<QString, int> portId);
+    void removePortName(QPair<QString, int> portId);
     void toggleMultiLinkButton(bool checked);
 
 private:
     QListWidget* portsTable;
     QPushButton* multiLinkButton;
+
+    QString getPortName(QPair<QString, int> portId);
 };
 
 

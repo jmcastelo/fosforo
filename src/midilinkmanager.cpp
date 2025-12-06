@@ -24,21 +24,21 @@ bool MidiLinkManager::enabled()
 
 
 
-QMap<QString, QMultiMap<int, Number<float>*>> MidiLinkManager::floatLinks()
+QMap<QPair<QString, int>, QMultiMap<int, Number<float>*>> MidiLinkManager::floatLinks()
 {
     return mFloatLinks;
 }
 
 
 
-QMap<QString, QMultiMap<int, Number<int>*>> MidiLinkManager::intLinks()
+QMap<QPair<QString, int>, QMultiMap<int, Number<int>*>> MidiLinkManager::intLinks()
 {
     return mIntLinks;
 }
 
 
 
-QMap<QString, QMultiMap<int, Number<unsigned int>*>> MidiLinkManager::uintLinks()
+QMap<QPair<QString, int>, QMultiMap<int, Number<unsigned int>*>> MidiLinkManager::uintLinks()
 {
     return mUintLinks;
 }
@@ -61,29 +61,50 @@ void MidiLinkManager::removeMidiSignals(QUuid id)
 
 
 
-void MidiLinkManager::setupMidi(QString portName, bool open)
+void MidiLinkManager::setupMidi(QPair<QString, int> portId, bool open)
 {
     if (open)
     {
-        if (!mFloatLinks.contains(portName)) {
-            mFloatLinks[portName] = QMultiMap<int, Number<float>*>();
+        if (!mFloatLinks.contains(portId)) {
+            mFloatLinks[portId] = QMultiMap<int, Number<float>*>();
         }
 
-        if (!mIntLinks.contains(portName)) {
-            mIntLinks[portName] = QMultiMap<int, Number<int>*>();
+        if (!mIntLinks.contains(portId)) {
+            mIntLinks[portId] = QMultiMap<int, Number<int>*>();
         }
 
-        if (!mUintLinks.contains(portName)) {
-            mUintLinks[portName] = QMultiMap<int, Number<unsigned int>*>();
+        if (!mUintLinks.contains(portId)) {
+            mUintLinks[portId] = QMultiMap<int, Number<unsigned int>*>();
         }
     }
-    /*else
+    else
     {
-        mFloatLinks.remove(portName);
-        mIntLinks.remove(portName);
-    }*/
+        if (mFloatLinks.contains(portId))
+        {
+            for (auto key : mFloatLinks[portId].keys()) {
+                removeKey(portId, key);
+            }
+            mFloatLinks.remove(portId);
+        }
 
-    mPortOpen[portName] = open;
+        if (mIntLinks.contains(portId))
+        {
+            for (auto key : mIntLinks[portId].keys()) {
+                removeKey(portId, key);
+            }
+            mIntLinks.remove(portId);
+        }
+
+        if (mUintLinks.contains(portId))
+        {
+            for (auto key : mUintLinks[portId].keys()) {
+                removeKey(portId, key);
+            }
+            mUintLinks.remove(portId);
+        }
+    }
+
+    mPortOpen[portId] = open;
 
     // setUpConnections(enabled());
 
@@ -92,27 +113,27 @@ void MidiLinkManager::setupMidi(QString portName, bool open)
 
 
 
-void MidiLinkManager::updateMidiLinks(QString portName, int key, int value)
+void MidiLinkManager::updateMidiLinks(QPair<QString, int> portId, int key, int value)
 {
     if (mLinkingFloat != nullptr)
     {
         // Linking a float number
 
-        setupMidiLink(portName, key, mLinkingFloat);
+        setupMidiLink(portId, key, mLinkingFloat);
         mLinkingFloat = nullptr;
     }
     else if (mLinkingInt != nullptr)
     {
         // Linking an int or uint number
 
-        setupMidiLink(portName, key, mLinkingInt);
+        setupMidiLink(portId, key, mLinkingInt);
         mLinkingInt = nullptr;
     }
     else if (mLinkingUint != nullptr)
     {
         // Linking an int or uint number
 
-        setupMidiLink(portName, key, mLinkingUint);
+        setupMidiLink(portId, key, mLinkingUint);
         mLinkingUint = nullptr;
     }
     else
@@ -120,9 +141,9 @@ void MidiLinkManager::updateMidiLinks(QString portName, int key, int value)
         // No number being linked: set value of already linked number
         // For each QMultiMap, iterate over all QMultiMap items
 
-        if (mFloatLinks.contains(portName) && mFloatLinks[portName].contains(key))
+        if (mFloatLinks.contains(portId) && mFloatLinks[portId].contains(key))
         {
-            auto [it, end] = mFloatLinks[portName].equal_range(key);
+            auto [it, end] = mFloatLinks[portId].equal_range(key);
             while (it != end)
             {
                 it.value()->setValueFromIndex(value);
@@ -130,9 +151,9 @@ void MidiLinkManager::updateMidiLinks(QString portName, int key, int value)
                 it++;
             }
         }
-        if (mIntLinks.contains(portName) && mIntLinks[portName].contains(key))
+        if (mIntLinks.contains(portId) && mIntLinks[portId].contains(key))
         {
-            auto [it, end] = mIntLinks[portName].equal_range(key);
+            auto [it, end] = mIntLinks[portId].equal_range(key);
             while (it != end)
             {
                 it.value()->setValueFromIndex(value);
@@ -140,9 +161,9 @@ void MidiLinkManager::updateMidiLinks(QString portName, int key, int value)
                 it++;
             }
         }
-        if (mUintLinks.contains(portName) && mUintLinks[portName].contains(key))
+        if (mUintLinks.contains(portId) && mUintLinks[portId].contains(key))
         {
-            auto [it, end] = mUintLinks[portName].equal_range(key);
+            auto [it, end] = mUintLinks[portId].equal_range(key);
             while (it != end)
             {
                 it.value()->setValueFromIndex(value);
@@ -155,18 +176,18 @@ void MidiLinkManager::updateMidiLinks(QString portName, int key, int value)
 
 
 
-void MidiLinkManager::setupMidiLink(QString portName, int key, Number<float>* number)
+void MidiLinkManager::setupMidiLink(QPair<QString, int> portId, int key, Number<float>* number)
 {
     // Init if no links map exists for this port
 
-    if (!mFloatLinks.contains(portName)) {
-        mFloatLinks[portName] = QMultiMap<int, Number<float>*>();
+    if (!mFloatLinks.contains(portId)) {
+        mFloatLinks[portId] = QMultiMap<int, Number<float>*>();
     }
 
     // Remove previously assigned key
 
     if (!mMultiLink) {
-        removeKey(key);
+        removeKey(portId, key);
     }
 
     // Adjust to midi range
@@ -177,32 +198,32 @@ void MidiLinkManager::setupMidiLink(QString portName, int key, Number<float>* nu
     // Remove link on number deletion
 
     connect(number, &Number<float>::deleting, this, [=, this]() {
-        mFloatLinks[portName].remove(key, number);
+        for (auto [id, map] : mFloatLinks.asKeyValueRange()) {
+            if (mFloatLinks[id].contains(key, number)) {
+                mFloatLinks[id].remove(key, number);
+            }
+        }
     });
 
     // Store link
 
-    mFloatLinks[portName].insert(key, number);
-
-    if (!mPortOpen[portName]) {
-        emit midiLinkSet(portName);
-    }
+    mFloatLinks[portId].insert(key, number);
 }
 
 
 
-void MidiLinkManager::setupMidiLink(QString portName, int key, Number<int>* number)
+void MidiLinkManager::setupMidiLink(QPair<QString, int> portId, int key, Number<int>* number)
 {
     // Init if no links map exists for this port
 
-    if (!mIntLinks.contains(portName)) {
-        mIntLinks[portName] = QMultiMap<int, Number<int>*>();
+    if (!mIntLinks.contains(portId)) {
+        mIntLinks[portId] = QMultiMap<int, Number<int>*>();
     }
 
     // Remove previously assigned key
 
     if (!mMultiLink) {
-        removeKey(key);
+        removeKey(portId, key);
     }
 
     // Adjust to midi range
@@ -213,32 +234,32 @@ void MidiLinkManager::setupMidiLink(QString portName, int key, Number<int>* numb
     // Remove link on number deletion
 
     connect(number, &Number<int>::deleting, this, [=, this]() {
-        mIntLinks[portName].remove(key, number);
+        for (auto [id, map] : mFloatLinks.asKeyValueRange()) {
+            if (mIntLinks[id].contains(key, number)) {
+                mIntLinks[id].remove(key, number);
+            }
+        }
     });
 
     // Store link
 
-    mIntLinks[portName].insert(key, number);
-
-    if (!mPortOpen[portName]) {
-        emit midiLinkSet(portName);
-    }
+    mIntLinks[portId].insert(key, number);
 }
 
 
 
-void MidiLinkManager::setupMidiLink(QString portName, int key, Number<unsigned int>* number)
+void MidiLinkManager::setupMidiLink(QPair<QString, int> portId, int key, Number<unsigned int>* number)
 {
     // Init if no links map exists for this port
 
-    if (!mUintLinks.contains(portName)) {
-        mUintLinks[portName] = QMultiMap<int, Number<unsigned int>*>();
+    if (!mUintLinks.contains(portId)) {
+        mUintLinks[portId] = QMultiMap<int, Number<unsigned int>*>();
     }
 
     // Remove previously assigned key
 
     if (!mMultiLink) {
-        removeKey(key);
+        removeKey(portId, key);
     }
 
     // Adjust to midi range
@@ -249,23 +270,23 @@ void MidiLinkManager::setupMidiLink(QString portName, int key, Number<unsigned i
     // Remove link on number deletion
 
     connect(number, &Number<unsigned int>::deleting, this, [=, this]() {
-        mUintLinks[portName].remove(key, number);
+        for (auto [id, map] : mFloatLinks.asKeyValueRange()) {
+            if (mUintLinks[id].contains(key, number)) {
+                mUintLinks[id].remove(key, number);
+            }
+        }
     });
 
     // Store link
 
-    mUintLinks[portName].insert(key, number);
-
-    if (!mPortOpen[portName]) {
-        emit midiLinkSet(portName);
-    }
+    mUintLinks[portId].insert(key, number);
 }
 
 
 
 void MidiLinkManager::clearLinks()
 {
-    for (auto [portName, links] : mFloatLinks.asKeyValueRange())
+    for (auto [portId, links] : mFloatLinks.asKeyValueRange())
     {
         QMultiMapIterator<int, Number<float>*> it(links);
         while (it.hasNext())
@@ -276,7 +297,7 @@ void MidiLinkManager::clearLinks()
         }
     }
 
-    for (auto [portName, links] : mIntLinks.asKeyValueRange())
+    for (auto [portId, links] : mIntLinks.asKeyValueRange())
     {
         QMultiMapIterator<int, Number<int>*> it(links);
         while (it.hasNext())
@@ -287,7 +308,7 @@ void MidiLinkManager::clearLinks()
         }
     }
 
-    for (auto [portName, links] : mUintLinks.asKeyValueRange())
+    for (auto [portId, links] : mUintLinks.asKeyValueRange())
     {
         QMultiMapIterator<int, Number<unsigned int>*> it(links);
         while (it.hasNext())
@@ -320,7 +341,7 @@ void MidiLinkManager::setMultiLink(bool enabled)
     {
         // Remove all links except the first set
 
-        for (auto [portName, links] : mFloatLinks.asKeyValueRange())
+        for (auto [portId, links] : mFloatLinks.asKeyValueRange())
         {
             foreach (int key, links.uniqueKeys())
             {
@@ -333,7 +354,7 @@ void MidiLinkManager::setMultiLink(bool enabled)
                 }
             }
         }
-        for (auto [portName, links] : mIntLinks.asKeyValueRange())
+        for (auto [portId, links] : mIntLinks.asKeyValueRange())
         {
             foreach (int key, links.uniqueKeys())
             {
@@ -346,7 +367,7 @@ void MidiLinkManager::setMultiLink(bool enabled)
                 }
             }
         }
-        for (auto [portName, links] : mUintLinks.asKeyValueRange())
+        for (auto [portId, links] : mUintLinks.asKeyValueRange())
         {
             foreach (int key, links.uniqueKeys())
             {
@@ -366,42 +387,60 @@ void MidiLinkManager::setMultiLink(bool enabled)
 
 
 
-void MidiLinkManager::removeKey(int key)
+void MidiLinkManager::remapMidiLinks(QPair<QString, int> oldId, QPair<QString, int> newId)
 {
-    for (auto [portName, links] : mFloatLinks.asKeyValueRange())
+    if (mFloatLinks.contains(oldId))
     {
-        auto [it, end] = links.equal_range(key);
-        while (it != end)
-        {
-            it.value()->setIndexMax(100'000);
-            it.value()->setMidiLinked(false);
-            it++;
-        }
-        links.remove(key);
+        mFloatLinks.insert(newId, mFloatLinks[oldId]);
+        mFloatLinks.remove(oldId);
     }
 
-    for (auto [portName, links] : mIntLinks.asKeyValueRange())
+    if (mIntLinks.contains(oldId))
     {
-        auto [it, end] = links.equal_range(key);
-        while (it != end)
-        {
-            it.value()->setIndexMax(100'000);
-            it.value()->setMidiLinked(false);
-            it++;
-        }
-        links.remove(key);
+        mIntLinks.insert(newId, mIntLinks[oldId]);
+        mIntLinks.remove(oldId);
     }
 
-    for (auto [portName, links] : mUintLinks.asKeyValueRange())
+    if (mUintLinks.contains(oldId))
     {
-        auto [it, end] = links.equal_range(key);
+        mUintLinks.insert(newId, mUintLinks[oldId]);
+        mUintLinks.remove(oldId);
+    }
+}
+
+
+
+void MidiLinkManager::removeKey(QPair<QString, int> portId, int key)
+{
+    {
+        auto [it, end] = mFloatLinks[portId].equal_range(key);
         while (it != end)
         {
             it.value()->setIndexMax(100'000);
             it.value()->setMidiLinked(false);
             it++;
         }
-        links.remove(key);
+        mFloatLinks[portId].remove(key);
+    }
+    {
+        auto [it, end] = mIntLinks[portId].equal_range(key);
+        while (it != end)
+        {
+            it.value()->setIndexMax(100'000);
+            it.value()->setMidiLinked(false);
+            it++;
+        }
+        mIntLinks[portId].remove(key);
+    }
+    {
+        auto [it, end] = mUintLinks[portId].equal_range(key);
+        while (it != end)
+        {
+            it.value()->setIndexMax(100'000);
+            it.value()->setMidiLinked(false);
+            it++;
+        }
+        mUintLinks[portId].remove(key);
     }
 }
 
@@ -439,7 +478,7 @@ void MidiLinkManager::connectMidiSignals(QUuid id)
         number->setIndexMax(100'000);
         number->setMidiLinked(false);
 
-        for (auto [portName, links] : mFloatLinks.asKeyValueRange())
+        for (auto [portId, links] : mFloatLinks.asKeyValueRange())
         {
             QList<int> keys = links.keys(number);
             foreach (int key, keys) {
@@ -452,7 +491,7 @@ void MidiLinkManager::connectMidiSignals(QUuid id)
         number->setIndexMax(100'000);
         number->setMidiLinked(false);
 
-        for (auto [portName, links] : mIntLinks.asKeyValueRange())
+        for (auto [portId, links] : mIntLinks.asKeyValueRange())
         {
             QList<int> keys = links.keys(number);
             foreach (int key, keys) {
@@ -465,7 +504,7 @@ void MidiLinkManager::connectMidiSignals(QUuid id)
         number->setIndexMax(100'000);
         number->setMidiLinked(false);
 
-        for (auto [portName, links] : mUintLinks.asKeyValueRange())
+        for (auto [portId, links] : mUintLinks.asKeyValueRange())
         {
             QList<int> keys = links.keys(number);
             foreach (int key, keys) {

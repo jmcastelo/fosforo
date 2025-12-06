@@ -55,7 +55,7 @@ private:
     ConfigurationParser* configParser;
     ControlWidget* controlWidget;
     PlotsWidget* plotsWidget;
-    MidiControl midiControl;
+    MidiControl* midiControl;
     MidiListWidget* midiListWidget;
     MidiLinkManager midiLinkManager;
     Overlay* overlay;

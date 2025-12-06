@@ -19,6 +19,7 @@ MidiListWidget::MidiListWidget(QWidget *parent): QWidget{parent}
     clearLinksButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
     portsTable = new QListWidget;
+    portsTable->setSelectionMode(QAbstractItemView::NoSelection);
 
     QHBoxLayout* hLayout = new QHBoxLayout;
     hLayout->addWidget(multiLinkButton);
@@ -32,72 +33,45 @@ MidiListWidget::MidiListWidget(QWidget *parent): QWidget{parent}
 
     connect(clearLinksButton, &QPushButton::clicked, this, &MidiListWidget::clearLinksButtonClicked);
     connect(multiLinkButton, &QPushButton::clicked, this, &MidiListWidget::multiLinkButtonChecked);
-    connect(portsTable, &QListWidget::itemClicked, this, &MidiListWidget::portChecked);
 }
 
 
 
-void MidiListWidget::populatePortsTable(QList<QString> portNames)
+void MidiListWidget::addPortName(QPair<QString, int> portId)
 {
-    // portsTable->clear();
+    QString portName = getPortName(portId);
+    QListWidgetItem* item = new QListWidgetItem(portName, portsTable);
+    item->setFlags(Qt::ItemIsEnabled);
 
-    // int portId = 0;
-
-
-    int numItems = portsTable->count();
-
-    for (int row = numItems - 1; row >= 0; row--)
-    {
-        QListWidgetItem* item = portsTable->item(row);
-
-        if (item && !portNames.contains(item->text())) {
-            delete item;
-        }
-    }
-
-    foreach (QString portName, portNames)
-    {
-        /*QListWidgetItem* item = new QListWidgetItem(name, portsTable);
-        QCheckBox* checkBox = new QCheckBox();
-        portsTable->setItemWidget(item, checkBox);
-        connect(checkBox, &QCheckBox::checkStateChanged, this, [=, this](Qt::CheckState state){
-            emit portSelected(portId, state == Qt::Checked);
-        });
-        portId++;*/
-
-        QList<QListWidgetItem*> items = portsTable->findItems(portName, Qt::MatchCaseSensitive);
-
-        if (items.isEmpty())
-        {
-            QListWidgetItem* item = new QListWidgetItem(portName, portsTable);
-            item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
-            item->setCheckState(Qt::Unchecked);
-        }
-
-    }
-
+    portsTable->sortItems();
 }
 
 
 
-void MidiListWidget::portChecked(QListWidgetItem* item)
+void MidiListWidget::removePortName(QPair<QString, int> portId)
 {
-    emit portSelected(item->text(), item->checkState() == Qt::Checked);
-}
+    QString portName = getPortName(portId);
 
+    auto items = portsTable->findItems(portName, Qt::MatchCaseSensitive);
 
-
-void MidiListWidget::checkPort(QString portName)
-{
-    QList<QListWidgetItem*> items = portsTable->findItems(portName, Qt::MatchCaseSensitive);
     if (!items.isEmpty()) {
-        items[0]->setCheckState(Qt::Checked);
-        emit portSelected(portName, true);
+        portsTable->removeItemWidget(items[0]);
+        delete items[0];
     }
+
+    portsTable->sortItems();
 }
+
 
 
 void MidiListWidget::toggleMultiLinkButton(bool checked)
 {
     multiLinkButton->setChecked(checked);
+}
+
+
+
+QString MidiListWidget::getPortName(QPair<QString, int> portId)
+{
+    return portId.first + " [" + QString::number(portId.second + 1) + "]";
 }
