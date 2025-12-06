@@ -773,8 +773,9 @@ void RenderManager::setBlenderProgram()
         // Set texture unit 0
 
         GLint locArrayTex = mBlenderProgram->uniformLocation("inArrayTex");
-        if (locArrayTex >= 0)
+        if (locArrayTex >= 0) {
             glUniform1i(locArrayTex, 0);
+        }
 
         mBlenderProgram->release();
     }
@@ -888,8 +889,24 @@ void RenderManager::adjustOrtho()
     GLfloat left, right, bottom, top;
     verticesCoords(left, right, bottom, top);
 
-    foreach (ImageOperation* operation, mFactory->operations())
+    foreach (ImageOperation* operation, mFactory->operations()) {
         operation->adjustOrtho(left, right, bottom, top);
+    }
+
+    // Orthographic projection: blender
+
+    QMatrix4x4 matrix;
+    matrix.setToIdentity();
+    matrix.ortho(left, right, bottom, top, -1.0, 1.0);
+
+    mContext->makeCurrent(mSurface);
+    mBlenderProgram->bind();
+
+    int locOrtho = mBlenderProgram->uniformLocation("ortho");
+    mBlenderProgram->setUniformValue(locOrtho, matrix);
+
+    mBlenderProgram->release();
+    mContext->doneCurrent();
 }
 
 
@@ -974,11 +991,17 @@ void RenderManager::resizeTextures()
 
     QList<GLuint*> oldTexIds;
 
-    foreach (Seed* seed, mFactory->seeds())
-        oldTexIds.append(seed->textureIds());
+    foreach (Seed* seed, mFactory->seeds()) {
+        foreach (GLuint* texId, seed->textureIds()) {
+            oldTexIds.append(texId);
+        }
+    }
 
-    foreach (ImageOperation* operation, mFactory->operations())
-        oldTexIds.append(operation->textureIds());
+    foreach (ImageOperation* operation, mFactory->operations()) {
+        foreach (GLuint* texId, operation->textureIds()) {
+            oldTexIds.append(texId);
+        }
+    }
 
     foreach (GLuint* oldTexId, oldTexIds)
     {
@@ -1022,8 +1045,11 @@ void RenderManager::resizeTextures()
         seed->setOutTextureId();
     }
 
-    foreach (ImageOperation* operation, mFactory->operations()) {
+    foreach (ImageOperation* operation, mFactory->operations())
+    {
+        operation->setBlitInTextureId();
         operation->setOutTextureId();
+        // operation->resetInputData();
     }
 
     emit texturesChanged();

@@ -377,7 +377,7 @@ void ConfigurationParser::readDisplay(int &width, int &height, QUuid &outputNode
                 }
             }
 
-            mGraphWidget->fitInView(sceneRect);
+            mGraphWidget->fitInView(sceneRect, Qt::KeepAspectRatio);
         }
         else if (stream.name() == "output_node") {
             outputNodeId = QUuid(stream.readElementText());

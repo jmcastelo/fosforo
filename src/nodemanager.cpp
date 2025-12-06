@@ -998,6 +998,9 @@ void NodeManager::setSeedFixed(QUuid id, bool fixed)
 
 void NodeManager::onTexturesChanged()
 {
+    // foreach (auto node, mOperationNodesMap) {
+        // node->operation()->setInputData(node->inputsList());
+    // }
     setOutput(mOutputId);
 }
 

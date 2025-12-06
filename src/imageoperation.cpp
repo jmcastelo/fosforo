@@ -32,6 +32,7 @@
 ImageOperation::ImageOperation()
 {
     pOutTexId = new GLuint(0);
+    pBlitInTexId = new GLuint(0);
     setOutTextureId();
 }
 
@@ -50,6 +51,7 @@ ImageOperation::ImageOperation(const ImageOperation& operation) :
     mSampler2DArrayAvailable { operation.mSampler2DArrayAvailable }
 {
     pOutTexId = new GLuint(0);
+    pBlitInTexId = new GLuint(0);
     setOutTextureId();
 
     // Copy parameters
@@ -101,6 +103,7 @@ ImageOperation::ImageOperation(const ImageOperation& operation, const ImageOpera
     mSampler2DArrayAvailable { operation.mSampler2DArrayAvailable }
 {
     pOutTexId = new GLuint(0);
+    pBlitInTexId = new GLuint(0);
     setOutTextureId();
 
     // Copy parameters
@@ -155,6 +158,7 @@ ImageOperation::~ImageOperation()
     }
 
     delete pOutTexId;
+    delete pBlitInTexId;
 
     qDeleteAll(floatUniformParameters);
     qDeleteAll(intUniformParameters);
@@ -320,8 +324,9 @@ void ImageOperation::adjustOrtho(GLfloat left, GLfloat right, GLfloat bottom, GL
 {
     foreach (UniformMat4Parameter* parameter, mMat4UniformParameters)
     {
-        if (parameter->type() == UniformMat4Type::ORTHOGRAPHIC)
+        if (parameter->type() == UniformMat4Type::ORTHOGRAPHIC) {
             parameter->setValues(QList<float> { left, right, bottom, top });
+        }
     }
 }
 
@@ -525,19 +530,19 @@ void ImageOperation::setBlitInTextureId()
 {
     if (mEnabled)
     {
-        pBlitInTexId = &mOutTexId;
+        *pBlitInTexId = mOutTexId;
     }
     else if (mBlendEnabled)
     {
-        pBlitInTexId = &mBlendOutTexId;
+        *pBlitInTexId = mBlendOutTexId;
     }
     else if (pInputTexId)
     {
-        pBlitInTexId = pInputTexId;
+        *pBlitInTexId = *pInputTexId;
     }
     else
     {
-        pBlitInTexId = nullptr;
+        *pBlitInTexId = 0;
     }
 }
 
@@ -623,12 +628,22 @@ void ImageOperation::setInputData(QList<InputData*> data)
 
 
 
+void ImageOperation::resetInputData()
+{
+    setInputData(mInputData);
+}
+
+
+
 GLuint ImageOperation::blitInTextureId()
 {
-    if (pBlitInTexId)
+    /*if (pBlitInTexId) {
         return *pBlitInTexId;
-    else
+    }
+    else {
         return 0;
+    }*/
+    return *pBlitInTexId;
 }
 
 

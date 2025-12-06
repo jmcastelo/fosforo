@@ -298,7 +298,11 @@ void Seed::loadImage(QString filename)
 
     if (imageFile.exists()) {
         mImage = QImage(filename).convertToFormat(QImage::Format_RGBA8888);
+
+        mContext->makeCurrent(mSurface);
         resizeImage();
+        mContext->doneCurrent();
+
         mImageFilename = filename;
     }
 }
@@ -327,8 +331,6 @@ void Seed::resizeImage()
         QPainter painter(&buffer);
         painter.drawImage(offsetX, offsetY, scaled);
 
-        mContext->makeCurrent(mSurface);
-
         glBindTexture(GL_TEXTURE_2D, mImageTexId);
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -336,8 +338,6 @@ void Seed::resizeImage()
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mTexWidth, mTexHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer.constBits());
 
         glBindTexture(GL_TEXTURE_2D, 0);
-
-        mContext->doneCurrent();
     }
 }
 

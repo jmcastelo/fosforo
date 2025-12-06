@@ -137,10 +137,16 @@ ApplicationController::ApplicationController()
 
     // resize(renderManager->texWidth(), renderManager->texHeight());
 
-    morphoWidget->resize(renderManager->texWidth(), renderManager->texHeight());
+    QSize screenSize = QGuiApplication::primaryScreen()->size();
+    int glSide = qMin(screenSize.width(), screenSize.height());
+    int ctrlWidth= qMax(screenSize.width(), screenSize.height()) - glSide;
+
+    // morphoWidget->resize(renderManager->texWidth(), renderManager->texHeight());
+    morphoWidget->resize(glSide, glSide);
+    morphoWidget->setPosition(0, 0);
     morphoWidget->show();
 
-    controlWidget->resize(1024, 1024);
+    controlWidget->resize(ctrlWidth, screenSize.height());
     controlWidget->show();
 }
 

@@ -279,13 +279,7 @@ void ImageOperationNode::equalizeBlendFactors()
 
 QList<InputData*> ImageOperationNode::inputsList()
 {
-    QList<InputData*> inputData;
-
-    foreach(InputData* inData, mInputs) {
-        inputData.append(inData);
-    }
-
-    return inputData;
+    return mInputs.values();
 }
 
 

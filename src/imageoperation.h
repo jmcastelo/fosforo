@@ -99,6 +99,7 @@ public:
     void setName(QString theName);
 
     void setInputData(QList<InputData*> data);
+    void resetInputData();
 
     GLuint blitInTextureId();
     GLuint blitOutTextureId();
