@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fosforo>
-    <operation name="Smooth mask" enabled="0">
-        <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gdmVjNChwb3MsIDAuMCwgMS4wKTsKICAgIHRleENvb3JkcyA9IHRleDsKfQo=</vertex_shader>
+    <operation name="Smooth Mask" enabled="0">
+        <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCnVuaWZvcm0gbWF0NCBvcnRobzsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gb3J0aG8gKiB2ZWM0KHBvcywgMC4wLCAxLjApOwogICAgdGV4Q29vcmRzID0gdGV4Owp9Cg==</vertex_shader>
         <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp1bmlmb3JtIHVpbnQgc2l6ZTsKdW5pZm9ybSBmbG9hdCB0aHJlc2hvbGQ7CnVuaWZvcm0gZmxvYXQgb3BhY2l0eTsKCnZvaWQgbWFpbigpCnsKICAgIHZlYzMgc3JjQ29sb3IgPSB0ZXh0dXJlKGluVGV4dHVyZSwgdGV4Q29vcmRzKS5yZ2I7CgogICAgaXZlYzIgdGV4U2l6ZSA9IHRleHR1cmVTaXplKGluVGV4dHVyZSwgMCk7CiAgICB2ZWMyIGZhY3RvciA9IHZlYzIoc2l6ZSkgLyB2ZWMyKHRleFNpemUpOwoKICAgIHZlYzMgc2FtcGxlUiA9IHRleHR1cmUoaW5UZXh0dXJlLCBjbGFtcCh0ZXhDb29yZHMgKyB2ZWMyKGZhY3Rvci54LCAwLjApLCAwLjAsIDEuMCkpLnJnYjsKICAgIHZlYzMgc2FtcGxlTCA9IHRleHR1cmUoaW5UZXh0dXJlLCBjbGFtcCh0ZXhDb29yZHMgKyB2ZWMyKC1mYWN0b3IueCwgMC4wKSwgMC4wLCAxLjApKS5yZ2I7CiAgICB2ZWMzIHNhbXBsZVUgPSB0ZXh0dXJlKGluVGV4dHVyZSwgY2xhbXAodGV4Q29vcmRzICsgdmVjMigwLjAsIGZhY3Rvci55KSwgMC4wLCAxLjApKS5yZ2I7CiAgICB2ZWMzIHNhbXBsZUQgPSB0ZXh0dXJlKGluVGV4dHVyZSwgY2xhbXAodGV4Q29vcmRzICsgdmVjMigwLjAsIC1mYWN0b3IueSksIDAuMCwgMS4wKSkucmdiOwoKICAgIHZlYzMgZHggPSBzYW1wbGVSIC0gc2FtcGxlTDsKICAgIHZlYzMgZHkgPSBzYW1wbGVVIC0gc2FtcGxlRDsKCiAgICBmbG9hdCBtYWduaXR1ZGUgPSBsZW5ndGgodmVjMihsZW5ndGgoZHgpLCBsZW5ndGgoZHkpKSk7CgogICAgdmVjMyBkc3RDb2xvciA9IHZlYzMoMC4wKTsKICAgIGlmIChtYWduaXR1ZGUgPiB0aHJlc2hvbGQpIHsKICAgICAgICBkc3RDb2xvciA9IHNyY0NvbG9yOwogICAgfQoKICAgIGZyYWdDb2xvciA9IHZlYzQobWl4KHNyY0NvbG9yLCBjbGFtcChkc3RDb2xvciwgMC4wLCAxLjApLCBvcGFjaXR5KSwgMS4wKTsKfQ==</fragment_shader>
         <sampler2d>inTexture</sampler2d>
         <parameter name="Threshold" type="float_uniform" editable="1" row="0" column="0">
@@ -17,6 +17,14 @@
         <parameter name="Size" type="uint_uniform" editable="1" row="0" column="1">
             <uniform name="size" type="5125" numitems="1">
                 <number inf="1" sup="999999" min="1" max="100">1</number>
+            </uniform>
+        </parameter>
+        <parameter name="Ortho" type="mat4_uniform" editable="0" row="1" column="0">
+            <uniform name="ortho" type="35676" mat4_type="3">
+                <number name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Right" inf="0" sup="10" min="0" max="2">1</number>
+                <number name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Top" inf="0" sup="10" min="0" max="2">1</number>
             </uniform>
         </parameter>
     </operation>

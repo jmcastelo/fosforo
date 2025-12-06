@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fosforo>
-    <operation name="Mask" enabled="1">
-        <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dCAobG9jYXRpb24gPSAwKSBpbiB2ZWMyIHBvczsKbGF5b3V0IChsb2NhdGlvbiA9IDEpIGluIHZlYzIgdGV4OwoKdW5pZm9ybSBtYXQ0IHRyYW5zZm9ybTsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gdHJhbnNmb3JtICogdmVjNChwb3MsIDAuMCwgMS4wKTsKICAgIHRleENvb3JkcyA9IHRleDsKfQo=</vertex_shader>
+    <operation name="Mask" enabled="0">
+        <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dCAobG9jYXRpb24gPSAwKSBpbiB2ZWMyIHBvczsKbGF5b3V0IChsb2NhdGlvbiA9IDEpIGluIHZlYzIgdGV4OwoKdW5pZm9ybSBtYXQ0IG9ydGhvOwoKb3V0IHZlYzIgdGV4Q29vcmRzOwoKdm9pZCBtYWluKCkKewogICAgZ2xfUG9zaXRpb24gPSBvcnRobyAqIHZlYzQocG9zLCAwLjAsIDEuMCk7CiAgICB0ZXhDb29yZHMgPSB0ZXg7Cn0K</vertex_shader>
         <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp1bmlmb3JtIGZsb2F0IGlubmVyUmFkaXVzOwp1bmlmb3JtIGZsb2F0IG91dGVyUmFkaXVzOwoKdm9pZCBtYWluKCkKewogICAgaXZlYzIgdGV4U2l6ZSA9IHRleHR1cmVTaXplKGluVGV4dHVyZSwgMCk7CiAgICAKICAgIHZlYzIgc2NhbGUgPSB2ZWMyKDEuMCk7CgogICAgaWYgKHRleFNpemUueCA+PSB0ZXhTaXplLnkpIHsKICAgICAgICBzY2FsZS54ID0gZmxvYXQodGV4U2l6ZS54KSAvIGZsb2F0KHRleFNpemUueSk7CiAgICB9IGVsc2UgewogICAgICAgIHNjYWxlLnkgPSBmbG9hdCh0ZXhTaXplLnkpIC8gZmxvYXQodGV4U2l6ZS54KTsKICAgIH0KCiAgICBmbG9hdCByID0gZGlzdGFuY2UoKHRleENvb3JkcyAtIHZlYzIoMC41LCAwLjUpKSAqIHNjYWxlLCB2ZWMyKDAuMCkpOwoKICAgIGlmIChyIDwgaW5uZXJSYWRpdXMgfHwgciA+IG91dGVyUmFkaXVzKQogICAgICAgIGZyYWdDb2xvciA9IHZlYzQoMC4wLCAwLjAsIDAuMCwgMS4wKTsKICAgIGVsc2UKICAgICAgICBmcmFnQ29sb3IgPSB0ZXh0dXJlKGluVGV4dHVyZSwgdGV4Q29vcmRzKTsKfQo=</fragment_shader>
         <sampler2d>inTexture</sampler2d>
         <parameter name="Inner radius" type="float_uniform" editable="1" row="0" column="0">
@@ -15,7 +15,7 @@
             </uniform>
         </parameter>
         <parameter name="Ortho" type="mat4_uniform" editable="0" row="1" column="0">
-            <uniform name="transform" type="35676" mat4_type="3">
+            <uniform name="ortho" type="35676" mat4_type="3">
                 <number name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
                 <number name="Right" inf="0" sup="10" min="0" max="2">1</number>
                 <number name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>

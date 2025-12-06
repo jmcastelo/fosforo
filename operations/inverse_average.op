@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fosforo>
-    <operation name="Inverse average" enabled="0">
-        <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gdmVjNChwb3MsIDAuMCwgMS4wKTsKICAgIHRleENvb3JkcyA9IHRleDsKfQo=</vertex_shader>
+    <operation name="Inverse Average" enabled="0">
+        <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCnVuaWZvcm0gbWF0NCBvcnRobzsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gb3J0aG8gKiB2ZWM0KHBvcywgMC4wLCAxLjApOwogICAgdGV4Q29vcmRzID0gdGV4Owp9Cg==</vertex_shader>
         <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp1bmlmb3JtIHVpbnQgc2l6ZTsKdW5pZm9ybSBmbG9hdCBvcGFjaXR5OwoKY29uc3QgdmVjMiBvZmZzZXRbOF0gPSB2ZWMyW10oCiAgICB2ZWMyKC0xLjAsIDEuMCksIHZlYzIoMC4wLCAxLjApLCB2ZWMyKDEuMCwgMS4wKSwKICAgIHZlYzIoLTEuMCwgMC4wKSwgdmVjMigxLjAsIDAuMCksCiAgICB2ZWMyKC0xLjAsIC0xLjApLCB2ZWMyKDAuMCwgLTEuMCksIHZlYzIoMS4wLCAtMS4wKQopOwoKdm9pZCBtYWluKCkKewogICAgdmVjMyBzcmNDb2xvciA9IHRleHR1cmUoaW5UZXh0dXJlLCB0ZXhDb29yZHMpLnJnYjsKCiAgICBpdmVjMiB0ZXhTaXplID0gdGV4dHVyZVNpemUoaW5UZXh0dXJlLCAwKTsKICAgIHZlYzIgZmFjdG9yID0gdmVjMihzaXplKSAvIHZlYzIodGV4U2l6ZSk7CgogICAgdmVjMyBhdmdDb2xvciA9IHZlYzMoMC4wKTsKICAgIGZvciAoaW50IGkgPSAwOyBpIDwgODsgaSsrKSB7CiAgICAgICAgYXZnQ29sb3IgKz0gdGV4dHVyZShpblRleHR1cmUsIGNsYW1wKHRleENvb3JkcyArIGZhY3RvciAqIG9mZnNldFtpXSwgMC4wLCAxLjApKS5yZ2I7CiAgICB9CgogICAgYXZnQ29sb3IgLz0gOC4wOwoKICAgIHZlYzMgZHN0Q29sb3IgPSAxLjAgLSBhdmdDb2xvcjsKCiAgICBmcmFnQ29sb3IgPSB2ZWM0KG1peChzcmNDb2xvciwgY2xhbXAoZHN0Q29sb3IsIDAuMCwgMS4wKSwgb3BhY2l0eSksIDEuMCk7Cn0K</fragment_shader>
         <sampler2d>inTexture</sampler2d>
         <parameter name="Opacity" type="float_uniform" editable="1" row="0" column="1">
@@ -12,6 +12,14 @@
         <parameter name="Size" type="uint_uniform" editable="1" row="0" column="0">
             <uniform name="size" type="5125" numitems="1">
                 <number inf="1" sup="999999" min="1" max="20">1</number>
+            </uniform>
+        </parameter>
+        <parameter name="Ortho" type="mat4_uniform" editable="0" row="1" column="0">
+            <uniform name="ortho" type="35676" mat4_type="3">
+                <number name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Right" inf="0" sup="10" min="0" max="2">1</number>
+                <number name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Top" inf="0" sup="10" min="0" max="2">1</number>
             </uniform>
         </parameter>
     </operation>
