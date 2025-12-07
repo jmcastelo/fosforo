@@ -126,6 +126,8 @@ signals:
 
     void midiEnabled(bool enabled);
 
+    void operationEdited(ImageOperation* operation);
+
     void parameterValueChanged(QUuid id, QString operationName, QString parameterName, QString value);
 
 public slots:

@@ -1270,6 +1270,10 @@ void OperationWidget::toggleEditMode(bool mode)
 
     mOpBuilder->setVisible(mEditMode);
 
+    if (!mEditMode) {
+        emit operationEdited(mOperation);
+    }
+
     opNameLabel->setVisible(!mEditMode);
     opNameLineEdit->setVisible(mEditMode);
 

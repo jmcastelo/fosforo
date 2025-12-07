@@ -86,18 +86,28 @@ signals:
 
 public slots:
     void iterate();
+
     void resize(GLuint width, GLuint height);
+
     void setOutputTextureId(GLuint* pTexId);
+
     void initOperation(QUuid id, ImageOperation* operation);
     void initSeed(QUuid id, Seed* seed);
+
+    void adjustOperationOrtho(ImageOperation* operation);
+
     void setSortedOperations(QList<ImageOperation*> sortedOperations);
+
     void setTextureFormat(TextureFormat format);
+
     void reset();
     void resetIterationNumer();
 
     void genImageTexture(QByteArray devId);
     void delImageTexture(QByteArray devId);
+
     void setVideoTextures();
+
     void setFrameImage(QByteArray devId, QImage image);
 
     void startRecording(QString recordFilename, int framesPerSecond, QMediaFormat format);

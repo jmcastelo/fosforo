@@ -661,6 +661,8 @@ void NodeManager::connectOperationWidget(OperationWidget* widget)
     emit midiSignalsCreated(widget->id(), widget->midiSignals());
 
     connect(this, &NodeManager::midiEnabled, widget, &OperationWidget::toggleMidiButton);
+
+    connect(widget, &OperationWidget::operationEdited, this, &NodeManager::operationEdited);
 }
 
 

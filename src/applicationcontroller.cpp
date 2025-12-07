@@ -112,6 +112,7 @@ ApplicationController::ApplicationController()
     connect(nodeManager, &NodeManager::outputTextureChanged, plotsWidget, &PlotsWidget::setTextureID);
     // connect(nodeManager, &NodeManager::outputFBOChanged, plotsWidget, &PlotsWidget::setFBO);
     connect(nodeManager, &NodeManager::sortedOperationsChanged, renderManager, &RenderManager::setSortedOperations);
+    connect(nodeManager, &NodeManager::operationEdited, renderManager, &RenderManager::adjustOperationOrtho);
     connect(nodeManager, &NodeManager::parameterValueChanged, overlay, &Overlay::addMessage);
     connect(nodeManager, &NodeManager::midiSignalsCreated, &midiLinkManager, &MidiLinkManager::addMidiSignals);
     connect(nodeManager, &NodeManager::midiSignalsRemoved, &midiLinkManager, &MidiLinkManager::removeMidiSignals);

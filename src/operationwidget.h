@@ -78,6 +78,7 @@ signals:
     void remove(QUuid id);
     void equalizeBlendFactors(QUuid id);
     void copy(QUuid id);
+    void operationEdited(ImageOperation* operation);
 
 public slots:
     void recreate();

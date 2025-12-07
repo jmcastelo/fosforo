@@ -338,7 +338,7 @@ void ControlWidget::about()
     aboutBox->setWindowTitle("About");
 
     QStringList lines;
-    lines.append("<img src=\":/icons/logo.png\" width=\"300\"/>");
+    lines.append("<img src=\":/icons/logo.png\" width=\"250\"/>");
     lines.append(QString("<h2>F&oacute;sforo %1</h2>").arg(mVersion));
     lines.append("<h4>Videofeedback simulation software.</h4>");
     lines.append("<h5>Let the pixels come alive!</h5><br>");

@@ -625,9 +625,19 @@ void RenderManager::initOperation(QUuid id, ImageOperation* operation)
 {
     Q_UNUSED(id)
 
+    // Init and link shaders
+
     operation->init(mContext, mSurface);
     operation->linkShaders();
+
+    // Adjust orthographic projection if any
+
+    adjustOperationOrtho(operation);
+
+    // Set parameters
+
     operation->setAllParameters();
+
     genOpTextures(operation);
 }
 
@@ -640,6 +650,14 @@ void RenderManager::initSeed(QUuid id, Seed* seed)
     seed->init(static_cast<GLenum>(mTexFormat), mTexWidth, mTexHeight, mContext, mSurface);
 }
 
+
+void RenderManager::adjustOperationOrtho(ImageOperation* operation)
+{
+    GLfloat left, right, bottom, top;
+    verticesCoords(left, right, bottom, top);
+
+    operation->adjustOrtho(left, right, bottom, top);
+}
 
 
 void RenderManager::setSortedOperations(QList<ImageOperation*> sortedOperations)
