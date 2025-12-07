@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fosforo>
+    <operation name="Morphological Gradient" enabled="0">
+        <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCnVuaWZvcm0gbWF0NCBvcnRobzsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gb3J0aG8gKiB2ZWM0KHBvcywgMC4wLCAxLjApOwogICAgdGV4Q29vcmRzID0gdGV4Owp9Cg==</vertex_shader>
+        <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp1bmlmb3JtIHVpbnQgZGlsYXRpb25TaXplOwp1bmlmb3JtIHVpbnQgZXJvc2lvblNpemU7CnVuaWZvcm0gZmxvYXQgb3BhY2l0eTsKCmNvbnN0IHZlYzIgb2Zmc2V0WzldID0gdmVjMltdKAogICAgdmVjMigtMS4wLCAxLjApLCB2ZWMyKDAuMCwgMS4wKSwgdmVjMigxLjAsIDEuMCksCiAgICB2ZWMyKC0xLjAsIDAuMCksIHZlYzIoMC4wLCAwLjApLCB2ZWMyKDEuMCwgMC4wKSwKICAgIHZlYzIoLTEuMCwgLTEuMCksIHZlYzIoMC4wLCAtMS4wKSwgdmVjMigxLjAsIC0xLjApCik7Cgp2b2lkIG1haW4oKQp7CiAgICB2ZWMzIHNyY0NvbG9yID0gdGV4dHVyZShpblRleHR1cmUsIHRleENvb3JkcykucmdiOwoKICAgIGl2ZWMyIHRleFNpemUgPSB0ZXh0dXJlU2l6ZShpblRleHR1cmUsIDApOwogICAgdmVjMiBkaWxhdGlvbkZhY3RvciA9IHZlYzIoZGlsYXRpb25TaXplKSAvIHZlYzIodGV4U2l6ZSk7CiAgICB2ZWMyIGVyb3Npb25GYWN0b3IgPSB2ZWMyKGVyb3Npb25TaXplKSAvIHZlYzIodGV4U2l6ZSk7CgogICAgdmVjMyBkaWxhdGlvbkNvbG9yID0gdGV4dHVyZShpblRleHR1cmUsIGNsYW1wKHRleENvb3JkcyArIGRpbGF0aW9uRmFjdG9yICogb2Zmc2V0WzBdLCAwLjAsIDEuMCkpLnJnYjsKICAgIHZlYzMgZXJvc2lvbkNvbG9yID0gdGV4dHVyZShpblRleHR1cmUsIGNsYW1wKHRleENvb3JkcyArIGVyb3Npb25GYWN0b3IgKiBvZmZzZXRbMF0sIDAuMCwgMS4wKSkucmdiOwogICAgZm9yIChpbnQgaSA9IDE7IGkgPCA5OyBpKyspIHsKICAgICAgICBkaWxhdGlvbkNvbG9yID0gbWF4KGRpbGF0aW9uQ29sb3IsIHRleHR1cmUoaW5UZXh0dXJlLCBjbGFtcCh0ZXhDb29yZHMgKyBkaWxhdGlvbkZhY3RvciAqIG9mZnNldFtpXSwgMC4wLCAxLjApKS5yZ2IpOwogICAgICAgIGVyb3Npb25Db2xvciA9IG1pbihlcm9zaW9uQ29sb3IsIHRleHR1cmUoaW5UZXh0dXJlLCBjbGFtcCh0ZXhDb29yZHMgKyBlcm9zaW9uRmFjdG9yICogb2Zmc2V0W2ldLCAwLjAsIDEuMCkpLnJnYik7CiAgICB9CgogICAgdmVjMyBkc3RDb2xvciA9IGRpbGF0aW9uQ29sb3IgLSBlcm9zaW9uQ29sb3I7CgogICAgZnJhZ0NvbG9yID0gdmVjNChtaXgoc3JjQ29sb3IsIGRzdENvbG9yLCBvcGFjaXR5KSwgMS4wKTsKfQo=</fragment_shader>
+        <sampler2d>inTexture</sampler2d>
+        <parameter name="Opacity" type="float_uniform" editable="1" row="0" column="2">
+            <uniform name="opacity" type="5126" numitems="1">
+                <number inf="0" sup="1" min="0" max="1">0</number>
+            </uniform>
+        </parameter>
+        <parameter name="Dilation Size" type="uint_uniform" editable="1" row="0" column="0">
+            <uniform name="dilationSize" type="5125" numitems="1">
+                <number inf="1" sup="999" min="1" max="20">1</number>
+            </uniform>
+        </parameter>
+        <parameter name="Erosion Size" type="uint_uniform" editable="1" row="0" column="1">
+            <uniform name="erosionSize" type="5125" numitems="1">
+                <number inf="1" sup="999" min="1" max="20">1</number>
+            </uniform>
+        </parameter>
+        <parameter name="Ortho" type="mat4_uniform" editable="0" row="1" column="0">
+            <uniform name="ortho" type="35676" mat4_type="3">
+                <number name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Right" inf="0" sup="10" min="0" max="2">1</number>
+                <number name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Top" inf="0" sup="10" min="0" max="2">1</number>
+            </uniform>
+        </parameter>
+    </operation>
+</fosforo>
