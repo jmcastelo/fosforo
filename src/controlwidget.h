@@ -177,8 +177,6 @@ private:
 
     QMap<QUuid, OperationWidget*> operationsWidgets;
 
-    bool overlayEnabled = false;
-
     void constructDisplayOptionsWidget();
     void constructRecordingOptionsWidget();
     void constructSortedOperationWidget();
@@ -191,12 +189,12 @@ private:
     void populateVideoCodecsComboBox(QMediaFormat::VideoCodec videoCodec);
 
 private slots:
-    void iterate();
+    void iterate(bool checked);
     void setOutputDir();
     void record(bool checked);
     void loadConfig();
     void saveConfig();
-    void toggleOverlay();
+    void toggleOverlay(bool checked);
     void about();
 
     //void populateScrollLayout(QList<QPair<QUuid, QString>> data, QList<QUuid> unsortedData);

@@ -494,6 +494,8 @@ void NodeManager::removeOperationNode(QUuid id)
         }
 
         sortOperations();
+
+        emit midiSignalsRemoved(id);
     }
 }
 
@@ -633,10 +635,14 @@ void NodeManager::replaceNodeOperation(QUuid id, ImageOperation* operation)
 
 void NodeManager::connectOperationWidget(OperationWidget* widget)
 {
-    connect(widget, &OperationWidget::remove, this, &NodeManager::nodeRemoved);
-    connect(widget, &OperationWidget::remove, this, &NodeManager::midiSignalsRemoved);
-    connect(widget, &OperationWidget::remove, this, &NodeManager::removeOperationNode);
+    // connect(widget, &OperationWidget::remove, this, &NodeManager::nodeRemoved);
+    // connect(widget, &OperationWidget::remove, this, &NodeManager::midiSignalsRemoved);
+    // connect(widget, &OperationWidget::remove, this, &NodeManager::removeOperationNode);
     connect(widget, &OperationWidget::remove, this, &NodeManager::removeSelectedNodes);
+    connect(widget, &OperationWidget::remove, this, [=, this]() {
+        emit nodeRemoved(widget->id());
+        removeOperationNode(widget->id());
+    });
 
     connect(widget, &OperationWidget::copy, this, &NodeManager::copySelectedNodes);
 
@@ -830,11 +836,13 @@ void NodeManager::addSeedNode(QUuid id, Seed* seed)
 
 void NodeManager::connectSeedWidget(QUuid id, SeedWidget* widget)
 {
-    Q_UNUSED(id)
-
-    connect(widget, &SeedWidget::remove, this, &NodeManager::nodeRemoved);
-    connect(widget, &SeedWidget::remove, this, &NodeManager::removeSeedNode);
+    // connect(widget, &SeedWidget::remove, this, &NodeManager::nodeRemoved);
+    // connect(widget, &SeedWidget::remove, this, &NodeManager::removeSeedNode);
     connect(widget, &SeedWidget::remove, this, &NodeManager::removeSelectedNodes);
+    connect(widget, &SeedWidget::remove, this, [=, this]() {
+        emit nodeRemoved(id);
+        removeSeedNode(id);
+    });
 
     connect(widget, &SeedWidget::copy, this, &NodeManager::copySelectedNodes);
 
@@ -1047,15 +1055,14 @@ void NodeManager::copySelectedNodes(QUuid id)
 
 
 
-void NodeManager::removeSelectedNodes(QUuid id)
+void NodeManager::removeSelectedNodes()
 {
-    foreach (QUuid selId, mSelectedNodeIds) {
-        if (selId != id) {
-            emit nodeRemoved(selId);
-            emit midiSignalsRemoved(selId);
-            removeOperationNode(selId);
-            removeSeedNode(selId);
-        }
+    emit removeNodes(mSelectedNodeIds);
+
+    foreach (QUuid selId, mSelectedNodeIds)
+    {
+        removeOperationNode(selId);
+        removeSeedNode(selId);
     }
 }
 

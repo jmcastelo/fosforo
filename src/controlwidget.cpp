@@ -188,18 +188,19 @@ void ControlWidget::constructSystemToolBar()
     systemToolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
     systemToolBar->setMinimumSize(0, 0);
 
-    iterateAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/media-playback-start.png")), "Start/pause feedback loop");
+    iterateAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/media-playback-start.png")), "Start/pause feedback loop (CTRL+Space)");
     iterateAction->setCheckable(true);
+    iterateAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Space));
 
-    QAction* resetAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/view-refresh.png")), "Reset");
-    resetAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Space));
+    QAction* resetAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/view-refresh.png")), "Reset (CTRL+SHIFT+Space)");
+    resetAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Space));
 
     // systemToolBar->addSeparator();
 
-    QAction* screenshotAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/digikam.png")), "Take screenshot");
+    QAction* screenshotAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/digikam.png")), "Take screenshot (CTRL+S)");
     screenshotAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
-    recordAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/media-record.png")), "Record video");
+    recordAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/media-record.png")), "Record video (CTRL+R)");
     recordAction->setCheckable(true);
     recordAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_R));
 
@@ -213,7 +214,9 @@ void ControlWidget::constructSystemToolBar()
 
     // systemToolBar->addSeparator();
 
-    QAction* overlayAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/align-horizontal-left.png")), "Overlay");
+    QAction* overlayAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/align-horizontal-left.png")), "Overlay (CTRL+O)");
+    overlayAction->setCheckable(true);
+    overlayAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_O));
 
     fullScreenAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/view-fullscreen.png")), "Full screen");
     fullScreenAction->setCheckable(true);
@@ -244,14 +247,16 @@ void ControlWidget::constructSystemToolBar()
 
 
 
-void ControlWidget::iterate()
+void ControlWidget::iterate(bool checked)
 {
-    if (iterateAction->isChecked())
+    if (checked) {
         iterateAction->setIcon(QIcon(QPixmap(":/icons/media-playback-pause.png")));
-    else
+    }
+    else {
         iterateAction->setIcon(QIcon(QPixmap(":/icons/media-playback-start.png")));
+    }
 
-    emit iterateStateChanged(iterateAction->isChecked());
+    emit iterateStateChanged(checked);
 }
 
 
@@ -339,10 +344,9 @@ void ControlWidget::saveConfig()
 
 
 
-void ControlWidget::toggleOverlay()
+void ControlWidget::toggleOverlay(bool checked)
 {
-    overlayEnabled = !overlayEnabled;
-    emit overlayToggled(overlayEnabled);
+    emit overlayToggled(checked);
 }
 
 

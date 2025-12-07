@@ -180,6 +180,7 @@ private slots:
     void addNewNodeOnPos(QUuid id, QWidget* widget, QPointF pos);
     // void addNewOperationNode(OperationWidget* widget);
     void connectNodes(QUuid srcId, QUuid dstId, InputType type, EdgeWidget* widget);
+    void removeNodes(QList<QUuid> ids);
     void removeNode(QUuid id);
     void removeEdge(QUuid srcId, QUuid dstId);
     void centerNodeBetween(QUuid srcId, QUuid dstId, QUuid opId);

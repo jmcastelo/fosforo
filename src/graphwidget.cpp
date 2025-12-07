@@ -99,6 +99,7 @@ GraphWidget::GraphWidget(Factory *factory, NodeManager* nodeManager, QWidget *pa
     connect(mFactory, &Factory::cleared, this, &GraphWidget::clearScene);
 
     connect(mNodeManager, &NodeManager::nodesConnected, this, &GraphWidget::connectNodes);
+    connect(mNodeManager, &NodeManager::removeNodes, this, &GraphWidget::removeNodes);
     connect(mNodeManager, &NodeManager::nodeRemoved, this, &GraphWidget::removeNode);
     connect(mNodeManager, &NodeManager::nodesDisconnected, this, &GraphWidget::removeEdge);
     connect(mNodeManager, &NodeManager::nodeInserted, this, &GraphWidget::centerNodeBetween);
@@ -424,6 +425,14 @@ void GraphWidget::reconnectNodes(Node* node)
     }
 }*/
 
+
+
+void GraphWidget::removeNodes(QList<QUuid> ids)
+{
+    foreach (QUuid id, ids) {
+        removeNode(id);
+    }
+}
 
 
 void GraphWidget::removeNode(QUuid id)

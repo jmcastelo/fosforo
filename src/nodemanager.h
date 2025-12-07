@@ -116,6 +116,7 @@ signals:
     void sortedOperationsChanged(QList<ImageOperation*> operations);
 
     void nodesConnected(QUuid srcId, QUuid dstId, InputType type, EdgeWidget* widget);
+    void removeNodes(QList<QUuid> ids);
     void nodeRemoved(QUuid id);
     void nodesDisconnected(QUuid srcId, QUuid dstId);
     void nodeInserted(QUuid srcId, QUuid dstId, QUuid opId);
@@ -174,7 +175,7 @@ private slots:
     void removeSeedNode(QUuid id);
 
     void copySelectedNodes(QUuid id);
-    void removeSelectedNodes(QUuid id);
+    void removeSelectedNodes();
 
     void removeAllNodes();
 
