@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fosforo>
+    <operation name="Erosion" enabled="0">
+        <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCnVuaWZvcm0gbWF0NCBvcnRobzsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gb3J0aG8gKiB2ZWM0KHBvcywgMC4wLCAxLjApOwogICAgdGV4Q29vcmRzID0gdGV4Owp9</vertex_shader>
+        <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp1bmlmb3JtIHVpbnQgc2l6ZTsKdW5pZm9ybSBmbG9hdCBvcGFjaXR5OwoKY29uc3QgdmVjMiBvZmZzZXRbOV0gPSB2ZWMyW10oCiAgICB2ZWMyKC0xLjAsIDEuMCksIHZlYzIoMC4wLCAxLjApLCB2ZWMyKDEuMCwgMS4wKSwKICAgIHZlYzIoLTEuMCwgMC4wKSwgdmVjMigwLjAsIDAuMCksIHZlYzIoMS4wLCAwLjApLAogICAgdmVjMigtMS4wLCAtMS4wKSwgdmVjMigwLjAsIC0xLjApLCB2ZWMyKDEuMCwgLTEuMCkKKTsKCnZvaWQgbWFpbigpCnsKICAgIHZlYzMgc3JjQ29sb3IgPSB0ZXh0dXJlKGluVGV4dHVyZSwgdGV4Q29vcmRzKS5yZ2I7CgogICAgaXZlYzIgdGV4U2l6ZSA9IHRleHR1cmVTaXplKGluVGV4dHVyZSwgMCk7CiAgICB2ZWMyIGZhY3RvciA9IHZlYzIoc2l6ZSkgLyB2ZWMyKHRleFNpemUpOwoKICAgIHZlYzMgZHN0Q29sb3IgPSB0ZXh0dXJlKGluVGV4dHVyZSwgY2xhbXAodGV4Q29vcmRzICsgZmFjdG9yICogb2Zmc2V0WzBdLCAwLjAsIDEuMCkpLnJnYjsKICAgIGZvciAoaW50IGkgPSAxOyBpIDwgOTsgaSsrKSB7CiAgICAgICAgZHN0Q29sb3IgPSBtaW4oZHN0Q29sb3IsIHRleHR1cmUoaW5UZXh0dXJlLCBjbGFtcCh0ZXhDb29yZHMgKyBmYWN0b3IgKiBvZmZzZXRbaV0sIDAuMCwgMS4wKSkucmdiKTsKICAgIH0KCiAgICBmcmFnQ29sb3IgPSB2ZWM0KG1peChzcmNDb2xvciwgZHN0Q29sb3IsIG9wYWNpdHkpLCAxLjApOwp9Cg==</fragment_shader>
+        <sampler2d>inTexture</sampler2d>
+        <parameter name="Opacity" type="float_uniform" editable="1" row="0" column="1">
+            <uniform name="opacity" type="5126" numitems="1">
+                <number inf="0" sup="1" min="0" max="1">0</number>
+            </uniform>
+        </parameter>
+        <parameter name="Size" type="uint_uniform" editable="1" row="0" column="0">
+            <uniform name="size" type="5125" numitems="1">
+                <number inf="1" sup="999" min="1" max="20">1</number>
+            </uniform>
+        </parameter>
+        <parameter name="Ortho" type="mat4_uniform" editable="0" row="1" column="0">
+            <uniform name="ortho" type="35676" mat4_type="3">
+                <number name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Right" inf="0" sup="10" min="0" max="2">1</number>
+                <number name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Top" inf="0" sup="10" min="0" max="2">1</number>
+            </uniform>
+        </parameter>
+    </operation>
+</fosforo>

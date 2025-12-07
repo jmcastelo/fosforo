@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fosforo>
+    <operation name="Color Mix" enabled="0">
+        <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCnVuaWZvcm0gbWF0NCBvcnRobzsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gb3J0aG8gKiB2ZWM0KHBvcywgMC4wLCAxLjApOwogICAgdGV4Q29vcmRzID0gdGV4Owp9</vertex_shader>
+        <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp1bmlmb3JtIG1hdDMgbWl4TWF0cml4Owp1bmlmb3JtIGZsb2F0IG9wYWNpdHk7Cgp2b2lkIG1haW4oKQp7CiAgICB2ZWMzIHNyY0NvbG9yID0gdGV4dHVyZShpblRleHR1cmUsIHRleENvb3JkcykucmdiOwogICAgdmVjMyBkc3RDb2xvciA9IGNsYW1wKG1peE1hdHJpeCAqIHNyY0NvbG9yLCAwLjAsIDEuMCk7CiAgICBmcmFnQ29sb3IgPSB2ZWM0KG1peChzcmNDb2xvciwgZHN0Q29sb3IsIG9wYWNpdHkpLCAxLjApOwp9Cg==</fragment_shader>
+        <sampler2d>inTexture</sampler2d>
+        <parameter name="Mix Matrix" type="float_uniform" editable="1" row="0" column="0">
+            <uniform name="mixMatrix" type="35675" numitems="1">
+                <number inf="-1000" sup="1000" min="-10" max="10">1</number>
+                <number inf="-1000" sup="1000" min="-10" max="10">0</number>
+                <number inf="-1000" sup="1000" min="-10" max="10">0</number>
+                <number inf="-1000" sup="1000" min="-10" max="10">0</number>
+                <number inf="-1000" sup="1000" min="-10" max="10">1</number>
+                <number inf="-1000" sup="1000" min="-10" max="10">0</number>
+                <number inf="-1000" sup="1000" min="-10" max="10">0</number>
+                <number inf="-1000" sup="1000" min="-10" max="10">0</number>
+                <number inf="-1000" sup="1000" min="-10" max="10">1</number>
+            </uniform>
+            <presets>
+                <preset name="RGB &gt;&gt; BGR">
+                    <value>0</value>
+                    <value>0</value>
+                    <value>1</value>
+                    <value>0</value>
+                    <value>1</value>
+                    <value>0</value>
+                    <value>1</value>
+                    <value>0</value>
+                    <value>0</value>
+                </preset>
+                <preset name="RGB &gt;&gt; BRG">
+                    <value>0</value>
+                    <value>0</value>
+                    <value>1</value>
+                    <value>1</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>1</value>
+                    <value>0</value>
+                </preset>
+                <preset name="RGB &gt;&gt; GBR">
+                    <value>0</value>
+                    <value>1</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>1</value>
+                    <value>1</value>
+                    <value>0</value>
+                    <value>0</value>
+                </preset>
+                <preset name="RGB &gt;&gt; GRB">
+                    <value>0</value>
+                    <value>1</value>
+                    <value>0</value>
+                    <value>1</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>1</value>
+                </preset>
+                <preset name="RGB &gt;&gt; RBG">
+                    <value>1</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>1</value>
+                    <value>0</value>
+                    <value>1</value>
+                    <value>0</value>
+                </preset>
+                <preset name="RGB &gt;&gt; RGB">
+                    <value>1</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>1</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>0</value>
+                    <value>1</value>
+                </preset>
+            </presets>
+        </parameter>
+        <parameter name="Opacity" type="float_uniform" editable="1" row="0" column="2">
+            <uniform name="opacity" type="5126" numitems="1">
+                <number inf="0" sup="1" min="0" max="1">1</number>
+            </uniform>
+        </parameter>
+        <parameter name="Ortho" type="mat4_uniform" editable="0" row="2" column="0">
+            <uniform name="ortho" type="35676" mat4_type="3">
+                <number name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Right" inf="0" sup="10" min="0" max="2">1</number>
+                <number name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Top" inf="0" sup="10" min="0" max="2">1</number>
+            </uniform>
+        </parameter>
+    </operation>
+</fosforo>

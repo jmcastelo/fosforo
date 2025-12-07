@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fosforo>
+    <operation name="Pixelation" enabled="0">
+        <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCnVuaWZvcm0gbWF0NCBvcnRobzsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gb3J0aG8gKiB2ZWM0KHBvcywgMC4wLCAxLjApOwogICAgdGV4Q29vcmRzID0gdGV4Owp9Cg==</vertex_shader>
+        <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp1bmlmb3JtIGZsb2F0IHNpemU7CnVuaWZvcm0gZmxvYXQgb3BhY2l0eTsKCnZvaWQgbWFpbigpCnsKICAgIGl2ZWMyIHRleFNpemUgPSB0ZXh0dXJlU2l6ZShpblRleHR1cmUsIDApOwogICAgCiAgICB2ZWMyIHV2ID0gdGV4Q29vcmRzLnh5OwogICAgdmVjMiB0YyA9IHRleENvb3JkczsKICAgIGlmIChzaXplID4gMC4wKSB7CiAgICAgICAgZmxvYXQgZHggPSBzaXplIC8gdGV4U2l6ZS54OwogICAgICAgIGZsb2F0IGR5ID0gc2l6ZSAvIHRleFNpemUueTsKICAgICAgICB0YyA9IHZlYzIoZHggKiAoZmxvb3IodXYueCAvIGR4KSArIDAuNSksIGR5ICogKGZsb29yKHV2LnkgLyBkeSkgKyAwLjUpKTsKICAgIH0KCiAgICB2ZWMzIHNyY0NvbG9yID0gdGV4dHVyZShpblRleHR1cmUsIHV2KS5yZ2I7CiAgICB2ZWMzIGRzdENvbG9yID0gdGV4dHVyZShpblRleHR1cmUsIHRjKS5yZ2I7CgogICAgZnJhZ0NvbG9yID0gdmVjNChtaXgoc3JjQ29sb3IsIGRzdENvbG9yLCBvcGFjaXR5KSwgMS4wKTsKfQ==</fragment_shader>
+        <sampler2d>inTexture</sampler2d>
+        <parameter name="Size" type="float_uniform" editable="1" row="0" column="0">
+            <uniform name="size" type="5126" numitems="1">
+                <number inf="1" sup="999" min="1" max="20">1</number>
+            </uniform>
+        </parameter>
+        <parameter name="Opacity" type="float_uniform" editable="1" row="0" column="1">
+            <uniform name="opacity" type="5126" numitems="1">
+                <number inf="0" sup="1" min="0" max="1">1</number>
+            </uniform>
+        </parameter>
+        <parameter name="Ortho" type="mat4_uniform" editable="0" row="1" column="0">
+            <uniform name="ortho" type="35676" mat4_type="3">
+                <number name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Right" inf="0" sup="10" min="0" max="2">1</number>
+                <number name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Top" inf="0" sup="10" min="0" max="2">1</number>
+            </uniform>
+        </parameter>
+    </operation>
+</fosforo>

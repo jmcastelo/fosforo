@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fosforo>
+    <operation name="Color Quantization" enabled="0">
+        <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCnVuaWZvcm0gbWF0NCBvcnRobzsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gb3J0aG8gKiB2ZWM0KHBvcywgMC4wLCAxLjApOwogICAgdGV4Q29vcmRzID0gdGV4Owp9</vertex_shader>
+        <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp1bmlmb3JtIHVpbnQgcmVkTGV2ZWxzOwp1bmlmb3JtIHVpbnQgZ3JlZW5MZXZlbHM7CnVuaWZvcm0gdWludCBibHVlTGV2ZWxzOwoKdW5pZm9ybSBmbG9hdCBvcGFjaXR5OwoKdm9pZCBtYWluKCkKewogICAgdmVjMyBzcmNDb2xvciA9IHRleHR1cmUoaW5UZXh0dXJlLCB0ZXhDb29yZHMpLnJnYjsKICAgIHZlYzMgbGV2ZWxzID0gdmVjMyhyZWRMZXZlbHMsIGdyZWVuTGV2ZWxzLCBibHVlTGV2ZWxzKTsKICAgIHZlYzMgZHN0Q29sb3IgPSBjbGFtcChmbG9vcihsZXZlbHMgKiBzcmNDb2xvciksIHZlYzMoMC4wKSwgbGV2ZWxzIC0gMS4wKSAvIChsZXZlbHMgLSAxLjApOwogICAgZnJhZ0NvbG9yID0gdmVjNChtaXgoc3JjQ29sb3IsIGRzdENvbG9yLCBvcGFjaXR5KSwgMS4wKTsKfQ==</fragment_shader>
+        <sampler2d>inTexture</sampler2d>
+        <parameter name="Opacity" type="float_uniform" editable="1" row="1" column="1">
+            <uniform name="opacity" type="5126" numitems="1">
+                <number inf="0" sup="1" min="0" max="1">0</number>
+            </uniform>
+        </parameter>
+        <parameter name="Red Levels" type="uint_uniform" editable="1" row="0" column="0">
+            <uniform name="redLevels" type="5125" numitems="1">
+                <number inf="2" sup="256" min="2" max="256">128</number>
+            </uniform>
+        </parameter>
+        <parameter name="Green Levels" type="uint_uniform" editable="1" row="0" column="1">
+            <uniform name="greenLevels" type="5125" numitems="1">
+                <number inf="2" sup="256" min="2" max="256">128</number>
+            </uniform>
+        </parameter>
+        <parameter name="Blue Levels" type="uint_uniform" editable="1" row="0" column="2">
+            <uniform name="blueLevels" type="5125" numitems="1">
+                <number inf="2" sup="256" min="2" max="256">128</number>
+            </uniform>
+        </parameter>
+        <parameter name="Ortho" type="mat4_uniform" editable="0" row="2" column="0">
+            <uniform name="ortho" type="35676" mat4_type="3">
+                <number name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Right" inf="0" sup="10" min="0" max="2">1</number>
+                <number name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Top" inf="0" sup="10" min="0" max="2">1</number>
+            </uniform>
+        </parameter>
+    </operation>
+</fosforo>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fosforo>
-    <operation name="Gamma Correction" enabled="0">
+    <operation name="Power" enabled="0">
         <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCnVuaWZvcm0gbWF0NCBvcnRobzsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gb3J0aG8gKiB2ZWM0KHBvcywgMC4wLCAxLjApOwogICAgdGV4Q29vcmRzID0gdGV4Owp9Cg==</vertex_shader>
         <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp1bmlmb3JtIGZsb2F0IGdhbW1hUmVkOwp1bmlmb3JtIGZsb2F0IGdhbW1hR3JlZW47CnVuaWZvcm0gZmxvYXQgZ2FtbWFCbHVlOwp1bmlmb3JtIGZsb2F0IG9wYWNpdHk7Cgp2b2lkIG1haW4oKQp7CiAgICB2ZWMzIHNyY0NvbG9yID0gdGV4dHVyZShpblRleHR1cmUsIHRleENvb3JkcykucmdiOwogICAgdmVjMyBkc3RDb2xvciA9IHBvdyhzcmNDb2xvciwgdmVjMyhnYW1tYVJlZCwgZ2FtbWFHcmVlbiwgZ2FtbWFCbHVlKSk7CiAgICBmcmFnQ29sb3IgPSB2ZWM0KG1peChzcmNDb2xvciwgZHN0Q29sb3IsIG9wYWNpdHkpLCAxLjApOwp9</fragment_shader>
         <sampler2d>inTexture</sampler2d>
@@ -11,17 +11,17 @@
         </parameter>
         <parameter name="Red" type="float_uniform" editable="1" row="0" column="0">
             <uniform name="gammaRed" type="5126" numitems="1">
-                <number inf="0" sup="1000" min="0" max="100">1</number>
+                <number inf="0" sup="1000" min="0" max="10">1</number>
             </uniform>
         </parameter>
         <parameter name="Green" type="float_uniform" editable="1" row="0" column="1">
             <uniform name="gammaGreen" type="5126" numitems="1">
-                <number inf="0" sup="1000" min="0" max="100">1</number>
+                <number inf="0" sup="1000" min="0" max="10">1</number>
             </uniform>
         </parameter>
         <parameter name="Blue" type="float_uniform" editable="1" row="0" column="2">
             <uniform name="gammaBlue" type="5126" numitems="1">
-                <number inf="0" sup="1000" min="0" max="100">1</number>
+                <number inf="0" sup="1000" min="0" max="10">1</number>
             </uniform>
         </parameter>
         <parameter name="Ortho" type="mat4_uniform" editable="0" row="2" column="0">

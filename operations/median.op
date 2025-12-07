@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fosforo>
+    <operation name="Median" enabled="0">
+        <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCnVuaWZvcm0gbWF0NCBvcnRobzsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gb3J0aG8gKiB2ZWM0KHBvcywgMC4wLCAxLjApOwogICAgdGV4Q29vcmRzID0gdGV4Owp9Cg==</vertex_shader>
+        <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp1bmlmb3JtIHVpbnQgc2l6ZTsKdW5pZm9ybSBmbG9hdCBvcGFjaXR5OwoKY29uc3QgdmVjMiBvZmZzZXRbOV0gPSB2ZWMyW10oCiAgICB2ZWMyKC0xLjAsIDEuMCksIHZlYzIoMC4wLCAxLjApLCB2ZWMyKDEuMCwgMS4wKSwKICAgIHZlYzIoLTEuMCwgMC4wKSwgdmVjMigwLjAsIDAuMCksIHZlYzIoMS4wLCAwLjApLAogICAgdmVjMigtMS4wLCAtMS4wKSwgdmVjMigwLjAsIC0xLjApLCB2ZWMyKDEuMCwgLTEuMCkKKTsKCnZvaWQgbWFpbigpCnsKICAgIGl2ZWMyIHRleFNpemUgPSB0ZXh0dXJlU2l6ZShpblRleHR1cmUsIDApOwogICAgdmVjMiBmYWN0b3IgPSB2ZWMyKHNpemUpIC8gdmVjMih0ZXhTaXplKTsKICAgIAogICAgdmVjMyBjb2xvcls5XTsKCiAgICBmb3IgKGludCBpID0gMDsgaSA8IDk7IGkrKykgewogICAgICAgIGNvbG9yW2ldID0gdGV4dHVyZShpblRleHR1cmUsIGNsYW1wKHRleENvb3JkcyArIGZhY3RvciAqIG9mZnNldFtpXSwgMC4wLCAxLjApKS5yZ2I7CiAgICB9CgogICAgLy8gU29ydCBjb2xvcnMKCiAgICBpbnQgaSA9IDE7CiAgICB3aGlsZSAoaSA8IDkpCiAgICB7CiAgICAgICAgdmVjMyBjID0gY29sb3JbaV07CiAgICAgICAgaXZlYzMgaiA9IGl2ZWMzKGkgLSAxKTsKICAgICAgICB3aGlsZSAoai54ID49IDAgJiYgY29sb3Jbai54XS5yID4gYy5yKQogICAgICAgIHsKICAgICAgICAgICAgY29sb3Jbai54ICsgMV0uciA9IGNvbG9yW2oueF0ucjsKICAgICAgICAgICAgai54LS07CiAgICAgICAgfQogICAgICAgIGNvbG9yW2oueCArIDFdLnIgPSBjLnI7CiAgICAgICAgd2hpbGUgKGoueSA+PSAwICYmIGNvbG9yW2oueV0uZyA+IGMuZykKICAgICAgICB7CiAgICAgICAgICAgIGNvbG9yW2oueSArIDFdLmcgPSBjb2xvcltqLnldLmc7CiAgICAgICAgICAgIGoueS0tOwogICAgICAgIH0KICAgICAgICBjb2xvcltqLnkgKyAxXS5nID0gYy5nOwogICAgICAgIHdoaWxlIChqLnogPj0gMCAmJiBjb2xvcltqLnpdLmIgPiBjLmIpCiAgICAgICAgewogICAgICAgICAgICBjb2xvcltqLnogKyAxXS5iID0gY29sb3Jbai56XS5iOwogICAgICAgICAgICBqLnotLTsKICAgICAgICB9CiAgICAgICAgY29sb3Jbai56ICsgMV0uYiA9IGMuYjsKICAgICAgICBpKys7CiAgICB9CgogICAgdmVjMyBzcmNDb2xvciA9IHRleHR1cmUoaW5UZXh0dXJlLCB0ZXhDb29yZHMpLnJnYjsKICAgIGZyYWdDb2xvciA9IHZlYzQobWl4KHNyY0NvbG9yLCBjb2xvcls0XSwgb3BhY2l0eSksIDEuMCk7Cn0=</fragment_shader>
+        <sampler2d>inTexture</sampler2d>
+        <parameter name="Opacity" type="float_uniform" editable="1" row="0" column="1">
+            <uniform name="opacity" type="5126" numitems="1">
+                <number inf="0" sup="1" min="0" max="1">0</number>
+            </uniform>
+        </parameter>
+        <parameter name="Size" type="uint_uniform" editable="1" row="0" column="0">
+            <uniform name="size" type="5125" numitems="1">
+                <number inf="1" sup="999" min="1" max="20">1</number>
+            </uniform>
+        </parameter>
+        <parameter name="Ortho" type="mat4_uniform" editable="0" row="1" column="0">
+            <uniform name="ortho" type="35676" mat4_type="3">
+                <number name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Right" inf="0" sup="10" min="0" max="2">1</number>
+                <number name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Top" inf="0" sup="10" min="0" max="2">1</number>
+            </uniform>
+        </parameter>
+    </operation>
+</fosforo>
