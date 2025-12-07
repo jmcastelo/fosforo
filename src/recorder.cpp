@@ -57,7 +57,9 @@ void Recorder::sendVideoFrame(QImage* image)
     if (sent)
     {
         frameNumber++;
-        emit frameRecorded(frameNumber);
+        if (frameNumber % 60 == 0) {
+            emit frameRecorded(frameNumber);
+        }
     }
     else {
         videoFrameInputReady = false;

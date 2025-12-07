@@ -93,12 +93,15 @@ ApplicationController::ApplicationController()
     connect(morphoWidget, &MorphoWidget::renderDone, plotsWidget, &PlotsWidget::updatePlots);
     connect(morphoWidget, &MorphoWidget::supportedTexFormats, controlWidget, &ControlWidget::populateTexFormatComboBox);
     connect(morphoWidget, &MorphoWidget::fullScreenToggled, controlWidget, &ControlWidget::toggleFullScreenAction);
+    connect(morphoWidget, &MorphoWidget::screenshot, controlWidget, &ControlWidget::screenshot);
+    connect(morphoWidget, &MorphoWidget::record, controlWidget, &ControlWidget::toggleRecording);
     connect(morphoWidget, &MorphoWidget::scaleTransformChanged, plotsWidget, &PlotsWidget::transformSources);
     connect(morphoWidget, &MorphoWidget::selectedPointChanged, plotsWidget, &PlotsWidget::setSelectedPoint);
     connect(plotsWidget, &PlotsWidget::selectedPointChanged, morphoWidget, &MorphoWidget::setCursor);
     connect(plotsWidget, &PlotsWidget::drawCursor, morphoWidget, &MorphoWidget::setDrawingCursor);
     connect(morphoWidget, &MorphoWidget::closing, this, &ApplicationController::closeAll);
     connect(morphoWidget, &MorphoWidget::sizeChanged, renderManager, &RenderManager::resize);
+    connect(morphoWidget, &MorphoWidget::resetIterations, renderManager, &RenderManager::reset);
     connect(morphoWidget, &MorphoWidget::sizeChanged, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
     connect(morphoWidget, &MorphoWidget::sizeChanged, plotsWidget, &PlotsWidget::setSize);
 

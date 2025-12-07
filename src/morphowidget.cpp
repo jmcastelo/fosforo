@@ -188,7 +188,21 @@ void MorphoWidget::keyPressEvent(QKeyEvent* event)
                 emit fullScreenToggled(true);
             }
         }
+        else if (event->key() == Qt::Key_S)
+        {
+            emit screenshot();
+        }
+        else if (event->key() == Qt::Key_R)
+        {
+            emit record();
+        }
+        else if (event->key() == Qt::Key_Space)
+        {
+            emit resetIterations();
+        }
     }
+
+    event->accept();
 }
 
 

@@ -192,6 +192,7 @@ void ControlWidget::constructSystemToolBar()
     iterateAction->setCheckable(true);
 
     QAction* resetAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/view-refresh.png")), "Reset");
+    resetAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Space));
 
     // systemToolBar->addSeparator();
 
@@ -230,7 +231,7 @@ void ControlWidget::constructSystemToolBar()
 
     connect(iterateAction, &QAction::triggered, this, &ControlWidget::iterate);
     connect(resetAction, &QAction::triggered, this, &ControlWidget::resetIterations);
-    connect(screenshotAction, &QAction::triggered, this, &ControlWidget::setScreenshotFilename);
+    connect(screenshotAction, &QAction::triggered, this, &ControlWidget::screenshot);
     connect(recordAction, &QAction::triggered, this, &ControlWidget::record);
     connect(optionsAction, &QAction::triggered, optionsWidget, &QTabWidget::show);
     connect(plotsAction, &QAction::triggered, this, &ControlWidget::showPlotsWidget);
@@ -255,9 +256,9 @@ void ControlWidget::iterate()
 
 
 
-void ControlWidget::record()
+void ControlWidget::record(bool checked)
 {
-    if (recordAction->isChecked())
+    if (checked)
     {
         recordAction->setIcon(QIcon(QPixmap(":/icons/media-playback-stop.png")));
         videoCaptureElapsedTimeLabel->setText("00:00:00.000");
@@ -273,13 +274,19 @@ void ControlWidget::record()
 
 
 
-void ControlWidget::setScreenshotFilename()
+void ControlWidget::screenshot()
 {
     // QString filename = QDir::toNativeSeparators(outputDir + '/' + QDateTime::currentDateTime().toString(Qt::ISODate) + ".png");
     QString filename = QDir::toNativeSeparators(outputDir + '/' + QDateTime::currentDateTime().toString("[yyyy-MM-dd][hh'h'mm'm'ss's'zzz'ms']") + ".png");
     emit takeScreenshot(filename);
 }
 
+
+
+void ControlWidget::toggleRecording()
+{
+    recordAction->trigger();
+}
 
 
 /*void ControlWidget::toggleSortedOperationWidget()

@@ -25,11 +25,10 @@
 
 
 
-#include "rendermanager.h"
 #include "operationwidget.h"
 #include "graphwidget.h"
 #include "midilistwidget.h"
-#include "plotswidget.h"
+#include "texformat.h"
 
 #include <QWidget>
 #include <QVBoxLayout>
@@ -122,6 +121,9 @@ public slots:
     //void setupMidi(QString portName, bool open);
     //void updateMidiLinks(QString portName, int key, int value);
 
+    void screenshot();
+    void toggleRecording();
+
     void toggleFullScreenAction(bool checked);
 
 protected:
@@ -190,9 +192,8 @@ private:
 
 private slots:
     void iterate();
-    void record();
-    void setScreenshotFilename();
     void setOutputDir();
+    void record(bool checked);
     void loadConfig();
     void saveConfig();
     void toggleOverlay();

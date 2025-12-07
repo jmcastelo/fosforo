@@ -70,6 +70,9 @@ signals:
     void scaleTransformChanged(QTransform transform);
 
     void fullScreenToggled(bool checked);
+    void screenshot();
+    void record();
+    void resetIterations();
 
     void closing();
 
