@@ -342,20 +342,27 @@ void ImageOperation::setUniform<float>(QString name, int type, GLsizei count, co
 
         int location = mProgram->uniformLocation(name);
 
-        if (type == GL_FLOAT)
+        if (type == GL_FLOAT) {
             glUniform1fv(location, count, values);
-        else if (type == GL_FLOAT_VEC2)
+        }
+        else if (type == GL_FLOAT_VEC2) {
             glUniform2fv(location, count, values);
-        else if (type == GL_FLOAT_VEC3)
+        }
+        else if (type == GL_FLOAT_VEC3) {
             glUniform3fv(location, count, values);
-        else if (type == GL_FLOAT_VEC4)
+        }
+        else if (type == GL_FLOAT_VEC4) {
             glUniform4fv(location, count, values);
-        else if (type == GL_FLOAT_MAT2)
+        }
+        else if (type == GL_FLOAT_MAT2) {
             glUniformMatrix2fv(location, count, GL_FALSE, values);
-        else if (type == GL_FLOAT_MAT3)
+        }
+        else if (type == GL_FLOAT_MAT3) {
             glUniformMatrix3fv(location, count, GL_FALSE, values);
-        else if (type == GL_FLOAT_MAT4)
+        }
+        else if (type == GL_FLOAT_MAT4) {
             glUniformMatrix4fv(location, count, GL_FALSE, values);
+        }
 
         mProgram->release();
         mContext->doneCurrent();
@@ -374,14 +381,18 @@ void ImageOperation::setUniform<int>(QString name, int type, GLsizei count, cons
 
         int location = mProgram->uniformLocation(name);
 
-        if (type == GL_INT)
+        if (type == GL_INT) {
             glUniform1iv(location, count, values);
-        else if (type == GL_INT_VEC2)
+        }
+        else if (type == GL_INT_VEC2) {
             glUniform2iv(location, count, values);
-        else if (type == GL_INT_VEC3)
+        }
+        else if (type == GL_INT_VEC3) {
             glUniform3iv(location, count, values);
-        else if (type == GL_INT_VEC4)
+        }
+        else if (type == GL_INT_VEC4) {
             glUniform4iv(location, count, values);
+        }
 
         mProgram->release();
         mContext->doneCurrent();
@@ -400,14 +411,18 @@ void ImageOperation::setUniform<unsigned int>(QString name, int type, GLsizei co
 
         int location = mProgram->uniformLocation(name);
 
-        if (type == GL_UNSIGNED_INT)
+        if (type == GL_UNSIGNED_INT) {
             glUniform1uiv(location, count, values);
-        else if (type == GL_UNSIGNED_INT_VEC2)
+        }
+        else if (type == GL_UNSIGNED_INT_VEC2) {
             glUniform2uiv(location, count, values);
-        else if (type == GL_UNSIGNED_INT_VEC3)
+        }
+        else if (type == GL_UNSIGNED_INT_VEC3) {
             glUniform3uiv(location, count, values);
-        else if (type == GL_UNSIGNED_INT_VEC4)
+        }
+        else if (type == GL_UNSIGNED_INT_VEC4) {
             glUniform4uiv(location, count, values);
+        }
 
         mProgram->release();
         mContext->doneCurrent();
@@ -423,14 +438,18 @@ void ImageOperation::setMat4Uniform(QString name, UniformMat4Type type, QList<fl
         QMatrix4x4 matrix;
         matrix.setToIdentity();
 
-        if (type == UniformMat4Type::TRANSLATION)
+        if (type == UniformMat4Type::TRANSLATION) {
             matrix.translate(values.at(0), -values.at(1));
-        else if (type == UniformMat4Type::ROTATION)
+        }
+        else if (type == UniformMat4Type::ROTATION) {
             matrix.rotate(values.at(0), 0.0f, 0.0f, 1.0f);
-        else if (type == UniformMat4Type::SCALING)
+        }
+        else if (type == UniformMat4Type::SCALING) {
             matrix.scale(values.at(0), values.at(1));
-        else if (type == UniformMat4Type::ORTHOGRAPHIC)
+        }
+        else if (type == UniformMat4Type::ORTHOGRAPHIC) {
             matrix.ortho(values.at(0), values.at(1), values.at(2), values.at(3), -1.0, 1.0);
+        }
 
         mContext->makeCurrent(mSurface);
         mProgram->bind();
@@ -448,8 +467,9 @@ void ImageOperation::setMat4Uniform(QString name, UniformMat4Type type, QList<fl
 template <>
 void ImageOperation::setOptionsParameter<GLenum>(OptionsParameter<GLenum>* parameter)
 {
-    if (mUpdate)
+    if (mUpdate) {
         setMinMagFilter(parameter->value());
+    }
 }
 
 
@@ -502,24 +522,19 @@ void ImageOperation::enable(bool set)
 
 void ImageOperation::setOutTextureId()
 {
-    if (mEnabled)
-    {
+    if (mEnabled) {
         *pOutTexId = mOutTexId;
     }
-    else if (mBlitEnabled)
-    {
+    else if (mBlitEnabled) {
         *pOutTexId = mBlitOutTexId;
     }
-    else if (mBlendEnabled)
-    {
+    else if (mBlendEnabled) {
         *pOutTexId = mBlendOutTexId;
     }
-    else if (pInputTexId)
-    {
+    else if (pInputTexId) {
         *pOutTexId = *pInputTexId;
     }
-    else
-    {
+    else {
         *pOutTexId = 0;
     }
 }
@@ -528,20 +543,16 @@ void ImageOperation::setOutTextureId()
 
 void ImageOperation::setBlitInTextureId()
 {
-    if (mEnabled)
-    {
+    if (mEnabled) {
         *pBlitInTexId = mOutTexId;
     }
-    else if (mBlendEnabled)
-    {
+    else if (mBlendEnabled) {
         *pBlitInTexId = mBlendOutTexId;
     }
-    else if (pInputTexId)
-    {
+    else if (pInputTexId) {
         *pBlitInTexId = *pInputTexId;
     }
-    else
-    {
+    else {
         *pBlitInTexId = 0;
     }
 }
@@ -637,12 +648,6 @@ void ImageOperation::resetInputData()
 
 GLuint ImageOperation::blitInTextureId()
 {
-    /*if (pBlitInTexId) {
-        return *pBlitInTexId;
-    }
-    else {
-        return 0;
-    }*/
     return *pBlitInTexId;
 }
 
