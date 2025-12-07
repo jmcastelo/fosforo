@@ -69,6 +69,8 @@ signals:
     void selectedPointChanged(QPoint point);
     void scaleTransformChanged(QTransform transform);
 
+    void fullScreenToggled(bool checked);
+
     void closing();
 
     void renderDone();
@@ -79,11 +81,13 @@ public slots:
     void setDrawingCursor(bool on){ drawingCursor = on; }
     void setCursor(QPoint point);
     void render(quintptr fence);
+    void toggleFullScreen(bool checked);
 
 protected:
     void wheelEvent(QWheelEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
+    void keyPressEvent(QKeyEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
 
 private:

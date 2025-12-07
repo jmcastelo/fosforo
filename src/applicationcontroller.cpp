@@ -92,6 +92,7 @@ ApplicationController::ApplicationController()
     connect(morphoWidget, &MorphoWidget::renderDone, this, &ApplicationController::measureFps);
     connect(morphoWidget, &MorphoWidget::renderDone, plotsWidget, &PlotsWidget::updatePlots);
     connect(morphoWidget, &MorphoWidget::supportedTexFormats, controlWidget, &ControlWidget::populateTexFormatComboBox);
+    connect(morphoWidget, &MorphoWidget::fullScreenToggled, controlWidget, &ControlWidget::toggleFullScreenAction);
     connect(morphoWidget, &MorphoWidget::scaleTransformChanged, plotsWidget, &PlotsWidget::transformSources);
     connect(morphoWidget, &MorphoWidget::selectedPointChanged, plotsWidget, &PlotsWidget::setSelectedPoint);
     connect(plotsWidget, &PlotsWidget::selectedPointChanged, morphoWidget, &MorphoWidget::setCursor);
@@ -132,6 +133,7 @@ ApplicationController::ApplicationController()
     connect(controlWidget, &ControlWidget::readConfig, configParser, &ConfigurationParser::read);
     connect(controlWidget, &ControlWidget::writeConfig, configParser, &ConfigurationParser::write);
     connect(controlWidget, &ControlWidget::nodesSelected, graphWidget, &GraphWidget::markNodes);
+    connect(controlWidget, &ControlWidget::fullScreenToggled, morphoWidget, &MorphoWidget::toggleFullScreen);
 
     connect(configParser, &ConfigurationParser::newImageSizeRead, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
     connect(configParser, &ConfigurationParser::newImageSizeRead, this, &ApplicationController::setSize);
@@ -144,7 +146,6 @@ ApplicationController::ApplicationController()
 
     // morphoWidget->resize(renderManager->texWidth(), renderManager->texHeight());
     morphoWidget->resize(glSide, glSide);
-    morphoWidget->setPosition(0, 0);
     morphoWidget->show();
 
     controlWidget->resize(ctrlWidth, screenSize.height());

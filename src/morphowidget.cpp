@@ -171,6 +171,28 @@ void MorphoWidget::mousePressEvent(QMouseEvent* event)
 
 
 
+void MorphoWidget::keyPressEvent(QKeyEvent* event)
+{
+    if (event->modifiers() == Qt::ControlModifier)
+    {
+        if (event->key() == Qt::Key_F)
+        {
+            if (windowState() == Qt::WindowFullScreen)
+            {
+                showNormal();
+                emit fullScreenToggled(false);
+            }
+            else
+            {
+                showFullScreen();
+                emit fullScreenToggled(true);
+            }
+        }
+    }
+}
+
+
+
 void MorphoWidget::closeEvent(QCloseEvent* event)
 {
     emit closing();
@@ -178,6 +200,17 @@ void MorphoWidget::closeEvent(QCloseEvent* event)
     QOpenGLWindow::closeEvent(event);
 }
 
+
+
+void MorphoWidget::toggleFullScreen(bool checked)
+{
+    if (checked) {
+        showFullScreen();
+    }
+    else {
+        showNormal();
+    }
+}
 
 
 void MorphoWidget::setSelectedPoint(QPointF pos)

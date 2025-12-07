@@ -214,6 +214,9 @@ void ControlWidget::constructSystemToolBar()
 
     QAction* overlayAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/align-horizontal-left.png")), "Overlay");
 
+    fullScreenAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/view-fullscreen.png")), "Full screen");
+    fullScreenAction->setCheckable(true);
+
     systemToolBar->addSeparator();
 
     loadConfigAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/document-open.png")), "Load configuration");
@@ -231,9 +234,10 @@ void ControlWidget::constructSystemToolBar()
     connect(recordAction, &QAction::triggered, this, &ControlWidget::record);
     connect(optionsAction, &QAction::triggered, optionsWidget, &QTabWidget::show);
     connect(plotsAction, &QAction::triggered, this, &ControlWidget::showPlotsWidget);
+    connect(overlayAction, &QAction::triggered, this, &ControlWidget::toggleOverlay);
+    connect(fullScreenAction, &QAction::triggered, this, &ControlWidget::fullScreenToggled);
     connect(loadConfigAction, &QAction::triggered, this, &ControlWidget::loadConfig);
     connect(saveConfigAction, &QAction::triggered, this, &ControlWidget::saveConfig);
-    connect(overlayAction, &QAction::triggered, this, &ControlWidget::toggleOverlay);
     connect(aboutAction, &QAction::triggered, this, &ControlWidget::about);
 }
 
@@ -293,6 +297,12 @@ void ControlWidget::setScreenshotFilename()
     updateScrollArea();
 }*/
 
+
+
+void ControlWidget::toggleFullScreenAction(bool checked)
+{
+    fullScreenAction->setChecked(checked);
+}
 
 
 void ControlWidget::loadConfig()

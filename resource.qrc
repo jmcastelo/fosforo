@@ -92,5 +92,6 @@
         <file>icons/logo.png</file>
         <file>icons/logo-small.png</file>
         <file>icons/development-gtk.png</file>
+        <file>icons/view-fullscreen.png</file>
     </qresource>
 </RCC>

@@ -87,6 +87,7 @@ signals:
     void showPlotsWidget();
 
     void overlayToggled(bool show);
+    void fullScreenToggled(bool checked);
 
     void imageSizeChanged(int width, int height);
 
@@ -121,6 +122,8 @@ public slots:
     //void setupMidi(QString portName, bool open);
     //void updateMidiLinks(QString portName, int key, int value);
 
+    void toggleFullScreenAction(bool checked);
+
 protected:
     //void resizeEvent(QResizeEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
@@ -145,6 +148,7 @@ private:
     QAction* iterateAction;
     QAction* recordAction;
     QAction* sortedOperationsAction;
+    QAction* fullScreenAction;
     QAction* saveConfigAction;
     QAction* loadConfigAction;
 
