@@ -33,10 +33,10 @@ void MidiControl::setObserver()
 
 
 
-libremidi::midi_in* MidiControl::createMidiIn(QPair<QString, int> id)
+libremidi::midi_in* MidiControl::createMidiIn(MidiInputPort *inPort)
 {
     libremidi::input_configuration config {
-        .on_message = [=, this](const libremidi::message& message) {
+        .on_message = [&, this](const libremidi::message& message) {
             if (message.get_message_type() == libremidi::message_type::CONTROL_CHANGE)
             {
                 // MIDI CC message bytes:
@@ -45,7 +45,7 @@ libremidi::midi_in* MidiControl::createMidiIn(QPair<QString, int> id)
                 // message[2] = value, ranges from 0 to 127
 
                 int key = message[0] * 128 + message[1];
-                emit ccInputMessageReceived(id, key, message[2]);
+                emit ccInputMessageReceived(inPort->set(), key, message[2]);
             }
         }
     };
@@ -58,26 +58,13 @@ libremidi::midi_in* MidiControl::createMidiIn(QPair<QString, int> id)
 
 void MidiControl::addInputPort(const libremidi::input_port& port)
 {
-    QString deviceName = QString::fromStdString(port.device_name);
-    int deviceNumber = 0;
+    MidiInputPort* inPort = new MidiInputPort(port, 0);
+    mInPortsMap.insert(port, inPort);
 
-    if (!deviceToIndicesMap.contains(deviceName)) {
-        deviceToIndicesMap[deviceName] = { 0 };
-    }
-    else {
-        deviceNumber = deviceToIndicesMap[deviceName].back() + 1;
-        deviceToIndicesMap[deviceName].append(deviceNumber);
-    }
+    libremidi::midi_in* midiIn = createMidiIn(inPort);
+    mInPortToMidiInMap.insert(port, midiIn);
 
-    QPair<QString, int> id = QPair { deviceName, deviceNumber };
-    handleToIdMap.insert(port.port, id);
-
-    libremidi::midi_in* midiIn = createMidiIn(id);
-    idToMidiInMap.insert(id, midiIn);
-
-    idToInputPortMap.insert(id, port);
-
-    emit inputPortAdded(id);
+    emit inputPortAdded(inPort);
 
     midiIn->open_port(port);
 
@@ -88,61 +75,17 @@ void MidiControl::addInputPort(const libremidi::input_port& port)
 
 void MidiControl::removeInputPort(const libremidi::input_port& port)
 {
-    auto handle = port.port;
-    auto devId = handleToIdMap[handle];
-
-    handleToIdMap.remove(handle);
-
     // Close port and delete midi input
 
-    auto midiIn = idToMidiInMap.take(devId);
+    auto midiIn = mInPortToMidiInMap.value(port);
     midiIn->close_port();
     emit inputPortOpen(devId, midiIn->is_port_open());
     delete midiIn;
 
-    idToInputPortMap.remove(devId);
+    auto inPort = mInPortsMap.value(port);
+    emit inputPortRemoved(inPort);
+    delete inPort;
 
-    emit inputPortRemoved(devId);
-
-    // Remap
-
-    for (int index = deviceToIndicesMap[devId.first].back(); index > devId.second; index--)
-    {
-        QPair<QString, int> oldId = QPair { devId.first, index };
-        QPair<QString, int> newId = QPair { devId.first, index - 1 };
-
-        recreateMidiIn(oldId, newId);
-
-        handleToIdMap[handleToIdMap.key(oldId)] = newId;
-
-        deviceToIndicesMap[devId.first][index]--;
-    }
-
-    deviceToIndicesMap[devId.first].removeOne(devId.second);
-}
-
-
-
-void MidiControl::recreateMidiIn(QPair<QString, int> oldId, QPair<QString, int> newId)
-{
-    auto oldMidiIn = idToMidiInMap.take(oldId);
-    oldMidiIn->close_port();
-    delete oldMidiIn;
-
-    emit inputPortRemoved(oldId);
-
-    libremidi::midi_in* midiIn = createMidiIn(newId);
-    idToMidiInMap.insert(newId, midiIn);
-
-    emit inputPortAdded(newId);
-
-    auto port = idToInputPortMap.value(oldId);
-    midiIn->open_port(port);
-
-    idToInputPortMap.insert(newId, port);
-    idToInputPortMap.remove(oldId);
-
-    emit inputPortIdChanged(oldId, newId);
-
-    emit inputPortOpen(newId, midiIn->is_port_open());
+    mInPortToMidiInMap.remove(port);
+    mInPortsMap.remove(port);
 }

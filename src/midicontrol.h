@@ -2,6 +2,8 @@
 #define MIDICONTROL_H
 
 
+#include "midiinputport.h"
+
 #include <QObject>
 #include <QPair>
 #include <QMap>
@@ -21,11 +23,11 @@ public:
     void setObserver();
 
 signals:
-    void inputPortAdded(QPair<QString, int> id);
-    void inputPortRemoved(QPair<QString, int> id);
-    void inputPortIdChanged(QPair<QString, int> oldId, QPair<QString, int> newId);
+    void inputPortAdded(MidiInputPort* inPort);
+    void inputPortRemoved(MidiInputPort* inPort);
     void inputPortOpen(QPair<QString, int> id, bool open);
-    void ccInputMessageReceived(QPair<QString, int> id, int key, int value);
+
+    void ccInputMessageReceived(int set, int key, int value);
 
 private:
     libremidi::observer observer;
@@ -35,10 +37,12 @@ private:
     QMap<libremidi::port_handle, QPair<QString, int>> handleToIdMap;
     QMap<QString, QList<int>> deviceToIndicesMap;
 
-    libremidi::midi_in* createMidiIn(QPair<QString, int> id);
+    QMap<libremidi::input_port, libremidi::midi_in*> mInPortToMidiInMap;
+    QMap<libremidi::input_port, MidiInputPort*> mInPortsMap;
+
+    libremidi::midi_in* createMidiIn(MidiInputPort* inPort);
     void addInputPort(const libremidi::input_port& port);
     void removeInputPort(const libremidi::input_port& port);
-    void recreateMidiIn(QPair<QString, int> oldId, QPair<QString, int> newId);
 };
 
 

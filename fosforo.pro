@@ -56,6 +56,7 @@ HEADERS += \
     src/inputdata.h \
     src/message.h \
     src/midicontrol.h \
+    src/midiinputport.h \
     src/midilinkmanager.h \
     src/midilistwidget.h \
     src/midisignals.h \
@@ -105,6 +106,7 @@ SOURCES += \
     src/main.cpp \
     src/message.cpp \
     src/midicontrol.cpp \
+    src/midiinputport.cpp \
     src/midilinkmanager.cpp \
     src/midilistwidget.cpp \
     src/morphowidget.cpp \
