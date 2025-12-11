@@ -1,27 +1,27 @@
 #include "midiinputport.h"
 
-MidiInputPort::MidiInputPort(libremidi::input_port port, int set) :
-    mSet { set },
+MidiInputPort::MidiInputPort(libremidi::input_port port, int map) :
+    mMap { map },
     mInPort { port }
 {}
 
 
 
-int MidiInputPort::set()
+int MidiInputPort::map()
 {
-    return mSet;
+    return mMap;
 }
 
 
 
-void MidiInputPort::setSet(int set)
+void MidiInputPort::setMap(int map)
 {
-    mSet = set;
+    mMap = map;
 }
 
 
 
 QString MidiInputPort::portName()
 {
-    return QString::fromStdString(mInPort.port_name);
+    return QString::fromStdString(mInPort.display_name);
 }

@@ -3,9 +3,10 @@
 
 
 
+#include "midiinputport.h"
+
 #include <QWidget>
-#include <QListWidget>
-#include <QTableWidgetItem>
+#include <QTableWidget>
 #include <QPushButton>
 
 
@@ -22,15 +23,15 @@ signals:
     void clearLinksButtonClicked();
 
 public slots:
-    void addPortName(QPair<QString, int> portId);
-    void removePortName(QPair<QString, int> portId);
+    void addPortEntry(MidiInputPort* inPort);
+    void removePortEntry(MidiInputPort* inPort);
     void toggleMultiLinkButton(bool checked);
 
 private:
-    QListWidget* portsTable;
-    QPushButton* multiLinkButton;
+    QTableWidget* mPortsTable;
+    QPushButton* mMultiLinkButton;
 
-    QString getPortName(QPair<QString, int> portId);
+    QList<MidiInputPort*> mMidiInPorts;
 };
 
 

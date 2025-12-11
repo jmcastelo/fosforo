@@ -1,4 +1,5 @@
 #include "midicontrol.h"
+
 #include <QDebug>
 
 
@@ -10,8 +11,11 @@ MidiControl::MidiControl(QObject *parent) : QObject(parent)
 
 MidiControl::~MidiControl()
 {
-    foreach (auto midiInput, idToMidiInMap) {
-        delete midiInput;
+    foreach (auto midiIn, mInPortToMidiInMap) {
+        delete midiIn;
+    }
+    foreach (auto inPort, mInPortsMap) {
+        delete inPort;
     }
 }
 
@@ -33,10 +37,10 @@ void MidiControl::setObserver()
 
 
 
-libremidi::midi_in* MidiControl::createMidiIn(MidiInputPort *inPort)
+libremidi::midi_in* MidiControl::createMidiIn(MidiInputPort* inPort)
 {
     libremidi::input_configuration config {
-        .on_message = [&, this](const libremidi::message& message) {
+        .on_message = [=, this](const libremidi::message& message) {
             if (message.get_message_type() == libremidi::message_type::CONTROL_CHANGE)
             {
                 // MIDI CC message bytes:
@@ -44,8 +48,9 @@ libremidi::midi_in* MidiControl::createMidiIn(MidiInputPort *inPort)
                 // message[1] = controller, ranges from 0 to 127 -> knob or fader
                 // message[2] = value, ranges from 0 to 127
 
-                int key = message[0] * 128 + message[1];
-                emit ccInputMessageReceived(inPort->set(), key, message[2]);
+                int key = (message[0] - 176) * 128 + message[1];
+
+                emit ccInputMessageReceived(inPort->map(), key, message[2]);
             }
         }
     };
@@ -58,7 +63,10 @@ libremidi::midi_in* MidiControl::createMidiIn(MidiInputPort *inPort)
 
 void MidiControl::addInputPort(const libremidi::input_port& port)
 {
-    MidiInputPort* inPort = new MidiInputPort(port, 0);
+    // Create midi input and open port
+
+    int map = mInPortsMap.size();
+    MidiInputPort* inPort = new MidiInputPort(port, map);
     mInPortsMap.insert(port, inPort);
 
     libremidi::midi_in* midiIn = createMidiIn(inPort);
@@ -68,7 +76,7 @@ void MidiControl::addInputPort(const libremidi::input_port& port)
 
     midiIn->open_port(port);
 
-    emit inputPortOpen(id, midiIn->is_port_open());
+    emit midiEnabled(anyPortOpen());
 }
 
 
@@ -77,15 +85,24 @@ void MidiControl::removeInputPort(const libremidi::input_port& port)
 {
     // Close port and delete midi input
 
-    auto midiIn = mInPortToMidiInMap.value(port);
+    auto midiIn = mInPortToMidiInMap.take(port);
     midiIn->close_port();
-    emit inputPortOpen(devId, midiIn->is_port_open());
     delete midiIn;
 
-    auto inPort = mInPortsMap.value(port);
+    auto inPort = mInPortsMap.take(port);
     emit inputPortRemoved(inPort);
     delete inPort;
 
-    mInPortToMidiInMap.remove(port);
-    mInPortsMap.remove(port);
+    emit midiEnabled(anyPortOpen());
+}
+
+
+
+bool MidiControl::anyPortOpen()
+{
+    bool anyOpen = false;
+    for (auto [port, midiIn] : mInPortToMidiInMap.asKeyValueRange()) {
+        anyOpen |= midiIn->is_port_open();
+    }
+    return anyOpen;
 }

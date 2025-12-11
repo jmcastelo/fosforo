@@ -12,14 +12,14 @@
 class MidiInputPort
 {
 public:
-    MidiInputPort(libremidi::input_port port, int set);
+    MidiInputPort(libremidi::input_port port, int map);
 
-    int set();
-    void setSet(int set);
+    int map();
+    void setMap(int map);
     QString portName();
 
 private:
-    int mSet = 0;
+    int mMap = 0;
     libremidi::input_port mInPort;
 };
 

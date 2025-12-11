@@ -64,7 +64,7 @@ void ConfigurationParser::write(QString filename)
 
         // Midi
 
-        if (mMidiLinkManager->enabled()) {
+        if (mMidiLinkManager->anyMidiLink()) {
             writeMidiData(mStream);
         }
 
@@ -214,42 +214,39 @@ void ConfigurationParser::writeMidiData(QXmlStreamWriter& stream)
 
     stream.writeAttribute("multi_link", QString::number(mMidiLinkManager->multiLink()));
 
-    for (auto [portId, links]: mMidiLinkManager->floatLinks().asKeyValueRange())
+    for (auto [map, links]: mMidiLinkManager->floatLinks().asKeyValueRange())
     {
         for (auto [key, number]: links.asKeyValueRange())
         {
             stream.writeStartElement("link");
             stream.writeAttribute("type", "float");
-            stream.writeAttribute("device_name", portId.first);
-            stream.writeAttribute("device_index", QString::number(portId.second));
+            stream.writeAttribute("map", QString::number(map));
             stream.writeAttribute("key", QString::number(key));
             stream.writeAttribute("number_id", number->id().toString());
             stream.writeEndElement();
         }
     }
 
-    for (auto [portId, links]: mMidiLinkManager->intLinks().asKeyValueRange())
+    for (auto [map, links]: mMidiLinkManager->intLinks().asKeyValueRange())
     {
         for (auto [key, number]: links.asKeyValueRange())
         {
             stream.writeStartElement("link");
             stream.writeAttribute("type", "int");
-            stream.writeAttribute("device_name", portId.first);
-            stream.writeAttribute("device_index", QString::number(portId.second));
+            stream.writeAttribute("map", QString::number(map));
             stream.writeAttribute("key", QString::number(key));
             stream.writeAttribute("number_id", number->id().toString());
             stream.writeEndElement();
         }
     }
 
-    for (auto [portId, links]: mMidiLinkManager->uintLinks().asKeyValueRange())
+    for (auto [map, links]: mMidiLinkManager->uintLinks().asKeyValueRange())
     {
         for (auto [key, number]: links.asKeyValueRange())
         {
             stream.writeStartElement("link");
             stream.writeAttribute("type", "uint");
-            stream.writeAttribute("device_name", portId.first);
-            stream.writeAttribute("device_index", QString::number(portId.second));
+            stream.writeAttribute("map", QString::number(map));
             stream.writeAttribute("key", QString::number(key));
             stream.writeAttribute("number_id", number->id().toString());
             stream.writeEndElement();
@@ -522,28 +519,26 @@ void ConfigurationParser::readMidiData(QXmlStreamReader& stream)
             while (stream.name() == "link")
             {
                 QString type = stream.attributes().value("type").toString();
-                QString deviceName = stream.attributes().value("device_name").toString();
-                int deviceIndex = stream.attributes().value("device_index").toInt();
-                QPair<QString, int> portId = QPair { deviceName, deviceIndex };
+                int map = stream.attributes().value("map").toInt();
                 int key = stream.attributes().value("key").toInt();
                 QUuid number_id = QUuid(stream.attributes().value("number_id").toString());
 
                 if (type == "float") {
                     Number<float>* number = mFactory->number<float>(number_id);
                     if (number) {
-                        mMidiLinkManager->setupMidiLink(portId, key, number);
+                        mMidiLinkManager->setupMidiLink(map, key, number);
                     }
                 }
                 else if (type == "int") {
                     Number<int>* number = mFactory->number<int>(number_id);
                     if (number) {
-                        mMidiLinkManager->setupMidiLink(portId, key, number);
+                        mMidiLinkManager->setupMidiLink(map, key, number);
                     }
                 }
                 else if (type == "uint") {
                     Number<unsigned int>* number = mFactory->number<unsigned int>(number_id);
                     if (number) {
-                        mMidiLinkManager->setupMidiLink(portId, key, number);
+                        mMidiLinkManager->setupMidiLink(map, key, number);
                     }
                 }
 

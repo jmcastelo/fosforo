@@ -3,75 +3,82 @@
 
 #include "midilistwidget.h"
 
-#include <QListWidgetItem>
+#include <QTableWidgetItem>
+#include <QHeaderView>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QSpinBox>
 
 
 
 MidiListWidget::MidiListWidget(QWidget *parent): QWidget{parent}
 {
-    multiLinkButton = new QPushButton("Multi-assign");
-    multiLinkButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    multiLinkButton->setCheckable(true);
+    mMultiLinkButton = new QPushButton("Multi-assign");
+    mMultiLinkButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    mMultiLinkButton->setCheckable(true);
 
     QPushButton* clearLinksButton = new QPushButton("Clear assignments");
     clearLinksButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-    portsTable = new QListWidget;
-    portsTable->setSelectionMode(QAbstractItemView::NoSelection);
+    mPortsTable = new QTableWidget;
+    mPortsTable->setColumnCount(2);
+    mPortsTable->setHorizontalHeaderLabels(QStringList { "Port Name", "Map" });
+    mPortsTable->horizontalHeader()->setStretchLastSection(false);
+    mPortsTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    mPortsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    mPortsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     QHBoxLayout* hLayout = new QHBoxLayout;
-    hLayout->addWidget(multiLinkButton);
+    hLayout->addWidget(mMultiLinkButton);
     hLayout->addWidget(clearLinksButton);
 
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addLayout(hLayout);
-    layout->addWidget(portsTable);
+    layout->addWidget(mPortsTable);
 
     setLayout(layout);
 
     connect(clearLinksButton, &QPushButton::clicked, this, &MidiListWidget::clearLinksButtonClicked);
-    connect(multiLinkButton, &QPushButton::clicked, this, &MidiListWidget::multiLinkButtonChecked);
+    connect(mMultiLinkButton, &QPushButton::clicked, this, &MidiListWidget::multiLinkButtonChecked);
 }
 
 
 
-void MidiListWidget::addPortName(QPair<QString, int> portId)
+void MidiListWidget::addPortEntry(MidiInputPort* inPort)
 {
-    QString portName = getPortName(portId);
-    QListWidgetItem* item = new QListWidgetItem(portName, portsTable);
-    item->setFlags(Qt::ItemIsEnabled);
+    const int row = mPortsTable->rowCount();
+    mPortsTable->insertRow(row);
 
-    portsTable->sortItems();
+    QString portName = inPort->portName();
+    QTableWidgetItem* nameItem = new QTableWidgetItem(portName);
+    mPortsTable->setItem(row, 0, nameItem);
+
+    QSpinBox* mapSpinBox = new QSpinBox;
+    mapSpinBox->setRange(1, 16);
+    mapSpinBox->setValue(inPort->map() + 1);
+    mapSpinBox->setAlignment(Qt::AlignCenter);
+
+    connect(mapSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [inPort](int value) {
+        inPort->setMap(value - 1);
+    });
+
+    mPortsTable->setCellWidget(row, 1, mapSpinBox);
+
+    mMidiInPorts.append(inPort);
 }
 
 
 
-void MidiListWidget::removePortName(QPair<QString, int> portId)
+void MidiListWidget::removePortEntry(MidiInputPort* inPort)
 {
-    QString portName = getPortName(portId);
-
-    auto items = portsTable->findItems(portName, Qt::MatchCaseSensitive);
-
-    if (!items.isEmpty()) {
-        portsTable->removeItemWidget(items[0]);
-        delete items[0];
-    }
-
-    portsTable->sortItems();
+    int row = mMidiInPorts.lastIndexOf(inPort);
+    mPortsTable->removeRow(row);
+    mMidiInPorts.removeOne(inPort);
 }
 
 
 
 void MidiListWidget::toggleMultiLinkButton(bool checked)
 {
-    multiLinkButton->setChecked(checked);
-}
-
-
-
-QString MidiListWidget::getPortName(QPair<QString, int> portId)
-{
-    return portId.first + " [" + QString::number(portId.second + 1) + "]";
+    mMultiLinkButton->setChecked(checked);
 }

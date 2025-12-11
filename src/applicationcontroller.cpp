@@ -41,16 +41,14 @@ ApplicationController::ApplicationController()
     midiControl = new MidiControl();
     midiListWidget = new MidiListWidget();
 
-    connect(midiControl, &MidiControl::inputPortAdded, midiListWidget, &MidiListWidget::addPortName);
-    connect(midiControl, &MidiControl::inputPortRemoved, midiListWidget, &MidiListWidget::removePortName);
-    connect(midiControl, &MidiControl::inputPortOpen, &midiLinkManager, &MidiLinkManager::setupMidi);
-    connect(midiControl, &MidiControl::inputPortIdChanged, &midiLinkManager, &MidiLinkManager::remapMidiLinks);
+    connect(midiControl, &MidiControl::inputPortAdded, midiListWidget, &MidiListWidget::addPortEntry);
+    connect(midiControl, &MidiControl::inputPortRemoved, midiListWidget, &MidiListWidget::removePortEntry);
+    connect(midiControl, &MidiControl::midiEnabled, nodeManager, &NodeManager::midiEnabled);
+    connect(midiControl, &MidiControl::midiEnabled, factory, &Factory::setMidiEnabled);
     connect(midiControl, &MidiControl::ccInputMessageReceived, &midiLinkManager, &MidiLinkManager::updateMidiLinks);
     connect(midiListWidget, &MidiListWidget::multiLinkButtonChecked, &midiLinkManager, &MidiLinkManager::setMultiLink);
     connect(midiListWidget, &MidiListWidget::clearLinksButtonClicked, &midiLinkManager, &MidiLinkManager::clearLinks);
     connect(&midiLinkManager, &MidiLinkManager::multiLinkSet, midiListWidget, &MidiListWidget::toggleMultiLinkButton);
-    connect(&midiLinkManager, &MidiLinkManager::midiEnabled, nodeManager, &NodeManager::midiEnabled);
-    connect(&midiLinkManager, &MidiLinkManager::midiEnabled, factory, &Factory::setMidiEnabled);
 
     midiControl->setObserver();
 
