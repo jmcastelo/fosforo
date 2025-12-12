@@ -152,9 +152,9 @@ void Factory::deleteSeed(Seed* seed)
 
 
 
-QList<QString> Factory::availableOperationNames()
+QStringList Factory::availableOperationNames()
 {
-    QList<QString> opNames;
+    QStringList opNames;
 
     foreach (ImageOperation* operation, mAvailOps) {
         opNames.append(operation->name());
@@ -232,31 +232,52 @@ Number<unsigned int>* Factory::number(QUuid id)
 
 void Factory::scan()
 {
+    // Select only operation files
+
+    QStringList filters;
+    filters << "*.op";
+
+    // Get operations from the resources system
+
+    QDir opsResDir = QDir(":/operations");
+
+    QStringList resFileNames = opsResDir.entryList(filters, QDir::Files | QDir::NoSymLinks, QDir::Name);
+    QStringList allFileNames = resFileNames;
+
+    // And from the ./operations directory
+
     QDir opsDir = QDir(QDir::currentPath() + "/operations");
 
-    if (opsDir.exists())
+    QStringList fileNames;
+
+    if (opsDir.exists()) {
+        fileNames = opsDir.entryList(filters, QDir::Files | QDir::NoSymLinks, QDir::Name);
+        allFileNames += fileNames;
+    }
+
+    // Add found operations
+
+    qDeleteAll(mAvailOps);
+    mAvailOps.clear();
+
+    OperationParser opParser;
+
+    foreach (QString fileName, allFileNames)
     {
-        QStringList filters;
-        filters << "*.op";
+        QString filePath = resFileNames.contains(fileName) ? opsResDir.absoluteFilePath(fileName) : opsDir.absoluteFilePath(fileName);
 
-        QStringList fileNames = opsDir.entryList(filters, QDir::Files | QDir::NoSymLinks, QDir::Name);
+        ImageOperation* operation = new ImageOperation();
 
-        qDeleteAll(mAvailOps);
-        mAvailOps.clear();
-
-        OperationParser opParser;
-
-        foreach (QString path, fileNames)
-        {
-            QString filePath = opsDir.absoluteFilePath(path);
-
-            ImageOperation* operation = new ImageOperation();
-
-            if (opParser.read(operation, filePath, false)) {
-                mAvailOps.append(operation);
-            }
+        if (opParser.read(operation, filePath, false)) {
+            mAvailOps.append(operation);
         }
     }
+
+    // Sort operations alphabetically by name
+
+    std::sort(mAvailOps.begin(), mAvailOps.end(), [] (const ImageOperation* op1, const ImageOperation* op2) {
+        return (op1->name() < op2->name());
+    });
 }
 
 

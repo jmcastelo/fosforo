@@ -87,7 +87,7 @@
         </parameter>
         <parameter name="Opacity" type="float_uniform" editable="1" row="0" column="2">
             <uniform name="opacity" type="5126" numitems="1">
-                <number inf="0" sup="1" min="0" max="1">1</number>
+                <number inf="0" sup="1" min="0" max="1">0</number>
             </uniform>
         </parameter>
         <parameter name="Ortho" type="mat4_uniform" editable="0" row="2" column="0">

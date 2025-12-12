@@ -37,7 +37,7 @@ win32:INCLUDEPATH += "C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.
 
 QT += widgets openglwidgets multimedia opengl
 
-RESOURCES += resource.qrc
+RESOURCES += ./resources/resources.qrc
 
 HEADERS += \
     src/applicationcontroller.h \

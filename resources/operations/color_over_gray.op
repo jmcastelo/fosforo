@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fosforo>
+    <operation name="Color Over Gray" enabled="0">
+        <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCnVuaWZvcm0gbWF0NCBvcnRobzsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gb3J0aG8gKiB2ZWM0KHBvcywgMC4wLCAxLjApOwogICAgdGV4Q29vcmRzID0gdGV4Owp9Cg==</vertex_shader>
+        <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp1bmlmb3JtIGZsb2F0IGh1ZTsKdW5pZm9ybSBmbG9hdCByYW5nZTsKdW5pZm9ybSBmbG9hdCBvcGFjaXR5OwoKLy8gSHVlIGluIFswLDFdCgp2ZWMzIHJnYjJoc3YodmVjMyBjKQp7CiAgICB2ZWM0IEsgPSB2ZWM0KDAuMCwgLTEuMCAvIDMuMCwgMi4wIC8gMy4wLCAtMS4wKTsKICAgIHZlYzQgcCA9IG1peCh2ZWM0KGMuYmcsIEsud3opLCB2ZWM0KGMuZ2IsIEsueHkpLCBzdGVwKGMuYiwgYy5nKSk7CiAgICB2ZWM0IHEgPSBtaXgodmVjNChwLnh5dywgYy5yKSwgdmVjNChjLnIsIHAueXp4KSwgc3RlcChwLngsIGMucikpOwoKICAgIGZsb2F0IGQgPSBxLnggLSBtaW4ocS53LCBxLnkpOwogICAgZmxvYXQgZSA9IDEuMGUtMTA7CiAgICByZXR1cm4gdmVjMyhhYnMocS56ICsgKHEudyAtIHEueSkgLyAoNi4wICogZCArIGUpKSwgZCAvIChxLnggKyBlKSwgcS54KTsKfQoKdmVjMyBoc3YycmdiKHZlYzMgYykKewogICAgdmVjNCBLID0gdmVjNCgxLjAsIDIuMCAvIDMuMCwgMS4wIC8gMy4wLCAzLjApOwogICAgdmVjMyBwID0gYWJzKGZyYWN0KGMueHh4ICsgSy54eXopICogNi4wIC0gSy53d3cpOwogICAgcmV0dXJuIGMueiAqIG1peChLLnh4eCwgY2xhbXAocCAtIEsueHh4LCAwLjAsIDEuMCksIGMueSk7Cn0KCnZvaWQgbWFpbigpCnsKICAgIHZlYzMgc3JjQ29sb3IgPSB0ZXh0dXJlKGluVGV4dHVyZSwgdGV4Q29vcmRzKS5yZ2I7CiAgICB2ZWMzIGhzdkNvbG9yID0gcmdiMmhzdihzcmNDb2xvcik7CgogICAgdmVjMyBkc3RDb2xvciA9IHNyY0NvbG9yOwoKICAgIGlmIChhYnMoaHN2Q29sb3IueCAtIGh1ZSkgPiByYW5nZSkgewogICAgICAgIGRzdENvbG9yID0gdmVjMygoc3JjQ29sb3IuciArIHNyY0NvbG9yLmcgKyBzcmNDb2xvci5iKSAvIDMuMCk7CiAgICB9CgogICAgZnJhZ0NvbG9yID0gdmVjNChtaXgoc3JjQ29sb3IsIGRzdENvbG9yLCBvcGFjaXR5KSwgMS4wKTsKfQo=</fragment_shader>
+        <sampler2d>inTexture</sampler2d>
+        <parameter name="Hue" type="float_uniform" editable="1" row="0" column="0">
+            <uniform name="hue" type="5126" numitems="1">
+                <number inf="0" sup="1" min="0" max="1">0</number>
+            </uniform>
+        </parameter>
+        <parameter name="Range" type="float_uniform" editable="1" row="0" column="1">
+            <uniform name="range" type="5126" numitems="1">
+                <number inf="0" sup="1" min="0" max="1">0</number>
+            </uniform>
+        </parameter>
+        <parameter name="Opacity" type="float_uniform" editable="1" row="0" column="2">
+            <uniform name="opacity" type="5126" numitems="1">
+                <number inf="0" sup="1" min="0" max="1">0</number>
+            </uniform>
+        </parameter>
+        <parameter name="Ortho" type="mat4_uniform" editable="0" row="1" column="0">
+            <uniform name="ortho" type="35676" mat4_type="3">
+                <number name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Right" inf="0" sup="10" min="0" max="2">1</number>
+                <number name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>
+                <number name="Top" inf="0" sup="10" min="0" max="2">1</number>
+            </uniform>
+        </parameter>
+    </operation>
+</fosforo>

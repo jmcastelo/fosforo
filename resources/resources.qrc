@@ -93,5 +93,29 @@
         <file>icons/logo-small.png</file>
         <file>icons/development-gtk.png</file>
         <file>icons/view-fullscreen.png</file>
+        <file>operations/affine.op</file>
+        <file>operations/brightness.op</file>
+        <file>operations/color_mix.op</file>
+        <file>operations/color_quantization.op</file>
+        <file>operations/contrast.op</file>
+        <file>operations/convolution.op</file>
+        <file>operations/dilation.op</file>
+        <file>operations/erosion.op</file>
+        <file>operations/gradient.op</file>
+        <file>operations/hue_shift.op</file>
+        <file>operations/inverse_average.op</file>
+        <file>operations/logistic.op</file>
+        <file>operations/mask.op</file>
+        <file>operations/median.op</file>
+        <file>operations/memory.op</file>
+        <file>operations/memory_modulated.op</file>
+        <file>operations/morphological_gradient.op</file>
+        <file>operations/neuromorphic.op</file>
+        <file>operations/pixelation.op</file>
+        <file>operations/power.op</file>
+        <file>operations/saturation.op</file>
+        <file>operations/smooth_mask.op</file>
+        <file>operations/value.op</file>
+        <file>operations/color_over_gray.op</file>
     </qresource>
 </RCC>
