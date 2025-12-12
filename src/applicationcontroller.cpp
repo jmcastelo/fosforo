@@ -98,7 +98,7 @@ ApplicationController::ApplicationController()
     connect(plotsWidget, &PlotsWidget::selectedPointChanged, morphoWidget, &MorphoWidget::setCursor);
     connect(plotsWidget, &PlotsWidget::drawCursor, morphoWidget, &MorphoWidget::setDrawingCursor);
     connect(morphoWidget, &MorphoWidget::closing, this, &ApplicationController::onMorphoWidgetClose);
-    connect(morphoWidget, &MorphoWidget::sizeChanged, renderManager, &RenderManager::resize);
+    // connect(morphoWidget, &MorphoWidget::sizeChanged, renderManager, &RenderManager::resize);
     connect(morphoWidget, &MorphoWidget::resetIterations, renderManager, &RenderManager::reset);
     connect(morphoWidget, &MorphoWidget::sizeChanged, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
     connect(morphoWidget, &MorphoWidget::sizeChanged, plotsWidget, &PlotsWidget::setSize);
@@ -298,9 +298,10 @@ void ApplicationController::showMidiWidget()
 
 void ApplicationController::setSize(int width, int height)
 {
-    morphoWidget->resize(width, height);
+    // morphoWidget->resize(width, height);
     renderManager->resize(width, height);
-    plotsWidget->setSize(width, height);
+    // morphoWidget->resetZoom(width, height);
+    // plotsWidget->setSize(width, height);
 }
 
 

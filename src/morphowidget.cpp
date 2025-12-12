@@ -34,14 +34,14 @@ MorphoWidget::MorphoWidget(int w, int h, Overlay* overlay_)
     : overlay { overlay_ }
 {
     image = QRect(0, 0, w, h);
-    frame = image;
+    // frame = image;
 
     selectedPoint = QPointF(w / 2, h / 2);
     cursor = QPointF(0.0, 0.0);
 
     overlay->setViewportRect(w, h);
 
-    setTitle("Fosforo");
+    setTitle("Fosforo: Output");
     setIcon(QIcon(QPixmap(":/icons/logo.png")));
 }
 
@@ -74,8 +74,9 @@ void MorphoWidget::wheelEvent(QWheelEvent* event)
 
     frameTransform.scale(factor, factor);
 
-    if (frameTransform.m11() > 1.0 || frameTransform.m22() > 1.0)
+    if (frameTransform.m11() > 1.0 || frameTransform.m22() > 1.0) {
         frameTransform.reset();
+    }
 
     frame = frameTransform.mapRect(image);
 
@@ -88,14 +89,18 @@ void MorphoWidget::wheelEvent(QWheelEvent* event)
 
     // Keep frame within image
 
-    if (frame.y() < image.y())
+    if (frame.y() < image.y()) {
         frame = frameTransform.translate(0.0, (image.y() - frame.y()) / frameTransform.m22()).mapRect(image);
-    if (frame.y() + frame.height() > image.y() + image.height())
+    }
+    if (frame.y() + frame.height() > image.y() + image.height()) {
         frame = frameTransform.translate(0.0, (image.y() + image.height() - frame.y() - frame.height()) / frameTransform.m22()).mapRect(image);
-    if (frame.x() < image.x())
+    }
+    if (frame.x() < image.x()) {
         frame = frameTransform.translate((image.x() - frame.x()) / frameTransform.m11(), 0.0).mapRect(image);
-    if (frame.x() + frame.width() > image.x() + image.width())
+    }
+    if (frame.x() + frame.width() > image.x() + image.width()) {
         frame = frameTransform.translate((image.x() + image.width() - frame.x() - frame.width()) / frameTransform.m11(), 0.0).mapRect(image);
+    }
 
     // Cursor
 
@@ -121,10 +126,12 @@ void MorphoWidget::mouseMoveEvent(QMouseEvent* event)
 
             frame = frameTransform.translate(delta.x(), delta.y()).mapRect(image);
 
-            if (frame.top() < image.top() || frame.bottom() > image.bottom())
+            if (frame.top() < image.top() || frame.bottom() > image.bottom()) {
                 frame = frameTransform.translate(0.0, -delta.y()).mapRect(image);
-            if (frame.left() < image.left() || frame.right() > image.right())
+            }
+            if (frame.left() < image.left() || frame.right() > image.right()) {
                 frame = frameTransform.translate(-delta.x(), 0.0).mapRect(image);
+            }
 
             prevPos = event->pos();
 
@@ -140,8 +147,7 @@ void MorphoWidget::mouseMoveEvent(QMouseEvent* event)
                 prevFrame = frame;
             }
         }
-        else if (drawingCursor)
-        {
+        else if (drawingCursor) {
             setSelectedPoint(event->position());
         }
     }
@@ -188,16 +194,13 @@ void MorphoWidget::keyPressEvent(QKeyEvent* event)
                 emit fullScreenToggled(true);
             }
         }
-        else if (event->key() == Qt::Key_S)
-        {
+        else if (event->key() == Qt::Key_S) {
             emit screenshot();
         }
-        else if (event->key() == Qt::Key_R)
-        {
+        else if (event->key() == Qt::Key_R) {
             emit record();
         }
-        else if (event->key() == Qt::Key_Space)
-        {
+        else if (event->key() == Qt::Key_Space) {
             emit resetIterations();
         }
     }
@@ -231,14 +234,18 @@ void MorphoWidget::setSelectedPoint(QPointF pos)
 {
     QPointF clickedPoint = QTransform().scale(1.0 / width(), 1.0 / height()).map(pos);
 
-    if (clickedPoint.x() < 0.0)
+    if (clickedPoint.x() < 0.0) {
         clickedPoint.setX(0.0);
-    if (clickedPoint.x() > 1.0)
+    }
+    if (clickedPoint.x() > 1.0) {
         clickedPoint.setX(1.0);
-    if (clickedPoint.y() < 0.0)
+    }
+    if (clickedPoint.y() < 0.0) {
         clickedPoint.setY(0.0);
-    if (clickedPoint.y() > 1.0)
+    }
+    if (clickedPoint.y() > 1.0) {
         clickedPoint.setY(1.0);
+    }
 
     selectedPoint = QTransform().translate(frame.left(), frame.top()).scale(frame.width(), frame.height()).map(clickedPoint);
 
@@ -247,14 +254,18 @@ void MorphoWidget::setSelectedPoint(QPointF pos)
     // Check boundaries
     // Note: right() = left() + width() - 1, bottom() = top() + height() - 1
 
-    if (point.x() < image.left())
+    if (point.x() < image.left()) {
         point.setX(image.left());
-    if (point.x() > image.right())
+    }
+    if (point.x() > image.right()) {
         point.setX(image.right());
-    if (point.y() < image.top())
+    }
+    if (point.y() < image.top()) {
         point.setY(image.top());
-    if (point.y() > image.bottom())
+    }
+    if (point.y() > image.bottom()) {
         point.setY(image.bottom());
+    }
 
     emit selectedPointChanged(point);
 
@@ -291,6 +302,18 @@ void MorphoWidget::resetZoom(int newWidth, int newHeight)
     QTransform scaleTransform = QTransform().scale(scaleX, scaleY);
 
     emit scaleTransformChanged(scaleTransform);
+}
+
+
+
+void MorphoWidget::adjustFrame(int width, int height)
+{
+    qreal scaleX = 1.0;
+    qreal scaleY = 1.0;
+    if (width > height)
+    {
+
+    }
 }
 
 
@@ -398,12 +421,15 @@ void MorphoWidget::initializeGL()
     glGenFramebuffers(1, &fbo);
 
     program = new QOpenGLShaderProgram();
-    if (!program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/cursor.vert"))
+    if (!program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/cursor.vert")) {
         qDebug() << "Vertex shader error:\n" << program->log();
-    if (!program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/cursor.frag"))
+    }
+    if (!program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/cursor.frag")) {
         qDebug() << "Fragment shader error:\n" << program->log();
-    if (!program->link())
+    }
+    if (!program->link()) {
         qDebug() << "Shader link error:\n" << program->log();
+    }
 
     vao = new QOpenGLVertexArrayObject();
     vao->create();

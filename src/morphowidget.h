@@ -121,6 +121,7 @@ private:
     void setSelectedPoint(QPointF pos);
     void updateCursor();
     void getSupportedTexFormats();
+    void adjustFrame(int width, int height);
 };
 
 

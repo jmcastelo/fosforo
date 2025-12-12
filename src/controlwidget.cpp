@@ -147,7 +147,7 @@ ControlWidget::ControlWidget(QString version, GraphWidget* graphWidget, MidiList
     // setAutoFillBackground(true);
     // setWindowFlags(Qt::SubWindow);
 
-    setWindowTitle("Fosforo");
+    setWindowTitle("Fosforo: Control");
     setWindowIcon(QIcon(QPixmap(":/icons/logo.png")));
 }
 

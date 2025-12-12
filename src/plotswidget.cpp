@@ -103,6 +103,9 @@ PlotsWidget::PlotsWidget(RenderManager*renderManager, QWidget* parent) :
 
     setLayout(layout);
 
+    setWindowTitle("Fosforo: Plots");
+    setWindowIcon(QIcon(QPixmap(":/icons/logo.png")));
+
     resize(800, 800);
 }
 
