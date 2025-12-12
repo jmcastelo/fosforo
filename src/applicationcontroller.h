@@ -86,6 +86,8 @@ private:
 
     // QQueue<qint64> timestamps;
 
+    void closeAll();
+
 private slots:
     // void computeUpdateFPS();
     // void computeIterationFPS();
@@ -100,7 +102,8 @@ private slots:
 
     void showMidiWidget();
 
-    void closeAll();
+    void onMorphoWidgetClose();
+    void onControlWidgetClose();
 };
 
 

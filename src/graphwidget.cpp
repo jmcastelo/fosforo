@@ -34,7 +34,6 @@
 #include <QMenu>
 #include <QAction>
 #include <QPainterPath>
-#include <QPointer>
 
 
 
@@ -216,23 +215,9 @@ void GraphWidget::onActionTriggered(QAction* action)
 
 void GraphWidget::closeEvent(QCloseEvent* event)
 {
-    /*QList<QPointer<Node>> watchers;
-
-    for (auto* item : scene()->items()) {
-        if (Node* node = qgraphicsitem_cast<Node*>(item)) {
-            watchers.append(QPointer<Node>(node));
-        }
-    }
-
-    foreach (QPointer<Node> wptr, watchers) {
-        if (!wptr.isNull()) {
-            wptr->close();
-        }
-    }*/
-
-    foreach (auto* item, scene()->items()) {
-        if (Node* node = qgraphicsitem_cast<Node*>(item)) {
-            node->close();
+    foreach (auto item, scene()->items()) {
+        if (QGraphicsProxyWidget* proxy = qgraphicsitem_cast<QGraphicsProxyWidget*>(item)) {
+            proxy->widget()->close();
         }
     }
 

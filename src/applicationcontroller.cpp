@@ -97,14 +97,14 @@ ApplicationController::ApplicationController()
     connect(morphoWidget, &MorphoWidget::selectedPointChanged, plotsWidget, &PlotsWidget::setSelectedPoint);
     connect(plotsWidget, &PlotsWidget::selectedPointChanged, morphoWidget, &MorphoWidget::setCursor);
     connect(plotsWidget, &PlotsWidget::drawCursor, morphoWidget, &MorphoWidget::setDrawingCursor);
-    connect(morphoWidget, &MorphoWidget::closing, this, &ApplicationController::closeAll);
+    connect(morphoWidget, &MorphoWidget::closing, this, &ApplicationController::onMorphoWidgetClose);
     connect(morphoWidget, &MorphoWidget::sizeChanged, renderManager, &RenderManager::resize);
     connect(morphoWidget, &MorphoWidget::resetIterations, renderManager, &RenderManager::reset);
     connect(morphoWidget, &MorphoWidget::sizeChanged, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
     connect(morphoWidget, &MorphoWidget::sizeChanged, plotsWidget, &PlotsWidget::setSize);
 
     connect(controlWidget, &ControlWidget::iterateStateChanged, this, &ApplicationController::setIterationState);
-    connect(controlWidget, &ControlWidget::closing, this, &ApplicationController::closeAll);
+    connect(controlWidget, &ControlWidget::closing, this, &ApplicationController::onControlWidgetClose);
 
     connect(renderManager, &RenderManager::texturesChanged, nodeManager, &NodeManager::onTexturesChanged);
     connect(renderManager, &RenderManager::frameRecorded, controlWidget, &ControlWidget::setVideoCaptureElapsedTimeLabel);
@@ -143,7 +143,7 @@ ApplicationController::ApplicationController()
 
     QSize screenSize = QGuiApplication::primaryScreen()->size();
     int glSide = qMin(screenSize.width(), screenSize.height());
-    int ctrlWidth= qMax(screenSize.width(), screenSize.height()) - glSide;
+    int ctrlWidth= screenSize.width() - glSide;
 
     // morphoWidget->resize(renderManager->texWidth(), renderManager->texHeight());
     morphoWidget->resize(glSide, glSide);
@@ -316,14 +316,26 @@ void ApplicationController::closeAll()
 
     plotsWidget->close();
     graphWidget->close();
-
-    if (morphoWidget->isVisible()) {
-        morphoWidget->close();
-    }
-    if (controlWidget->isVisible()) {
-        controlWidget->close();
-    }
 }
+
+
+
+void ApplicationController::onMorphoWidgetClose()
+{
+    closeAll();
+    disconnect(controlWidget, &ControlWidget::closing, this, &ApplicationController::onControlWidgetClose);
+    controlWidget->close();
+}
+
+
+
+void ApplicationController::onControlWidgetClose()
+{
+    closeAll();
+    disconnect(morphoWidget, &MorphoWidget::closing, this, &ApplicationController::onMorphoWidgetClose);
+    morphoWidget->close();
+}
+
 
 
 /*void ApplicationController::resizeEvent(QResizeEvent* event)
