@@ -310,6 +310,7 @@ void MorphoWidget::adjustFrame(int width, int height)
 {
     qreal scaleX = 1.0;
     qreal scaleY = 1.0;
+
     if (width > height)
     {
 
