@@ -1,7 +1,5 @@
 #include "midicontrol.h"
 
-#include <QDebug>
-
 
 
 MidiControl::MidiControl(QObject *parent) : QObject(parent)

@@ -6,7 +6,7 @@
 #include "factory.h"
 #include "rendermanager.h"
 #include "nodemanager.h"
-#include "morphowidget.h"
+#include "outputwindow.h"
 #include "graphwidget.h"
 #include "configparser.h"
 #include "controlwidget.h"
@@ -50,7 +50,7 @@ private:
     Factory* factory;
     RenderManager* renderManager;
     NodeManager* nodeManager;
-    MorphoWidget* morphoWidget;
+    OutputWindow* outputWindow;
     GraphWidget* graphWidget;
     ConfigurationParser* configParser;
     ControlWidget* controlWidget;
@@ -102,7 +102,7 @@ private slots:
 
     void showMidiWidget();
 
-    void onMorphoWidgetClose();
+    void onOutputWindowClose();
     void onControlWidgetClose();
 };
 

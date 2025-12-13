@@ -142,7 +142,7 @@ ControlWidget::ControlWidget(QString version, GraphWidget* graphWidget, MidiList
 
     setLayout(mainVBoxLayout);
 
-    // Needed over morphoWidget
+    // Needed over outputWindow
 
     // setAutoFillBackground(true);
     // setWindowFlags(Qt::SubWindow);

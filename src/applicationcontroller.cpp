@@ -26,7 +26,7 @@ ApplicationController::ApplicationController()
 
     overlay = new Overlay();
 
-    morphoWidget = new MorphoWidget(renderManager->texWidth(), renderManager->texHeight(), overlay);
+    outputWindow = new OutputWindow(renderManager->texWidth(), renderManager->texHeight(), overlay);
 
     plotsWidget = new PlotsWidget(renderManager);
     plotsWidget->setVisible(false);
@@ -62,19 +62,19 @@ ApplicationController::ApplicationController()
     // connect(iterationTimer, &TimerThread::stepTimeMeasured, controlWidget, &ControlWidget::updateIterationMetricsLabels);
     // connect(iterationTimer, &TimerThread::stepPerformed, controlWidget, &ControlWidget::updateIterationNumberLabel);
 
-    connect(renderManager, &RenderManager::frameReady, morphoWidget, &MorphoWidget::render);
+    connect(renderManager, &RenderManager::frameReady, outputWindow, &OutputWindow::render);
     // connect(renderManager, &RenderManager::stepTimeMeasured, controlWidget, &ControlWidget::updateIterationMetricsLabels);
     // connect(renderManager, &RenderManager::stepPerformed, controlWidget, &ControlWidget::updateIterationNumberLabel);
-    // connect(updateTimer, &TimerThread::timeout, morphoWidget, QOverload<>::of(&MorphoWidget::update));
+    // connect(updateTimer, &TimerThread::timeout, outputWindow, QOverload<>::of(&OutputWindow::update));
     // connect(updateTimer, &TimerThread::stepTimeMeasured, controlWidget, &ControlWidget::updateUpdateMetricsLabels);
 
     // connect(this, &ApplicationController::iterationPerformed, controlWidget, &ControlWidget::updateIterationNumberLabel);
     // connect(this, &ApplicationController::iterationTimeMeasured, controlWidget, &ControlWidget::updateIterationMetricsLabels);
     // connect(this, &ApplicationController::updateTimeMeasured, controlWidget, &ControlWidget::updateUpdateMetricsLabels);
 
-    connect(morphoWidget, &MorphoWidget::openGLInitialized, this, [&]() {
-        renderManager->init(morphoWidget->context());
-        // plotsWidget->init(morphoWidget->context());
+    connect(outputWindow, &OutputWindow::openGLInitialized, this, [&]() {
+        renderManager->init(outputWindow->context());
+        // plotsWidget->init(outputWindow->context());
 
         // numIterations = 0;
         // numUpdates = 0;
@@ -87,21 +87,21 @@ ApplicationController::ApplicationController()
 
         renderManager->start();
     });
-    connect(morphoWidget, &MorphoWidget::renderDone, this, &ApplicationController::measureFps);
-    connect(morphoWidget, &MorphoWidget::renderDone, plotsWidget, &PlotsWidget::updatePlots);
-    connect(morphoWidget, &MorphoWidget::supportedTexFormats, controlWidget, &ControlWidget::populateTexFormatComboBox);
-    connect(morphoWidget, &MorphoWidget::fullScreenToggled, controlWidget, &ControlWidget::toggleFullScreenAction);
-    connect(morphoWidget, &MorphoWidget::screenshot, controlWidget, &ControlWidget::screenshot);
-    connect(morphoWidget, &MorphoWidget::record, controlWidget, &ControlWidget::toggleRecording);
-    connect(morphoWidget, &MorphoWidget::scaleTransformChanged, plotsWidget, &PlotsWidget::transformSources);
-    connect(morphoWidget, &MorphoWidget::selectedPointChanged, plotsWidget, &PlotsWidget::setSelectedPoint);
-    connect(plotsWidget, &PlotsWidget::selectedPointChanged, morphoWidget, &MorphoWidget::setCursor);
-    connect(plotsWidget, &PlotsWidget::drawCursor, morphoWidget, &MorphoWidget::setDrawingCursor);
-    connect(morphoWidget, &MorphoWidget::closing, this, &ApplicationController::onMorphoWidgetClose);
-    // connect(morphoWidget, &MorphoWidget::sizeChanged, renderManager, &RenderManager::resize);
-    connect(morphoWidget, &MorphoWidget::resetIterations, renderManager, &RenderManager::reset);
-    connect(morphoWidget, &MorphoWidget::sizeChanged, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
-    connect(morphoWidget, &MorphoWidget::sizeChanged, plotsWidget, &PlotsWidget::setSize);
+    connect(outputWindow, &OutputWindow::renderDone, this, &ApplicationController::measureFps);
+    connect(outputWindow, &OutputWindow::renderDone, plotsWidget, &PlotsWidget::updatePlots);
+    connect(outputWindow, &OutputWindow::supportedTexFormats, controlWidget, &ControlWidget::populateTexFormatComboBox);
+    connect(outputWindow, &OutputWindow::fullScreenToggled, controlWidget, &ControlWidget::toggleFullScreenAction);
+    connect(outputWindow, &OutputWindow::screenshot, controlWidget, &ControlWidget::screenshot);
+    connect(outputWindow, &OutputWindow::record, controlWidget, &ControlWidget::toggleRecording);
+    connect(outputWindow, &OutputWindow::scaleTransformChanged, plotsWidget, &PlotsWidget::transformSources);
+    connect(outputWindow, &OutputWindow::selectedPointChanged, plotsWidget, &PlotsWidget::setSelectedPoint);
+    connect(plotsWidget, &PlotsWidget::selectedPointChanged, outputWindow, &OutputWindow::setCursor);
+    connect(plotsWidget, &PlotsWidget::drawCursor, outputWindow, &OutputWindow::setDrawingCursor);
+    connect(outputWindow, &OutputWindow::closing, this, &ApplicationController::onOutputWindowClose);
+    // connect(outputWindow, &OutputWindow::sizeChanged, renderManager, &RenderManager::resize);
+    connect(outputWindow, &OutputWindow::resetIterations, renderManager, &RenderManager::reset);
+    connect(outputWindow, &OutputWindow::sizeChanged, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
+    connect(outputWindow, &OutputWindow::sizeChanged, plotsWidget, &PlotsWidget::setSize);
 
     connect(controlWidget, &ControlWidget::iterateStateChanged, this, &ApplicationController::setIterationState);
     connect(controlWidget, &ControlWidget::closing, this, &ApplicationController::onControlWidgetClose);
@@ -110,7 +110,7 @@ ApplicationController::ApplicationController()
     connect(renderManager, &RenderManager::frameRecorded, controlWidget, &ControlWidget::setVideoCaptureElapsedTimeLabel);
 
     connect(nodeManager, &NodeManager::outputTextureChanged, renderManager, &RenderManager::setOutputTextureId);
-    connect(nodeManager, &NodeManager::outputTextureChanged, morphoWidget, &MorphoWidget::setOutputTextureId);
+    connect(nodeManager, &NodeManager::outputTextureChanged, outputWindow, &OutputWindow::setOutputTextureId);
     connect(nodeManager, &NodeManager::outputTextureChanged, plotsWidget, &PlotsWidget::setTextureID);
     // connect(nodeManager, &NodeManager::outputFBOChanged, plotsWidget, &PlotsWidget::setFBO);
     connect(nodeManager, &NodeManager::sortedOperationsChanged, renderManager, &RenderManager::setSortedOperations);
@@ -134,7 +134,7 @@ ApplicationController::ApplicationController()
     connect(controlWidget, &ControlWidget::readConfig, configParser, &ConfigurationParser::read);
     connect(controlWidget, &ControlWidget::writeConfig, configParser, &ConfigurationParser::write);
     connect(controlWidget, &ControlWidget::nodesSelected, graphWidget, &GraphWidget::markNodes);
-    connect(controlWidget, &ControlWidget::fullScreenToggled, morphoWidget, &MorphoWidget::toggleFullScreen);
+    connect(controlWidget, &ControlWidget::fullScreenToggled, outputWindow, &OutputWindow::toggleFullScreen);
 
     connect(configParser, &ConfigurationParser::newImageSizeRead, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
     connect(configParser, &ConfigurationParser::newImageSizeRead, this, &ApplicationController::setSize);
@@ -145,9 +145,9 @@ ApplicationController::ApplicationController()
     int glSide = qMin(screenSize.width(), screenSize.height());
     int ctrlWidth= screenSize.width() - glSide;
 
-    // morphoWidget->resize(renderManager->texWidth(), renderManager->texHeight());
-    morphoWidget->resize(glSide, glSide);
-    morphoWidget->show();
+    // outputWindow->resize(renderManager->texWidth(), renderManager->texHeight());
+    outputWindow->resize(glSide, glSide);
+    outputWindow->show();
 
     controlWidget->resize(ctrlWidth, screenSize.height());
     controlWidget->show();
@@ -163,7 +163,7 @@ ApplicationController::~ApplicationController()
     delete nodeManager;
     delete factory;
     delete renderManager;
-    delete morphoWidget;
+    delete outputWindow;
     delete overlay;
     delete videoInControl;
     delete midiControl;
@@ -190,8 +190,8 @@ ApplicationController::~ApplicationController()
         iterate();
     }
 
-    // morphoWidget->update();
-    // morphoWidget->render();
+    // outputWindow->update();
+    // outputWindow->render();
 
     // qint64 cpuTimeNs = timer.nsecsElapsed();
     // qDebug() << "CPU time (ms):" << cpuTimeNs / 1'000'000.0;
@@ -298,9 +298,9 @@ void ApplicationController::showMidiWidget()
 
 void ApplicationController::setSize(int width, int height)
 {
-    // morphoWidget->resize(width, height);
+    // outputWindow->resize(width, height);
     renderManager->resize(width, height);
-    // morphoWidget->resetZoom(width, height);
+    // outputWindow->resetZoom(width, height);
     // plotsWidget->setSize(width, height);
 }
 
@@ -321,7 +321,7 @@ void ApplicationController::closeAll()
 
 
 
-void ApplicationController::onMorphoWidgetClose()
+void ApplicationController::onOutputWindowClose()
 {
     closeAll();
     disconnect(controlWidget, &ControlWidget::closing, this, &ApplicationController::onControlWidgetClose);
@@ -333,8 +333,8 @@ void ApplicationController::onMorphoWidgetClose()
 void ApplicationController::onControlWidgetClose()
 {
     closeAll();
-    disconnect(morphoWidget, &MorphoWidget::closing, this, &ApplicationController::onMorphoWidgetClose);
-    morphoWidget->close();
+    disconnect(outputWindow, &OutputWindow::closing, this, &ApplicationController::onOutputWindowClose);
+    outputWindow->close();
 }
 
 
@@ -344,7 +344,7 @@ void ApplicationController::onControlWidgetClose()
     QApplicationController::resizeEvent(event);
 
     if (stackedLayout->currentWidget() == controlWidget)
-        morphoWidget->resize(event->size());
+        outputWindow->resize(event->size());
     else
         controlWidget->resize(event->size());
 
@@ -366,8 +366,8 @@ void ApplicationController::onControlWidgetClose()
         {
             if (stackedLayout->currentWidget() == controlWidget)
             {
-                stackedLayout->setCurrentWidget(morphoWidget);
-                morphoWidget->update();
+                stackedLayout->setCurrentWidget(outputWindow);
+                outputWindow->update();
             }
             else {
                 stackedLayout->setCurrentWidget(controlWidget);
@@ -379,7 +379,7 @@ void ApplicationController::onControlWidgetClose()
             if (opacity > 1.0)
                 opacity = 1.0;
             controlWidgetOpacityEffect->setOpacity(opacity);
-            morphoWidget->update();
+            outputWindow->update();
         }
         else if (event->key() == Qt::Key_PageDown)
         {
@@ -387,7 +387,7 @@ void ApplicationController::onControlWidgetClose()
             if (opacity < 0.0)
                 opacity = 0.0;
             controlWidgetOpacityEffect->setOpacity(opacity);
-            morphoWidget->update();
+            outputWindow->update();
         }
     }
     else if (event->key() == Qt::Key_Space)

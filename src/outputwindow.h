@@ -22,8 +22,8 @@
 
 
 
-#ifndef MORPHOWIDGET_H
-#define MORPHOWIDGET_H
+#ifndef OUTPUTWINDOW_H
+#define OUTPUTWINDOW_H
 
 
 
@@ -47,13 +47,13 @@
 
 
 
-class MorphoWidget : public QOpenGLWindow, protected QOpenGLFunctions_4_5_Core
+class OutputWindow : public QOpenGLWindow, protected QOpenGLFunctions_4_5_Core
 {
     Q_OBJECT
 
 public:
-    MorphoWidget(int width_, int height_, Overlay *overlay_);
-    virtual ~MorphoWidget() override;
+    OutputWindow(int imgWidth, int imgHeight, Overlay *overlay);
+    virtual ~OutputWindow() override;
 
     void initializeGL() override;
     void paintGL() override;
@@ -96,32 +96,56 @@ protected:
 private:
     GLuint* pOutTexId = nullptr;
 
+    int mTexWidth;
+    int mTexHeight;
+
+    QPointF mTranslation;
+    float mScaleExp;
+    float mLeft;
+    float mRight;
+    float mBottom;
+    float mTop;
+
+    QOpenGLShaderProgram* mOutProgram = nullptr;
+    GLuint mOutVao;
+    GLuint mOutVboPos;
+    GLuint mOutVboTex;
+
     GLuint fbo = 0;
 
-    QRect image;
-    QRect frame;
-    QTransform frameTransform;
-    QPointF prevPos;
+    // QRect image;
+    // QRect frame;
+    // QTransform frameTransform;
+    QPointF mPrevPos;
 
     QPointF selectedPoint;
     QTransform selectedPointTransform;
     QPointF cursor;
     bool drawingCursor = false;
 
-    QRect prevFrame;
+    // QRect prevFrame;
 
-    QOpenGLShaderProgram* program = nullptr;
-    QOpenGLVertexArrayObject* vao = nullptr;
-    QOpenGLBuffer* vbo = nullptr;
+    QOpenGLShaderProgram* mCursorProgram = nullptr;
+    QOpenGLVertexArrayObject* mCursorVao = nullptr;
+    QOpenGLBuffer* mCursorVbo = nullptr;
 
-    Overlay* overlay = nullptr;
+    Overlay* mOverlay = nullptr;
 
     QMutex mutex;
 
+    void verticesCoords(int width, int height, GLfloat& left, GLfloat& right, GLfloat& bottom, GLfloat& top);
+
+    void setVao();
+
+    void setOutTranslation(QPointF delta);
+    void setOutScaling(float delta);
+    void setOutOrthographic(int width, int height);
+    void setOutTransform();
+
     void setSelectedPoint(QPointF pos);
     void updateCursor();
+
     void getSupportedTexFormats();
-    void adjustFrame(int width, int height);
 };
 
 

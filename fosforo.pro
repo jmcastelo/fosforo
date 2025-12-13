@@ -61,12 +61,12 @@ HEADERS += \
     src/midilinkmanager.h \
     src/midilistwidget.h \
     src/midisignals.h \
-    src/morphowidget.h \
     src/node.h \
     src/nodemanager.h \
     src/operationbuilder.h \
     src/operationparser.h \
     src/operationwidget.h \
+    src/outputwindow.h \
     src/overlay.h \
     src/parameters/baseuniformparameter.h \
     src/parameters/number.h \
@@ -110,12 +110,12 @@ SOURCES += \
     src/midiinputport.cpp \
     src/midilinkmanager.cpp \
     src/midilistwidget.cpp \
-    src/morphowidget.cpp \
     src/node.cpp \
     src/nodemanager.cpp \
     src/operationbuilder.cpp \
     src/operationparser.cpp \
     src/operationwidget.cpp \
+    src/outputwindow.cpp \
     src/overlay.cpp \
     src/parameters/baseuniformparameter.cpp \
     src/parameters/optionsparameter.cpp \

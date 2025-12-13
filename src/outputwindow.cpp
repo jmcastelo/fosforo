@@ -22,7 +22,7 @@
 
 
 
-#include "morphowidget.h"
+#include "outputwindow.h"
 
 #include <QSurfaceFormat>
 #include <QPainter>
@@ -30,16 +30,18 @@
 
 
 
-MorphoWidget::MorphoWidget(int w, int h, Overlay* overlay_)
-    : overlay { overlay_ }
+OutputWindow::OutputWindow(int imgWidth, int imgHeight, Overlay* overlay) :
+    mTexWidth { imgWidth },
+    mTexHeight { imgHeight },
+    mOverlay { overlay }
 {
-    image = QRect(0, 0, w, h);
+    // image = QRect(0, 0, w, h);
     // frame = image;
 
-    selectedPoint = QPointF(w / 2, h / 2);
+    // selectedPoint = QPointF(w / 2, h / 2);
     cursor = QPointF(0.0, 0.0);
 
-    overlay->setViewportRect(w, h);
+    // overlay->setViewportRect(w, h);
 
     setTitle("Fosforo: Output");
     setIcon(QIcon(QPixmap(":/icons/logo.png")));
@@ -47,28 +49,36 @@ MorphoWidget::MorphoWidget(int w, int h, Overlay* overlay_)
 
 
 
-MorphoWidget::~MorphoWidget()
+OutputWindow::~OutputWindow()
 {
     makeCurrent();
 
     glDeleteFramebuffers(1, &fbo);
-    vao->destroy();
-    vbo->destroy();
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    GLuint vbos[2] = { mOutVboPos, mOutVboTex };
+    glDeleteBuffers(2, vbos);
+
+    glDeleteVertexArrays(1, &mOutVao);
+
+    delete mOutProgram;
 
     doneCurrent();
 
-    delete vao;
-    delete vbo;
-    delete program;
+    delete mCursorVao;
+    delete mCursorVbo;
+    delete mCursorProgram;
 }
 
 
 
-void MorphoWidget::wheelEvent(QWheelEvent* event)
+void OutputWindow::wheelEvent(QWheelEvent* event)
 {
     // Frame
 
-    QRect frameBefore = frame;
+    /*QRect frameBefore = frame;
 
     qreal factor = pow(2.0, -event->angleDelta().y() / 1200.0);
 
@@ -107,14 +117,24 @@ void MorphoWidget::wheelEvent(QWheelEvent* event)
     QPointF point = selectedPointTransform.map(selectedPoint);
     cursor.setX(2.0 * ((point.x() - frame.left()) / frame.width() - 0.5));
     cursor.setY(2.0 * (0.5 - (point.y() - frame.top()) / frame.height()));
-    updateCursor();
+    updateCursor();*/
+
+    float angleDelta = event->angleDelta().y();
+    setOutScaling(angleDelta);
+
+    // QPointF delta = event->position() - mPrevPos;
+    // setOutTranslation(delta);
+
+    makeCurrent();
+    setOutTransform();
+    doneCurrent();
 
     event->accept();
 }
 
 
 
-void MorphoWidget::mouseMoveEvent(QMouseEvent* event)
+void OutputWindow::mouseMoveEvent(QMouseEvent* event)
 {
     if (event->buttons() == Qt::LeftButton)
     {
@@ -122,7 +142,7 @@ void MorphoWidget::mouseMoveEvent(QMouseEvent* event)
         {
             // Frame
 
-            QPointF delta = QTransform().scale(static_cast<qreal>(image.width()) / width(), static_cast<qreal>(image.height()) / height()).map(prevPos - event->position());
+            /*QPointF delta = QTransform().scale(static_cast<qreal>(image.width()) / width(), static_cast<qreal>(image.height()) / height()).map(prevPos - event->position());
 
             frame = frameTransform.translate(delta.x(), delta.y()).mapRect(image);
 
@@ -145,7 +165,16 @@ void MorphoWidget::mouseMoveEvent(QMouseEvent* event)
                 updateCursor();
 
                 prevFrame = frame;
-            }
+            }*/
+
+            QPointF delta = event->position() - mPrevPos;
+            setOutTranslation(delta);
+
+            makeCurrent();
+            setOutTransform();
+            doneCurrent();
+
+            mPrevPos = event->position();
         }
         else if (drawingCursor) {
             setSelectedPoint(event->position());
@@ -157,17 +186,16 @@ void MorphoWidget::mouseMoveEvent(QMouseEvent* event)
 
 
 
-void MorphoWidget::mousePressEvent(QMouseEvent* event)
+void OutputWindow::mousePressEvent(QMouseEvent* event)
 {
     if (event->buttons() == Qt::LeftButton)
     {
         if (event->modifiers() == Qt::ControlModifier)
         {
-            prevPos = event->position();
-            prevFrame = frame;
+            mPrevPos = event->position();
+            // prevFrame = frame;
         }
-        else if (drawingCursor)
-        {
+        else if (drawingCursor) {
             setSelectedPoint(event->position());
         }
     }
@@ -177,7 +205,7 @@ void MorphoWidget::mousePressEvent(QMouseEvent* event)
 
 
 
-void MorphoWidget::keyPressEvent(QKeyEvent* event)
+void OutputWindow::keyPressEvent(QKeyEvent* event)
 {
     if (event->modifiers() == Qt::ControlModifier)
     {
@@ -210,7 +238,7 @@ void MorphoWidget::keyPressEvent(QKeyEvent* event)
 
 
 
-void MorphoWidget::closeEvent(QCloseEvent* event)
+void OutputWindow::closeEvent(QCloseEvent* event)
 {
     emit closing();
 
@@ -219,7 +247,7 @@ void MorphoWidget::closeEvent(QCloseEvent* event)
 
 
 
-void MorphoWidget::toggleFullScreen(bool checked)
+void OutputWindow::toggleFullScreen(bool checked)
 {
     if (checked) {
         showFullScreen();
@@ -230,9 +258,9 @@ void MorphoWidget::toggleFullScreen(bool checked)
 }
 
 
-void MorphoWidget::setSelectedPoint(QPointF pos)
+void OutputWindow::setSelectedPoint(QPointF pos)
 {
-    QPointF clickedPoint = QTransform().scale(1.0 / width(), 1.0 / height()).map(pos);
+    /*QPointF clickedPoint = QTransform().scale(1.0 / width(), 1.0 / height()).map(pos);
 
     if (clickedPoint.x() < 0.0) {
         clickedPoint.setX(0.0);
@@ -271,24 +299,24 @@ void MorphoWidget::setSelectedPoint(QPointF pos)
 
     cursor.setX(2.0 * (clickedPoint.x() - 0.5));
     cursor.setY(2.0 * (0.5 - clickedPoint.y()));
-    updateCursor();
+    updateCursor();*/
 }
 
 
 
-void MorphoWidget::setCursor(QPoint selPoint)
+void OutputWindow::setCursor(QPoint selPoint)
 {
-    QPointF point = selectedPointTransform.map(selPoint);
+    /*QPointF point = selectedPointTransform.map(selPoint);
     cursor.setX(2.0 * ((point.x() - frame.left()) / frame.width() - 0.5));
     cursor.setY(2.0 * (0.5 - (point.y() - frame.top()) / frame.height()));
-    updateCursor();
+    updateCursor();*/
 }
 
 
 
-void MorphoWidget::resetZoom(int newWidth, int newHeight)
+void OutputWindow::resetZoom(int newWidth, int newHeight)
 {
-    QRect oldImage = image;
+    /*QRect oldImage = image;
 
     image = QRect(0, 0, newWidth, newHeight);
 
@@ -301,32 +329,122 @@ void MorphoWidget::resetZoom(int newWidth, int newHeight)
 
     QTransform scaleTransform = QTransform().scale(scaleX, scaleY);
 
-    emit scaleTransformChanged(scaleTransform);
+    emit scaleTransformChanged(scaleTransform);*/
 }
 
 
 
-void MorphoWidget::adjustFrame(int width, int height)
-{
-    qreal scaleX = 1.0;
-    qreal scaleY = 1.0;
-
-    if (width > height)
-    {
-
-    }
-}
-
-
-
-void MorphoWidget::setOutputTextureId(GLuint* pTexId)
+void OutputWindow::setOutputTextureId(GLuint* pTexId)
 {
     pOutTexId = pTexId;
 }
 
 
 
-void MorphoWidget::updateCursor()
+void OutputWindow::verticesCoords(int width, int height, GLfloat& left, GLfloat& right, GLfloat& bottom, GLfloat& top)
+{
+    // Maintain aspect ratio
+
+    GLfloat w = static_cast<GLfloat>(width);
+    GLfloat h = static_cast<GLfloat>(height);
+
+    GLfloat ratio = w / h;
+
+    if (width > height)
+    {
+        top = 1.0f;
+        bottom = -top;
+        right = top * ratio;
+        left = -right;
+    }
+    else
+    {
+        right = 1.0f;
+        left = -right;
+        top = right / ratio;
+        bottom = -top;
+    }
+}
+
+
+
+void OutputWindow::setVao()
+{
+    // Recompute vertices coordinates
+
+    GLfloat left, right, bottom, top;
+    verticesCoords(mTexWidth, mTexHeight, left, right, bottom, top);
+
+    GLfloat vertCoords[] = {
+        left, bottom,
+        right, bottom,
+        left, top,
+        right, top
+    };
+
+    GLfloat texCoords[] = {
+        0.0f, 0.0f,  // Bottom-left
+        1.0f, 0.0f,  // Bottom-right
+        0.0f, 1.0f,  // Top-left
+        1.0f, 1.0f   // Top-right
+    };
+
+    glBindVertexArray(mOutVao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mOutVboPos);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertCoords), vertCoords, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mOutVboTex);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glBindVertexArray(0);
+}
+
+
+
+void OutputWindow::setOutTranslation(QPointF delta)
+{
+    mTranslation += QTransform().scale((mRight - mLeft) * pow(2.0, -mScaleExp) / width(), (mTop - mBottom) * pow(2.0, -mScaleExp) / height()).map(delta);
+}
+
+
+
+void OutputWindow::setOutScaling(float delta)
+{
+    mScaleExp += 1.0e-3 * delta;
+}
+
+
+
+void OutputWindow::setOutOrthographic(int width, int height)
+{
+    verticesCoords(width, height, mLeft, mRight, mBottom, mTop);
+}
+
+
+void OutputWindow::setOutTransform()
+{
+    QMatrix4x4 outTransform;
+    outTransform.setToIdentity();
+    outTransform.ortho(mLeft, mRight, mBottom, mTop, -1.0, 1.0);
+    outTransform.scale(pow(2.0, mScaleExp), -pow(2.0, mScaleExp));
+    outTransform.translate(mTranslation.x(), mTranslation.y());
+
+    mOutProgram->bind();
+    int location = mOutProgram->uniformLocation("transform");
+    mOutProgram->setUniformValue(location, outTransform);
+    mOutProgram->release();
+}
+
+
+
+void OutputWindow::updateCursor()
 {
     GLfloat x = static_cast<GLfloat>(cursor.x());
     GLfloat y = static_cast<GLfloat>(cursor.y());
@@ -344,12 +462,12 @@ void MorphoWidget::updateCursor()
 
     makeCurrent();
 
-    vao->bind();
+    mCursorVao->bind();
 
-    vbo->bind();
-    vbo->allocate(cursorVertices, sizeof(cursorVertices));
+    mCursorVbo->bind();
+    mCursorVbo->allocate(cursorVertices, sizeof(cursorVertices));
 
-    program->bind();
+    mCursorProgram->bind();
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
     glEnableVertexAttribArray(0);
@@ -357,16 +475,16 @@ void MorphoWidget::updateCursor()
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
 
-    vao->release();
-    vbo->release();
-    program->release();
+    mCursorVao->release();
+    mCursorVbo->release();
+    mCursorProgram->release();
 
     doneCurrent();
 }
 
 
 
-void MorphoWidget::getSupportedTexFormats()
+void OutputWindow::getSupportedTexFormats()
 {
     QList<TextureFormat> allFormats =
     {
@@ -409,7 +527,7 @@ void MorphoWidget::getSupportedTexFormats()
 
 
 
-void MorphoWidget::initializeGL()
+void OutputWindow::initializeGL()
 {
     initializeOpenGLFunctions();
 
@@ -421,25 +539,62 @@ void MorphoWidget::initializeGL()
 
     glGenFramebuffers(1, &fbo);
 
-    program = new QOpenGLShaderProgram();
-    if (!program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/cursor.vert")) {
-        qDebug() << "Vertex shader error:\n" << program->log();
+    // Image
+
+    mOutProgram = new QOpenGLShaderProgram();
+    if (!mOutProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/screen.vert")) {
+        qDebug() << "Vertex shader error:\n" << mOutProgram->log();
     }
-    if (!program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/cursor.frag")) {
-        qDebug() << "Fragment shader error:\n" << program->log();
+    if (!mOutProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/screen.frag")) {
+        qDebug() << "Fragment shader error:\n" << mOutProgram->log();
     }
-    if (!program->link()) {
-        qDebug() << "Shader link error:\n" << program->log();
+    if (!mOutProgram->link()) {
+        qDebug() << "Shader link error:\n" << mOutProgram->log();
     }
 
-    vao = new QOpenGLVertexArrayObject();
-    vao->create();
+    // Vertex array object
 
-    vbo = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-    vbo->create();
-    vbo->setUsagePattern(QOpenGLBuffer::DynamicDraw);
+    glGenVertexArrays(1, &mOutVao);
+
+    // Vertex buffer object: vertices positions
+
+    glGenBuffers(1, &mOutVboPos);
+
+    // Vertex buffer object: texture coordinates
+
+    glGenBuffers(1, &mOutVboTex);
+
+    setVao();
+
+    // Set output transformation
+
+    mTranslation = QPointF(0.0, 0.0);
+    mScaleExp = 0.0;
+
+    setOutTransform();
+
+    // Cursor
+
+    mCursorProgram = new QOpenGLShaderProgram();
+    if (!mCursorProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/cursor.vert")) {
+        qDebug() << "Vertex shader error:\n" << mCursorProgram->log();
+    }
+    if (!mCursorProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/cursor.frag")) {
+        qDebug() << "Fragment shader error:\n" << mCursorProgram->log();
+    }
+    if (!mCursorProgram->link()) {
+        qDebug() << "Shader link error:\n" << mCursorProgram->log();
+    }
+
+    mCursorVao = new QOpenGLVertexArrayObject();
+    mCursorVao->create();
+
+    mCursorVbo = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    mCursorVbo->create();
+    mCursorVbo->setUsagePattern(QOpenGLBuffer::DynamicDraw);
 
     updateCursor();
+
     getSupportedTexFormats();
 
     emit openGLInitialized();
@@ -447,9 +602,9 @@ void MorphoWidget::initializeGL()
 
 
 
-void MorphoWidget::paintGL()
+void OutputWindow::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    /*glClear(GL_COLOR_BUFFER_BIT);
 
     // Bind fbo as read frame buffer
 
@@ -472,31 +627,53 @@ void MorphoWidget::paintGL()
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        program->bind();
-        vao->bind();
+        mCursorProgram->bind();
+        mCursorVao->bind();
 
         glDrawArrays(GL_LINES, 0, 8);
 
-        vao->release();
-        program->release();
+        mCursorVao->release();
+        mCursorProgram->release();
 
         glDisable(GL_BLEND);
     }
 
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);*/
+
+    GLuint outTexId = 0;
+    if (pOutTexId) {
+        outTexId = *pOutTexId;
+    }
+
+    glBindVertexArray(mOutVao);
+
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    mOutProgram->bind();
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, outTexId);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    mOutProgram->release();
+
+    glBindVertexArray(0);
 }
 
 
 
-void MorphoWidget::paintOverGL()
+void OutputWindow::paintOverGL()
 {
     QPainter painter;
 
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    if (overlay->isEnabled()) {
-        overlay->paint(&painter);
+    if (mOverlay->isEnabled()) {
+        mOverlay->paint(&painter);
     }
 
     painter.end();
@@ -504,16 +681,23 @@ void MorphoWidget::paintOverGL()
 
 
 
-void MorphoWidget::resizeGL(int w, int h)
+void OutputWindow::resizeGL(int width, int height)
 {
-    resetZoom(w, h);
-    overlay->setViewportRect(w, h);
-    emit sizeChanged(w, h);
+    setOutOrthographic(width, height);
+    makeCurrent();
+    setOutTransform();
+    doneCurrent();
+
+    resetZoom(width, height);
+
+    mOverlay->setViewportRect(width, height);
+
+    emit sizeChanged(width, height);
 }
 
 
 
-void MorphoWidget::render(quintptr pFence)
+void OutputWindow::render(quintptr pFence)
 {
     QMutexLocker locker(&mutex);
 
