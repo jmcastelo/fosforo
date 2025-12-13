@@ -599,8 +599,7 @@ void RenderManager::resize(GLuint width, GLuint height)
         resizeTextures();
         recreateArrayTexture(&mBlendArrayTexId, mNumArrayTexLayers);
 
-        foreach (ImageOperation* operation, mFactory->operations())
-        {
+        foreach (ImageOperation* operation, mFactory->operations()) {
             if (operation->sampler2DArrayAvail()) {
                 recreateArrayTexture(operation->arrayTextureId(), operation->arrayTextureDepth());
             }

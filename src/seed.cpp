@@ -480,12 +480,15 @@ void Seed::clearTexture(GLuint texId)
 
 void Seed::setRandomProgram()
 {
-    if (!mRandomProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/random.vert"))
+    if (!mRandomProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/random.vert")) {
         qDebug() << "Vertex shader error:\n" << mRandomProgram->log();
-    if (!mRandomProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/random.frag"))
+    }
+    if (!mRandomProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/random.frag")) {
         qDebug() << "Fragment shader error:\n" << mRandomProgram->log();
-    if (!mRandomProgram->link())
+    }
+    if (!mRandomProgram->link()) {
         qDebug() << "Shader link error:\n" << mRandomProgram->log();
+    }
 
     // Set in attribute: vertex coordinates
 

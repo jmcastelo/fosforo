@@ -341,6 +341,18 @@ void OutputWindow::setOutputTextureId(GLuint* pTexId)
 
 
 
+void OutputWindow::setOutputTextureSize(GLuint width, GLuint height)
+{
+    mTexWidth = width;
+    mTexHeight = height;
+
+    makeCurrent();
+    setVao();
+    doneCurrent();
+}
+
+
+
 void OutputWindow::verticesCoords(int width, int height, GLfloat& left, GLfloat& right, GLfloat& bottom, GLfloat& top)
 {
     // Maintain aspect ratio
@@ -432,9 +444,9 @@ void OutputWindow::setOutTransform()
 {
     QMatrix4x4 outTransform;
     outTransform.setToIdentity();
-    outTransform.ortho(mLeft, mRight, mBottom, mTop, -1.0, 1.0);
     outTransform.scale(pow(2.0, mScaleExp), -pow(2.0, mScaleExp));
     outTransform.translate(mTranslation.x(), mTranslation.y());
+    outTransform.ortho(mLeft, mRight, mBottom, mTop, -1.0, 1.0);
 
     mOutProgram->bind();
     int location = mOutProgram->uniformLocation("transform");
@@ -692,7 +704,7 @@ void OutputWindow::resizeGL(int width, int height)
 
     mOverlay->setViewportRect(width, height);
 
-    emit sizeChanged(width, height);
+    // emit sizeChanged(width, height);
 }
 
 

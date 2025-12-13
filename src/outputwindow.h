@@ -80,6 +80,7 @@ signals:
 
 public slots:
     void setOutputTextureId(GLuint* pTexId);
+    void setOutputTextureSize(GLuint width, GLuint height);
     void resetZoom(int width, int height);
     void setDrawingCursor(bool on){ drawingCursor = on; }
     void setCursor(QPoint point);

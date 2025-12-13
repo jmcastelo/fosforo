@@ -53,8 +53,10 @@ ApplicationController::ApplicationController()
     midiControl->setObserver();
 
     controlWidget = new ControlWidget(renderManager->version(), graphWidget, midiListWidget);
-    controlWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    controlWidget->setMinimumSize(0, 0);
+    // controlWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    // controlWidget->setMinimumSize(0, 0);
+
+    controlWidget->updateWindowSizeLineEdits(renderManager->texWidth(), renderManager->texHeight());
 
     connect(graphWidget, &GraphWidget::selectedNodesChanged, controlWidget, &ControlWidget::selectOpsTableRows);
 
@@ -100,8 +102,8 @@ ApplicationController::ApplicationController()
     connect(outputWindow, &OutputWindow::closing, this, &ApplicationController::onOutputWindowClose);
     // connect(outputWindow, &OutputWindow::sizeChanged, renderManager, &RenderManager::resize);
     connect(outputWindow, &OutputWindow::resetIterations, renderManager, &RenderManager::reset);
-    connect(outputWindow, &OutputWindow::sizeChanged, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
-    connect(outputWindow, &OutputWindow::sizeChanged, plotsWidget, &PlotsWidget::setSize);
+    // connect(outputWindow, &OutputWindow::sizeChanged, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
+    // connect(outputWindow, &OutputWindow::sizeChanged, plotsWidget, &PlotsWidget::setSize);
 
     connect(controlWidget, &ControlWidget::iterateStateChanged, this, &ApplicationController::setIterationState);
     connect(controlWidget, &ControlWidget::closing, this, &ApplicationController::onControlWidgetClose);
@@ -300,8 +302,8 @@ void ApplicationController::setSize(int width, int height)
 {
     // outputWindow->resize(width, height);
     renderManager->resize(width, height);
-    // outputWindow->resetZoom(width, height);
-    // plotsWidget->setSize(width, height);
+    outputWindow->setOutputTextureSize(width, height);
+    plotsWidget->setSize(width, height);
 }
 
 
