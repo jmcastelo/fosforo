@@ -175,7 +175,7 @@ private slots:
     void removeSeedNode(QUuid id);
 
     void copySelectedNodes(QUuid id);
-    void removeSelectedNodes();
+    void removeSelectedNodes(QUuid id);
 
     void removeAllNodes();
 

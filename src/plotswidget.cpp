@@ -289,8 +289,9 @@ void PlotsWidget::removeColorPath()
 
         sources.removeAt(index);
 
-        for (int i = 0; i < colorPaths.size(); i++)
+        for (int i = 0; i < colorPaths.size(); i++) {
             selectPathComboBox->setItemText(i, QString::number(i + 1));
+        }
 
         setControls(selectPathComboBox->currentIndex());
     }

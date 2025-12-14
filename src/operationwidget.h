@@ -75,7 +75,7 @@ public:
 signals:
     void outputChanged(QUuid id);
     void connectTo();
-    void remove();
+    void remove(QUuid id);
     void equalizeBlendFactors(QUuid id);
     void copy(QUuid id);
     void operationEdited(ImageOperation* operation);

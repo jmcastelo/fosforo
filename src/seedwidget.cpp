@@ -96,7 +96,7 @@ SeedWidget::SeedWidget(QUuid id, Seed* seed, VideoInputControl* videoInCtrl, QWi
 
     headerToolBar->addAction(QIcon(QPixmap(":/icons/dialog-close.png")), "Delete", this, [=, this]() {
         mVideoInputControl->unuseCamera(mSeed->videoDevId());
-        emit remove();
+        emit remove(id);
     });
 
     QHBoxLayout* headerLayout = new QHBoxLayout;

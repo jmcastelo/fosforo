@@ -56,7 +56,7 @@ public:
 
     //Node(GraphWidget* graphWidget, QString name);
     explicit Node(QUuid id, QWidget* widget, QGraphicsItem* parent = nullptr);
-    // ~Node();
+    ~Node();
 
     enum { Type = UserType + 1 };
     int type() const override { return Type; }

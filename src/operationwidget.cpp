@@ -97,7 +97,9 @@ OperationWidget::OperationWidget(QUuid id, ImageOperation* operation, bool midiE
 
     // Delete action
 
-    headerToolBar->addAction(QIcon(QPixmap(":/icons/dialog-close.png")), "Delete", this, &OperationWidget::remove);
+    headerToolBar->addAction(QIcon(QPixmap(":/icons/dialog-close.png")), "Delete", this, [=, this](){
+        emit remove(id);
+    });
 
     // Operation name label
 

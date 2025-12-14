@@ -62,11 +62,11 @@ Node::Node(QUuid id, QWidget *widget, QGraphicsItem* parent) :
 
 
 
-/*Node::~Node()
+Node::~Node()
 {
+    delete mWidget;
     // delete mProxyWidget;
-    qDebug() << this;
-}*/
+}
 
 
 /*void Node::closeEvent(QCloseEvent* event)
@@ -81,8 +81,9 @@ void Node::resizeEvent(QGraphicsSceneResizeEvent* event)
 {
     mProxyWidget->resize(event->newSize());
 
-    foreach (Edge *edge, edgeList)
+    foreach (Edge *edge, edgeList) {
         edge->adjust();
+    }
 
     QGraphicsWidget::resizeEvent(event);
 }
@@ -174,9 +175,11 @@ QVector<Edge*> Node::edges() const
 
 bool Node::connectedTo(Node *node)
 {
-    foreach (Edge* edge, edgeList)
-        if (edge->destNode() == node)
+    foreach (Edge* edge, edgeList) {
+        if (edge->destNode() == node) {
             return true;
+        }
+    }
 
     return false;
 }

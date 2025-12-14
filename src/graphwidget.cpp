@@ -379,10 +379,10 @@ void GraphWidget::reconnectNodes(Node* node)
         {
             // Avoid connecting already connected nodes
 
-            foreach (Edge* edge, inEdge->sourceNode()->edges())
-            {
-                if (edge->destNode() == outEdge->destNode())
+            foreach (Edge* edge, inEdge->sourceNode()->edges()) {
+                if (edge->destNode() == outEdge->destNode()) {
                     return;
+                }
             }
 
             // Reconnect nodes
@@ -438,7 +438,7 @@ void GraphWidget::removeNode(QUuid id)
             }
 
             scene()->removeItem(edge);
-            delete edge;
+            edge->deleteLater();
         }
 
         scene()->removeItem(node);

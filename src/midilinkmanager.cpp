@@ -102,7 +102,7 @@ void MidiLinkManager::updateMidiLinks(int map, int key, int value)
     else
     {
         // No number being linked: set value of already linked number
-        // For each QMultiMap, iterate over all QMultiMap items
+        // For each QMultiMap, iterate over all QMultiMap items (multi-link)
 
         if (mFloatLinks.contains(map) && mFloatLinks[map].contains(key))
         {
@@ -161,10 +161,8 @@ void MidiLinkManager::setupMidiLink(int map, int key, Number<float>* number)
     // Remove link on number deletion
 
     connect(number, &Number<float>::deleting, this, [=, this]() {
-        for (auto [mapNum, multiMap] : mFloatLinks.asKeyValueRange()) {
-            if (multiMap.contains(key, number)) {
-                multiMap.remove(key, number);
-            }
+        if (mFloatLinks[map].contains(key, number)) {
+            mFloatLinks[map].remove(key, number);
         }
     });
 
@@ -197,10 +195,8 @@ void MidiLinkManager::setupMidiLink(int map, int key, Number<int>* number)
     // Remove link on number deletion
 
     connect(number, &Number<int>::deleting, this, [=, this]() {
-        for (auto [mapNum, multiMap] : mIntLinks.asKeyValueRange()) {
-            if (multiMap.contains(key, number)) {
-                multiMap.remove(key, number);
-            }
+        if (mIntLinks[map].contains(key, number)) {
+            mIntLinks[map].remove(key, number);
         }
     });
 
@@ -233,10 +229,8 @@ void MidiLinkManager::setupMidiLink(int map, int key, Number<unsigned int>* numb
     // Remove link on number deletion
 
     connect(number, &Number<unsigned int>::deleting, this, [=, this]() {
-        for (auto [mapNum, multiMap] : mUintLinks.asKeyValueRange()) {
-            if (multiMap.contains(key, number)) {
-                multiMap.remove(key, number);
-            }
+        if (mUintLinks[map].contains(key, number)) {
+            mUintLinks[map].remove(key, number);
         }
     });
 

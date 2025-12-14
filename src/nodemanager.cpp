@@ -486,8 +486,7 @@ void NodeManager::removeOperationNode(QUuid id)
 
         // Delete node
 
-        delete mOperationNodesMap.value(id);
-        mOperationNodesMap.remove(id);
+        delete mOperationNodesMap.take(id);
 
         if (id == mOutputId) {
             setOutput(QUuid());
@@ -639,9 +638,9 @@ void NodeManager::connectOperationWidget(OperationWidget* widget)
     // connect(widget, &OperationWidget::remove, this, &NodeManager::midiSignalsRemoved);
     // connect(widget, &OperationWidget::remove, this, &NodeManager::removeOperationNode);
     connect(widget, &OperationWidget::remove, this, &NodeManager::removeSelectedNodes);
-    connect(widget, &OperationWidget::remove, this, [=, this]() {
-        emit nodeRemoved(widget->id());
-        removeOperationNode(widget->id());
+    connect(widget, &OperationWidget::remove, this, [=, this](QUuid id) {
+        removeOperationNode(id);
+        emit nodeRemoved(id);
     });
 
     connect(widget, &OperationWidget::copy, this, &NodeManager::copySelectedNodes);
@@ -839,9 +838,9 @@ void NodeManager::connectSeedWidget(QUuid id, SeedWidget* widget)
     // connect(widget, &SeedWidget::remove, this, &NodeManager::nodeRemoved);
     // connect(widget, &SeedWidget::remove, this, &NodeManager::removeSeedNode);
     connect(widget, &SeedWidget::remove, this, &NodeManager::removeSelectedNodes);
-    connect(widget, &SeedWidget::remove, this, [=, this]() {
-        emit nodeRemoved(id);
+    connect(widget, &SeedWidget::remove, this, [=, this](QUuid id) {
         removeSeedNode(id);
+        emit nodeRemoved(id);
     });
 
     connect(widget, &SeedWidget::copy, this, &NodeManager::copySelectedNodes);
@@ -852,25 +851,25 @@ void NodeManager::connectSeedWidget(QUuid id, SeedWidget* widget)
 
     connect(widget, &SeedWidget::connectTo, this, [=, this]() {
         if (connSrcId.isNull()) {
-            connSrcId = widget->id();
+            connSrcId = id;
         }
         else
         {
-            connectOperations(connSrcId, widget->id(), 1.0);
+            connectOperations(connSrcId, id, 1.0);
             connSrcId = QUuid();
         }
     });
 
     connect(widget, &SeedWidget::typeChanged, this, [=, this](){
-        if (isOutput(widget->id()))
+        if (isOutput(id))
         {
-            pOutputTextureId = mSeedsMap.value(widget->id())->pOutTextureId();
+            pOutputTextureId = mSeedsMap.value(id)->pOutTextureId();
 
             emit outputTextureChanged(pOutputTextureId);
             //emit outputFBOChanged(seeds.value(id)->getFBO());
         }
 
-        resetInputSeedTexId(widget->id());
+        resetInputSeedTexId(id);
     });
 }
 
@@ -1055,14 +1054,19 @@ void NodeManager::copySelectedNodes(QUuid id)
 
 
 
-void NodeManager::removeSelectedNodes()
+void NodeManager::removeSelectedNodes(QUuid id)
 {
-    emit removeNodes(mSelectedNodeIds);
+    QList<QUuid> selNodeIds = mSelectedNodeIds;
 
-    foreach (QUuid selId, mSelectedNodeIds)
+    if (selNodeIds.contains(id))
     {
-        removeOperationNode(selId);
-        removeSeedNode(selId);
+        foreach (QUuid selId, selNodeIds)
+        {
+            removeOperationNode(selId);
+            removeSeedNode(selId);
+        }
+
+        emit removeNodes(selNodeIds);
     }
 }
 

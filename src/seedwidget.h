@@ -27,7 +27,7 @@ signals:
     void typeChanged();
     void seedDrawn();
     void connectTo();
-    void remove();
+    void remove(QUuid id);
     void copy(QUuid id);
 
 
