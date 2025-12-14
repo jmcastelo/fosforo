@@ -30,16 +30,16 @@
 
 
 
-OutputWindow::OutputWindow(int imgWidth, int imgHeight, Overlay* overlay) :
-    mTexWidth { imgWidth },
-    mTexHeight { imgHeight },
+OutputWindow::OutputWindow(int texWidth, int texHeight, Overlay* overlay) :
+    mTexWidth { texWidth },
+    mTexHeight { texHeight },
     mOverlay { overlay }
 {
     // image = QRect(0, 0, w, h);
     // frame = image;
 
-    // selectedPoint = QPointF(w / 2, h / 2);
-    cursor = QPointF(0.0, 0.0);
+    // mSelectedPoint = QPointF(texWidth / 2, texHeight / 2);
+    mCursor = QPointF(0.0, 0.0);
 
     // overlay->setViewportRect(w, h);
 
@@ -53,7 +53,7 @@ OutputWindow::~OutputWindow()
 {
     makeCurrent();
 
-    glDeleteFramebuffers(1, &fbo);
+    // glDeleteFramebuffers(1, &fbo);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -127,6 +127,7 @@ void OutputWindow::wheelEvent(QWheelEvent* event)
 
     makeCurrent();
     setOutTransform();
+    setCursorTransform();
     doneCurrent();
 
     event->accept();
@@ -172,11 +173,12 @@ void OutputWindow::mouseMoveEvent(QMouseEvent* event)
 
             makeCurrent();
             setOutTransform();
+            setCursorTransform();
             doneCurrent();
 
             mPrevPos = event->position();
         }
-        else if (drawingCursor) {
+        else if (mDrawingCursor) {
             setSelectedPoint(event->position());
         }
     }
@@ -195,7 +197,7 @@ void OutputWindow::mousePressEvent(QMouseEvent* event)
             mPrevPos = event->position();
             // prevFrame = frame;
         }
-        else if (drawingCursor) {
+        else if (mDrawingCursor) {
             setSelectedPoint(event->position());
         }
     }
@@ -260,7 +262,7 @@ void OutputWindow::toggleFullScreen(bool checked)
 
 void OutputWindow::setSelectedPoint(QPointF pos)
 {
-    /*QPointF clickedPoint = QTransform().scale(1.0 / width(), 1.0 / height()).map(pos);
+    QPointF clickedPoint = QTransform().scale(1.0 / width(), 1.0 / height()).map(pos);
 
     if (clickedPoint.x() < 0.0) {
         clickedPoint.setX(0.0);
@@ -275,7 +277,7 @@ void OutputWindow::setSelectedPoint(QPointF pos)
         clickedPoint.setY(1.0);
     }
 
-    selectedPoint = QTransform().translate(frame.left(), frame.top()).scale(frame.width(), frame.height()).map(clickedPoint);
+    /*selectedPoint = QTransform().translate(frame.left(), frame.top()).scale(frame.width(), frame.height()).map(clickedPoint);
 
     QPoint point = QPoint(floor(selectedPoint.x()), floor(selectedPoint.y()));
 
@@ -295,21 +297,45 @@ void OutputWindow::setSelectedPoint(QPointF pos)
         point.setY(image.bottom());
     }
 
-    emit selectedPointChanged(point);
+    emit selectedPointChanged(point);*/
 
-    cursor.setX(2.0 * (clickedPoint.x() - 0.5));
-    cursor.setY(2.0 * (0.5 - clickedPoint.y()));
-    updateCursor();*/
+    mCursor = QTransform().translate(-mTranslation.x(), -mTranslation.y()).scale((mRight - mLeft) * pow(2.0, -mScaleExp) / width(), (mTop - mBottom) * pow(2.0, -mScaleExp) / height()).translate(-0.5 * width(), -0.5 * height()).map(pos);
+
+    if (mCursor.x() < mVertLeft) {
+        mCursor.setX(mVertLeft);
+    }
+    if (mCursor.x() > mVertRight) {
+        mCursor.setX(mVertRight);
+    }
+    if (mCursor.y() < mVertBottom) {
+        mCursor.setY(mVertBottom);
+    }
+    if (mCursor.y() > mVertTop) {
+        mCursor.setY(mVertTop);
+    }
+    // mCursor.setX(2.0 * (clickedPoint.x() - 0.5));
+    // mCursor.setY(2.0 * (clickedPoint.y() - 0.5));
+
+    makeCurrent();
+    updateCursor();
+    doneCurrent();
+
+    QPointF texPoint = QTransform().scale(mTexWidth / (mVertRight - mVertLeft), mTexHeight / (mVertTop - mVertBottom)).translate(-mVertLeft, -mVertBottom).map(mCursor);
+
+    QPoint selTexPoint = QPoint(qMin(qFloor(texPoint.x()), mTexWidth - 1), qMin(qFloor(texPoint.y()), mTexHeight - 1));
+
+    emit selectedPointChanged(selTexPoint);
 }
 
 
 
 void OutputWindow::setCursor(QPoint selPoint)
 {
-    /*QPointF point = selectedPointTransform.map(selPoint);
-    cursor.setX(2.0 * ((point.x() - frame.left()) / frame.width() - 0.5));
-    cursor.setY(2.0 * (0.5 - (point.y() - frame.top()) / frame.height()));
-    updateCursor();*/
+    mCursor = QTransform().translate(mVertLeft, mVertBottom).scale((mVertRight - mVertLeft) / mTexWidth, (mVertTop - mVertBottom) / mTexHeight).translate(0.5, 0.5).map(QPointF(selPoint));
+
+    makeCurrent();
+    updateCursor();
+    doneCurrent();
 }
 
 
@@ -384,14 +410,13 @@ void OutputWindow::setVao()
 {
     // Recompute vertices coordinates
 
-    GLfloat left, right, bottom, top;
-    verticesCoords(mTexWidth, mTexHeight, left, right, bottom, top);
+    verticesCoords(mTexWidth, mTexHeight, mVertLeft, mVertRight, mVertBottom, mVertTop);
 
     GLfloat vertCoords[] = {
-        left, bottom,
-        right, bottom,
-        left, top,
-        right, top
+        mVertLeft, mVertBottom,
+        mVertRight, mVertBottom,
+        mVertLeft, mVertTop,
+        mVertRight, mVertTop
     };
 
     GLfloat texCoords[] = {
@@ -444,9 +469,9 @@ void OutputWindow::setOutTransform()
 {
     QMatrix4x4 outTransform;
     outTransform.setToIdentity();
+    outTransform.ortho(mLeft, mRight, mBottom, mTop, -1.0, 1.0);
     outTransform.scale(pow(2.0, mScaleExp), -pow(2.0, mScaleExp));
     outTransform.translate(mTranslation.x(), mTranslation.y());
-    outTransform.ortho(mLeft, mRight, mBottom, mTop, -1.0, 1.0);
 
     mOutProgram->bind();
     int location = mOutProgram->uniformLocation("transform");
@@ -456,10 +481,26 @@ void OutputWindow::setOutTransform()
 
 
 
+void OutputWindow::setCursorTransform()
+{
+    QMatrix4x4 cursorTransform;
+    cursorTransform.setToIdentity();
+    cursorTransform.ortho(mLeft, mRight, mBottom, mTop, -1.0, 1.0);
+    cursorTransform.scale(pow(2.0, mScaleExp), -pow(2.0, mScaleExp));
+    cursorTransform.translate(mTranslation.x(), mTranslation.y());
+
+    mCursorProgram->bind();
+    int location = mCursorProgram->uniformLocation("transform");
+    mCursorProgram->setUniformValue(location, cursorTransform);
+    mCursorProgram->release();
+}
+
+
+
 void OutputWindow::updateCursor()
 {
-    GLfloat x = static_cast<GLfloat>(cursor.x());
-    GLfloat y = static_cast<GLfloat>(cursor.y());
+    GLfloat x = static_cast<GLfloat>(mCursor.x());
+    GLfloat y = static_cast<GLfloat>(mCursor.y());
 
     GLfloat cursorVertices[] = {
         x, -1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
@@ -472,7 +513,7 @@ void OutputWindow::updateCursor()
         1.0f, y, 1.0f, 1.0f, 1.0f, 0.0f
     };
 
-    makeCurrent();
+    // makeCurrent();
 
     mCursorVao->bind();
 
@@ -491,7 +532,7 @@ void OutputWindow::updateCursor()
     mCursorVbo->release();
     mCursorProgram->release();
 
-    doneCurrent();
+    // doneCurrent();
 }
 
 
@@ -549,7 +590,7 @@ void OutputWindow::initializeGL()
 
     glDisable(GL_DEPTH_TEST);
 
-    glGenFramebuffers(1, &fbo);
+    // glGenFramebuffers(1, &fbo);
 
     // Image
 
@@ -606,6 +647,7 @@ void OutputWindow::initializeGL()
     mCursorVbo->setUsagePattern(QOpenGLBuffer::DynamicDraw);
 
     updateCursor();
+    setCursorTransform();
 
     getSupportedTexFormats();
 
@@ -634,23 +676,9 @@ void OutputWindow::paintGL()
 
     glBlitFramebuffer(frame.x(), frame.y() + frame.height(), frame.x() + frame.width(), frame.y(), 0, 0, width(), height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-    if (drawingCursor)
-    {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0); */
 
-        mCursorProgram->bind();
-        mCursorVao->bind();
-
-        glDrawArrays(GL_LINES, 0, 8);
-
-        mCursorVao->release();
-        mCursorProgram->release();
-
-        glDisable(GL_BLEND);
-    }
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);*/
+    // Draw output texture
 
     GLuint outTexId = 0;
     if (pOutTexId) {
@@ -673,6 +701,24 @@ void OutputWindow::paintGL()
     mOutProgram->release();
 
     glBindVertexArray(0);
+
+    // Draw cursor
+
+    if (mDrawingCursor)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        mCursorProgram->bind();
+        mCursorVao->bind();
+
+        glDrawArrays(GL_LINES, 0, 8);
+
+        mCursorVao->release();
+        mCursorProgram->release();
+
+        glDisable(GL_BLEND);
+    }
 }
 
 
@@ -696,8 +742,10 @@ void OutputWindow::paintOverGL()
 void OutputWindow::resizeGL(int width, int height)
 {
     setOutOrthographic(width, height);
+
     makeCurrent();
     setOutTransform();
+    setCursorTransform();
     doneCurrent();
 
     resetZoom(width, height);
@@ -711,7 +759,7 @@ void OutputWindow::resizeGL(int width, int height)
 
 void OutputWindow::render(quintptr pFence)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(&mMutex);
 
     context()->makeCurrent(this);
 

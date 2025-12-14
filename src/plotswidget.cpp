@@ -61,9 +61,13 @@ PlotsWidget::PlotsWidget(RenderManager*renderManager, QWidget* parent) :
     xCoordValidator = new QIntValidator(0, mTexWidth - 1, xCoordLineEdit);
     xCoordLineEdit->setValidator(xCoordValidator);
 
+    connect(xCoordLineEdit, &QLineEdit::editingFinished, this, &PlotsWidget::setCoords);
+
     yCoordLineEdit = new QLineEdit;
     yCoordValidator = new QIntValidator(0, mTexHeight - 1, xCoordLineEdit);
     yCoordLineEdit->setValidator(yCoordValidator);
+
+    connect(yCoordLineEdit, &QLineEdit::editingFinished, this, &PlotsWidget::setCoords);
 
     QPushButton* viewSourcePushButton = new QPushButton(QIcon(QPixmap(":/icons/eye.png")), "");
     viewSourcePushButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -137,6 +141,20 @@ PlotsWidget::~PlotsWidget()
     context->doneCurrent();
 }*/
 
+
+
+void PlotsWidget::setCoords()
+{
+    QPoint source = QPoint(xCoordLineEdit->text().toInt(), yCoordLineEdit->text().toInt());
+
+    int index = selectPathComboBox->currentIndex();
+
+    colorPaths[index].setSource(source);
+
+    cursor = colorPaths[index].source();
+
+    emit selectedPointChanged(cursor);
+}
 
 
 void PlotsWidget::updatePlots()
@@ -228,14 +246,18 @@ void PlotsWidget::transformSources(QTransform transform)
 
 void PlotsWidget::checkPoint(QPoint &point)
 {
-    if (point.x() < 0)
+    if (point.x() < 0) {
         point.setX(0);
-    if (point.y() < 0)
+    }
+    if (point.y() < 0) {
         point.setY(0);
-    if (point.x() >= static_cast<int>(mTexWidth))
+    }
+    if (point.x() >= static_cast<int>(mTexWidth)) {
         point.setX(mTexWidth - 1);
-    if (point.y() >= static_cast<int>(mTexHeight))
+    }
+    if (point.y() >= static_cast<int>(mTexHeight)) {
         point.setY(mTexHeight - 1);
+    }
 }
 
 
@@ -292,8 +314,9 @@ void PlotsWidget::setNumIts()
 {
     numIts = numItsLineEdit->text().toInt();
 
-    for (ColorPath &path : colorPaths)
+    for (ColorPath &path : colorPaths) {
         path.setMaxNumPoints(numIts);
+    }
 }
 
 

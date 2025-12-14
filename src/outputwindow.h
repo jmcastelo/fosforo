@@ -52,7 +52,7 @@ class OutputWindow : public QOpenGLWindow, protected QOpenGLFunctions_4_5_Core
     Q_OBJECT
 
 public:
-    OutputWindow(int imgWidth, int imgHeight, Overlay *overlay);
+    OutputWindow(int texWidth, int texHeight, Overlay *overlay);
     virtual ~OutputWindow() override;
 
     void initializeGL() override;
@@ -81,10 +81,14 @@ signals:
 public slots:
     void setOutputTextureId(GLuint* pTexId);
     void setOutputTextureSize(GLuint width, GLuint height);
+
     void resetZoom(int width, int height);
-    void setDrawingCursor(bool on){ drawingCursor = on; }
+
+    void setDrawingCursor(bool on) { mDrawingCursor = on; }
     void setCursor(QPoint point);
+
     void render(quintptr fence);
+
     void toggleFullScreen(bool checked);
 
 protected:
@@ -100,29 +104,33 @@ private:
     int mTexWidth;
     int mTexHeight;
 
+    GLfloat mVertLeft;
+    GLfloat mVertRight;
+    GLfloat mVertBottom;
+    GLfloat mVertTop;
+
     QPointF mTranslation;
-    float mScaleExp;
-    float mLeft;
-    float mRight;
-    float mBottom;
-    float mTop;
+    GLfloat mScaleExp;
+    GLfloat mLeft;
+    GLfloat mRight;
+    GLfloat mBottom;
+    GLfloat mTop;
 
     QOpenGLShaderProgram* mOutProgram = nullptr;
     GLuint mOutVao;
     GLuint mOutVboPos;
     GLuint mOutVboTex;
 
-    GLuint fbo = 0;
+    // GLuint fbo = 0;
 
     // QRect image;
     // QRect frame;
     // QTransform frameTransform;
     QPointF mPrevPos;
 
-    QPointF selectedPoint;
-    QTransform selectedPointTransform;
-    QPointF cursor;
-    bool drawingCursor = false;
+    QTransform mSelectedPointTransform;
+    QPointF mCursor;
+    bool mDrawingCursor = false;
 
     // QRect prevFrame;
 
@@ -132,7 +140,7 @@ private:
 
     Overlay* mOverlay = nullptr;
 
-    QMutex mutex;
+    QMutex mMutex;
 
     void verticesCoords(int width, int height, GLfloat& left, GLfloat& right, GLfloat& bottom, GLfloat& top);
 
@@ -142,6 +150,8 @@ private:
     void setOutScaling(float delta);
     void setOutOrthographic(int width, int height);
     void setOutTransform();
+
+    void setCursorTransform();
 
     void setSelectedPoint(QPointF pos);
     void updateCursor();

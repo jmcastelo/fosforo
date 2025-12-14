@@ -95,6 +95,7 @@ private:
     void setPixelRGB();
 
 private slots:
+    void setCoords();
     void addColorPath();
     void removeColorPath();
     void setControls(int index);
