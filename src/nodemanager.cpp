@@ -628,6 +628,9 @@ void NodeManager::replaceNodeOperation(QUuid id, ImageOperation* operation)
 {
     mOperationNodesMap.value(id)->setOperation(operation);
     sortOperations();
+    if (mOutputId == id) {
+        setOutput(id);
+    }
 }
 
 
