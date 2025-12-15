@@ -639,8 +639,8 @@ void NodeManager::connectOperationWidget(OperationWidget* widget)
     // connect(widget, &OperationWidget::remove, this, &NodeManager::removeOperationNode);
     connect(widget, &OperationWidget::remove, this, &NodeManager::removeSelectedNodes);
     connect(widget, &OperationWidget::remove, this, [=, this](QUuid id) {
-        removeOperationNode(id);
         emit nodeRemoved(id);
+        removeOperationNode(id);
     });
 
     connect(widget, &OperationWidget::copy, this, &NodeManager::copySelectedNodes);
@@ -839,8 +839,8 @@ void NodeManager::connectSeedWidget(QUuid id, SeedWidget* widget)
     // connect(widget, &SeedWidget::remove, this, &NodeManager::removeSeedNode);
     connect(widget, &SeedWidget::remove, this, &NodeManager::removeSelectedNodes);
     connect(widget, &SeedWidget::remove, this, [=, this](QUuid id) {
-        removeSeedNode(id);
         emit nodeRemoved(id);
+        removeSeedNode(id);
     });
 
     connect(widget, &SeedWidget::copy, this, &NodeManager::copySelectedNodes);
@@ -1060,13 +1060,13 @@ void NodeManager::removeSelectedNodes(QUuid id)
 
     if (selNodeIds.contains(id))
     {
+        emit removeNodes(selNodeIds);
+
         foreach (QUuid selId, selNodeIds)
         {
             removeOperationNode(selId);
             removeSeedNode(selId);
         }
-
-        emit removeNodes(selNodeIds);
     }
 }
 
