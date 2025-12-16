@@ -5,6 +5,7 @@
 
 #include <QObject>
 #include <QVideoFrameInput>
+#include <QAudioInput>
 #include <QMediaCaptureSession>
 #include <QMediaRecorder>
 #include <QMediaFormat>
@@ -17,15 +18,11 @@ class Recorder : public QObject
     Q_OBJECT
 
 public:
-    unsigned int frameNumber = 0;
-    qreal fps;
-    QVideoFrameInput videoInput;
-
-    Recorder(QString filename, qreal framesPerSecond, QMediaFormat format);
+    Recorder(QString filename, int framesPerSecond, QMediaRecorder::Quality quality, QMediaFormat format, bool yuv420p);
 
     void startRecording();
     void stopRecording();
-    bool isRecording(){ return recorder.recorderState() == QMediaRecorder::RecordingState && videoFrameInputReady; }
+    bool isRecording();
 
 public slots:
     void sendVideoFrame(QImage* image);
@@ -34,12 +31,22 @@ signals:
     void frameRecorded(int number);
 
 private:
-    QMediaCaptureSession session;
-    QMediaRecorder recorder;
-    bool videoFrameInputReady = true;
+    unsigned int mFrameNumber = 0;
+    qint64 mFrameTime = 0;
+    qint64 mFrameDelta;
+    qint64 mFps;
+    bool mYuv420p;
+
+    QVideoFrameInput mVideoInput;
+    QMediaCaptureSession mSession;
+    QMediaRecorder mRecorder;
+    bool mVideoFrameInputReady = true;
 
 private slots:
     void setVideoFrameInputReady();
+
+private:
+    QVideoFrame copyImageToVideoFrame(QImage* image);
 };
 
 #endif // RECORDER_H

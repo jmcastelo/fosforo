@@ -62,6 +62,7 @@
 #include <QTableWidgetItem>
 #include <QScrollArea>
 #include <QMediaFormat>
+#include <QMediaRecorder>
 
 
 
@@ -92,7 +93,7 @@ signals:
 
     void texFormatChanged(TextureFormat format);
 
-    void startRecording(QString recordFilename, int framesPerSecond, QMediaFormat format);
+    void startRecording(QString recordFilename, int framesPerSecond, QMediaRecorder::Quality quality, QMediaFormat format, bool yuv420p);
     void stopRecording();
     void takeScreenshot(QString filename);
 
@@ -154,13 +155,15 @@ private:
     QAction* saveConfigAction;
     QAction* loadConfigAction;
 
-    qreal framesPerSecond = 60.0;
+    int framesPerSecond = 60;
     QString outputDir;
+    QMediaRecorder::Quality quality = QMediaRecorder::NormalQuality;
     QMediaFormat format;
     QList<QMediaFormat::VideoCodec> supportedVideoCodecs;
     QList<QMediaFormat::FileFormat> supportedFileFormats;
     QComboBox* fileFormatsComboBox;
     QComboBox* videoCodecsComboBox;
+    bool yuv420p = false;
 
     QStatusBar* statusBar;
 

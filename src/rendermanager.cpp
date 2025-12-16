@@ -421,9 +421,9 @@ void RenderManager::takeScreenshot(QString filename)
 
 
 
-void RenderManager::startRecording(QString recordFilename, int framesPerSecond, QMediaFormat format)
+void RenderManager::startRecording(QString recordFilename, int framesPerSecond, QMediaRecorder::Quality quality, QMediaFormat format, bool yuv420p)
 {
-    recorder = new Recorder(recordFilename, framesPerSecond, format);
+    recorder = new Recorder(recordFilename, framesPerSecond, quality, format, yuv420p);
 
     connect(recorder, &Recorder::frameRecorded, this, &RenderManager::frameRecorded);
 

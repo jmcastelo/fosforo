@@ -268,7 +268,7 @@ void ControlWidget::record(bool checked)
         recordAction->setIcon(QIcon(QPixmap(":/icons/media-playback-stop.png")));
         videoCaptureElapsedTimeLabel->setText("00:00:00.000");
         QString filename = QDir::toNativeSeparators(outputDir + '/' + QDateTime::currentDateTime().toString("[yyyy-MM-dd][hh'h'mm'm'ss's'zzz'ms']"));
-        emit startRecording(filename, framesPerSecond, format);
+        emit startRecording(filename, framesPerSecond, quality, format, yuv420p);
     }
     else
     {
@@ -705,6 +705,11 @@ void ControlWidget::constructRecordingOptionsWidget()
     QPushButton* outputDirButton = new QPushButton(QIcon(QPixmap(":/icons/document-open.png")), "");
     outputDirButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
+    QComboBox* qualityComboBox = new QComboBox;
+    qualityComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    qualityComboBox->addItems({"Very low quality", "Low quality", "Normal quality", "High quality", "Very high quality"});
+    qualityComboBox->setCurrentIndex(quality);
+
     videoCodecsComboBox = new QComboBox;
     videoCodecsComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     populateVideoCodecsComboBox(QMediaFormat::VideoCodec::H264);
@@ -720,14 +725,19 @@ void ControlWidget::constructRecordingOptionsWidget()
     fpsVideoLineEdit->setValidator(fpsVideoValidator);
     fpsVideoLineEdit->setText(QString::number(framesPerSecond));
 
+    QCheckBox* yuv402pCheckBox = new QCheckBox;
+    yuv402pCheckBox->setChecked(yuv420p);
+
     videoCaptureElapsedTimeLabel = new QLabel("00:00:00.000");
     videoCaptureElapsedTimeLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
     QFormLayout* formLayout = new QFormLayout;
     formLayout->setFormAlignment(Qt::AlignCenter);
     formLayout->addRow("Output dir:", outputDirButton);
+    formLayout->addRow("Quality:", qualityComboBox);
     formLayout->addRow("Codec:", videoCodecsComboBox);
     formLayout->addRow("File format:", fileFormatsComboBox);
+    formLayout->addRow("YUV420P:", yuv402pCheckBox);
     formLayout->addRow("FPS:", fpsVideoLineEdit);
     formLayout->addRow("Elapsed time:", videoCaptureElapsedTimeLabel);
 
@@ -738,6 +748,9 @@ void ControlWidget::constructRecordingOptionsWidget()
     // Signals + Slots
 
     connect(outputDirButton, &QPushButton::clicked, this, &ControlWidget::setOutputDir);
+    connect(qualityComboBox, &QComboBox::activated, this, [=, this](int index) {
+        quality = static_cast<QMediaRecorder::Quality>(index);
+    });
     connect(fileFormatsComboBox, &QComboBox::activated, this, [=, this](int index) {
         if (index >= 0) {
             format.setFileFormat(supportedFileFormats[index]);
@@ -756,8 +769,11 @@ void ControlWidget::constructRecordingOptionsWidget()
             }
         }
     });
+    connect(yuv402pCheckBox, &QCheckBox::clicked, this, [=, this](bool checked) {
+        yuv420p = checked;
+    });
     connect(fpsVideoLineEdit, &FocusLineEdit::editingFinished, this, [=, this]() {
-        framesPerSecond = fpsVideoLineEdit->text().toDouble();
+        framesPerSecond = fpsVideoLineEdit->text().toInt();
     });
 }
 
@@ -767,7 +783,7 @@ void ControlWidget::populateFileFormatsComboBox(QMediaFormat::FileFormat fileFor
 {
     fileFormatsComboBox->clear();
 
-    format.resolveForEncoding(QMediaFormat::RequiresVideo);
+    // format.resolveForEncoding(QMediaFormat::RequiresVideo);
 
     int index = 0;
 
@@ -799,7 +815,7 @@ void ControlWidget::populateVideoCodecsComboBox(QMediaFormat::VideoCodec videoCo
 {
     videoCodecsComboBox->clear();
 
-    format.setAudioCodec(QMediaFormat::AudioCodec::Opus);
+    format.setAudioCodec(QMediaFormat::AudioCodec::AAC);
     format.resolveForEncoding(QMediaFormat::RequiresVideo);
 
     int index = 0;

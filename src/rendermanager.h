@@ -110,7 +110,7 @@ public slots:
 
     void setFrameImage(QByteArray devId, QImage image);
 
-    void startRecording(QString recordFilename, int framesPerSecond, QMediaFormat format);
+    void startRecording(QString recordFilename, int framesPerSecond, QMediaRecorder::Quality quality, QMediaFormat format, bool yuv420p);
     void stopRecording();
 
     void takeScreenshot(QString filename);
