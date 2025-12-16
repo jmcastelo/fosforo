@@ -117,5 +117,6 @@
         <file>operations/smooth_mask.op</file>
         <file>operations/value.op</file>
         <file>operations/color_over_gray.op</file>
+        <file>operations/color_picker.op</file>
     </qresource>
 </RCC>
