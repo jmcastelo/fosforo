@@ -35,13 +35,7 @@ OutputWindow::OutputWindow(int texWidth, int texHeight, Overlay* overlay) :
     mTexHeight { texHeight },
     mOverlay { overlay }
 {
-    // image = QRect(0, 0, w, h);
-    // frame = image;
-
-    // mSelectedPoint = QPointF(texWidth / 2, texHeight / 2);
     mCursor = QPointF(0.0, 0.0);
-
-    // overlay->setViewportRect(w, h);
 
     setTitle("Fosforo: Output");
     setIcon(QIcon(QPixmap(":/icons/logo.png")));
@@ -52,8 +46,6 @@ OutputWindow::OutputWindow(int texWidth, int texHeight, Overlay* overlay) :
 OutputWindow::~OutputWindow()
 {
     makeCurrent();
-
-    // glDeleteFramebuffers(1, &fbo);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -76,54 +68,8 @@ OutputWindow::~OutputWindow()
 
 void OutputWindow::wheelEvent(QWheelEvent* event)
 {
-    // Frame
-
-    /*QRect frameBefore = frame;
-
-    qreal factor = pow(2.0, -event->angleDelta().y() / 1200.0);
-
-    frameTransform.scale(factor, factor);
-
-    if (frameTransform.m11() > 1.0 || frameTransform.m22() > 1.0) {
-        frameTransform.reset();
-    }
-
-    frame = frameTransform.mapRect(image);
-
-    // This transform is used to zoom following the pointer
-
-    QTransform superscale = QTransform().scale((frameBefore.width() - frame.width()) / (frameTransform.m11() * width()), (frameBefore.height() - frame.height()) / (frameTransform.m22() * height()));
-    QPointF increment = superscale.map(event->position());
-
-    frame = frameTransform.translate(increment.x(), increment.y()).mapRect(image);
-
-    // Keep frame within image
-
-    if (frame.y() < image.y()) {
-        frame = frameTransform.translate(0.0, (image.y() - frame.y()) / frameTransform.m22()).mapRect(image);
-    }
-    if (frame.y() + frame.height() > image.y() + image.height()) {
-        frame = frameTransform.translate(0.0, (image.y() + image.height() - frame.y() - frame.height()) / frameTransform.m22()).mapRect(image);
-    }
-    if (frame.x() < image.x()) {
-        frame = frameTransform.translate((image.x() - frame.x()) / frameTransform.m11(), 0.0).mapRect(image);
-    }
-    if (frame.x() + frame.width() > image.x() + image.width()) {
-        frame = frameTransform.translate((image.x() + image.width() - frame.x() - frame.width()) / frameTransform.m11(), 0.0).mapRect(image);
-    }
-
-    // Cursor
-
-    QPointF point = selectedPointTransform.map(selectedPoint);
-    cursor.setX(2.0 * ((point.x() - frame.left()) / frame.width() - 0.5));
-    cursor.setY(2.0 * (0.5 - (point.y() - frame.top()) / frame.height()));
-    updateCursor();*/
-
     float angleDelta = event->angleDelta().y();
     setOutScaling(angleDelta);
-
-    // QPointF delta = event->position() - mPrevPos;
-    // setOutTranslation(delta);
 
     makeCurrent();
     setOutTransform();
@@ -141,33 +87,6 @@ void OutputWindow::mouseMoveEvent(QMouseEvent* event)
     {
         if (event->modifiers() == Qt::ControlModifier)
         {
-            // Frame
-
-            /*QPointF delta = QTransform().scale(static_cast<qreal>(image.width()) / width(), static_cast<qreal>(image.height()) / height()).map(prevPos - event->position());
-
-            frame = frameTransform.translate(delta.x(), delta.y()).mapRect(image);
-
-            if (frame.top() < image.top() || frame.bottom() > image.bottom()) {
-                frame = frameTransform.translate(0.0, -delta.y()).mapRect(image);
-            }
-            if (frame.left() < image.left() || frame.right() > image.right()) {
-                frame = frameTransform.translate(-delta.x(), 0.0).mapRect(image);
-            }
-
-            prevPos = event->pos();
-
-            // Cursor
-
-            if (prevFrame != frame)
-            {
-                QPointF point = selectedPointTransform.translate(static_cast<qreal>(prevFrame.left() - frame.left()) / image.width(), static_cast<qreal>(prevFrame.top() - frame.top()) / image.height()).map(selectedPoint);
-                cursor.setX(2.0 * ((point.x() - frame.left()) / frame.width() - 0.5));
-                cursor.setY(2.0 * (0.5 - (point.y() - frame.top()) / frame.height()));
-                updateCursor();
-
-                prevFrame = frame;
-            }*/
-
             QPointF delta = event->position() - mPrevPos;
             setOutTranslation(delta);
 
@@ -192,10 +111,8 @@ void OutputWindow::mousePressEvent(QMouseEvent* event)
 {
     if (event->buttons() == Qt::LeftButton)
     {
-        if (event->modifiers() == Qt::ControlModifier)
-        {
+        if (event->modifiers() == Qt::ControlModifier) {
             mPrevPos = event->position();
-            // prevFrame = frame;
         }
         else if (mDrawingCursor) {
             setSelectedPoint(event->position());
@@ -277,9 +194,6 @@ void OutputWindow::toggleAutoResize(bool checked)
 
     if (checked)
     {
-        // mTranslationOld = mTranslation;
-        // mScaleExpOld = mScaleExp;
-
         mTranslation = QPointF(0.0, 0.0);
         mScaleExp = 0.0;
 
@@ -290,9 +204,6 @@ void OutputWindow::toggleAutoResize(bool checked)
     }
     else
     {
-        // mTranslation = mTranslationOld;
-        // mScaleExp = mScaleExpOld;
-
         resize(mOldWidth, mOldHeight);
     }
 }
@@ -301,43 +212,6 @@ void OutputWindow::toggleAutoResize(bool checked)
 
 void OutputWindow::setSelectedPoint(QPointF pos)
 {
-    QPointF clickedPoint = QTransform().scale(1.0 / width(), 1.0 / height()).map(pos);
-
-    if (clickedPoint.x() < 0.0) {
-        clickedPoint.setX(0.0);
-    }
-    if (clickedPoint.x() > 1.0) {
-        clickedPoint.setX(1.0);
-    }
-    if (clickedPoint.y() < 0.0) {
-        clickedPoint.setY(0.0);
-    }
-    if (clickedPoint.y() > 1.0) {
-        clickedPoint.setY(1.0);
-    }
-
-    /*selectedPoint = QTransform().translate(frame.left(), frame.top()).scale(frame.width(), frame.height()).map(clickedPoint);
-
-    QPoint point = QPoint(floor(selectedPoint.x()), floor(selectedPoint.y()));
-
-    // Check boundaries
-    // Note: right() = left() + width() - 1, bottom() = top() + height() - 1
-
-    if (point.x() < image.left()) {
-        point.setX(image.left());
-    }
-    if (point.x() > image.right()) {
-        point.setX(image.right());
-    }
-    if (point.y() < image.top()) {
-        point.setY(image.top());
-    }
-    if (point.y() > image.bottom()) {
-        point.setY(image.bottom());
-    }
-
-    emit selectedPointChanged(point);*/
-
     mCursor = QTransform().translate(-mTranslation.x(), -mTranslation.y()).scale((mRight - mLeft) * pow(2.0, -mScaleExp) / width(), (mTop - mBottom) * pow(2.0, -mScaleExp) / height()).translate(-0.5 * width(), -0.5 * height()).map(pos);
 
     if (mCursor.x() < mVertLeft) {
@@ -352,8 +226,6 @@ void OutputWindow::setSelectedPoint(QPointF pos)
     if (mCursor.y() > mVertTop) {
         mCursor.setY(mVertTop);
     }
-    // mCursor.setX(2.0 * (clickedPoint.x() - 0.5));
-    // mCursor.setY(2.0 * (clickedPoint.y() - 0.5));
 
     makeCurrent();
     updateCursor();
@@ -613,8 +485,6 @@ void OutputWindow::initializeGL()
 
     glDisable(GL_DEPTH_TEST);
 
-    // glGenFramebuffers(1, &fbo);
-
     // Image
 
     mOutProgram = new QOpenGLShaderProgram();
@@ -681,26 +551,6 @@ void OutputWindow::initializeGL()
 
 void OutputWindow::paintGL()
 {
-    /*glClear(GL_COLOR_BUFFER_BIT);
-
-    // Bind fbo as read frame buffer
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
-    if (pOutTexId) {
-        glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *pOutTexId, 0);
-    }
-    else {
-        glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-    }
-
-    // Render to default frame buffer (screen) from fbo
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-    glBlitFramebuffer(frame.x(), frame.y() + frame.height(), frame.x() + frame.width(), frame.y(), 0, 0, width(), height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0); */
-
     // Draw output texture
 
     GLuint outTexId = 0;
@@ -772,8 +622,6 @@ void OutputWindow::resizeGL(int width, int height)
     doneCurrent();
 
     mOverlay->setViewportRect(width, height);
-
-    // emit sizeChanged(width, height);
 }
 
 
@@ -817,7 +665,6 @@ void OutputWindow::render(quintptr pFence)
 void OutputWindow::updateView()
 {
     context()->makeCurrent(this);
-    // makeCurrent();
 
     paintGL();
     paintOverGL();
@@ -825,5 +672,4 @@ void OutputWindow::updateView()
     context()->swapBuffers(this);
 
     context()->doneCurrent();
-    // doneCurrent();
 }

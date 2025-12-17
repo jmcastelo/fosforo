@@ -35,12 +35,6 @@ signals:
 
     void iterationPerformed();
     void iterationTimeMeasured(double uspf, double currentFPS);
-    // void updateTimeMeasured(double uspf, double currentFPS);
-
-/*protected:
-    void closeEvent(QCloseEvent* event) override;
-    void resizeEvent(QResizeEvent* event) override;
-    void keyPressEvent(QKeyEvent* event) override;*/
 
 private:
     Factory* factory;
@@ -57,22 +51,6 @@ private:
     Overlay* overlay;
     VideoInputControl* videoInControl;
 
-    // TimerThread* updateTimer;
-    // std::chrono::time_point<std::chrono::steady_clock> updateStart;
-    // std::chrono::time_point<std::chrono::steady_clock> updateEnd;
-
-    // TimerThread* iterationTimer;
-    // std::chrono::time_point<std::chrono::steady_clock> iterationStart;
-    // std::chrono::time_point<std::chrono::steady_clock> iterationEnd;
-
-    // int numUpdates = 0;
-    // double updateFPS = 60.0;
-    // std::chrono::microseconds updateTime;
-
-    // int numIterations = 0;
-    // double iterationFPS = 60.0;
-    // std::chrono::microseconds iterationTime;
-
     std::chrono::time_point<std::chrono::steady_clock> stepStart;
     std::chrono::time_point<std::chrono::steady_clock> stepEnd;
     std::chrono::time_point<std::chrono::steady_clock> multiStepStart;
@@ -82,14 +60,9 @@ private:
 
     QTimer updateViewTimer;
 
-    // QQueue<qint64> timestamps;
-
     void closeAll();
 
 private slots:
-    // void computeUpdateFPS();
-    // void computeIterationFPS();
-
     void setIterationTimerInterval(double fps);
 
     void measureFps();

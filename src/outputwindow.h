@@ -114,8 +114,8 @@ private:
     GLfloat mVertBottom;
     GLfloat mVertTop;
 
-    QPointF mTranslation, mTranslationOld;
-    GLfloat mScaleExp, mScaleExpOld;
+    QPointF mTranslation;
+    GLfloat mScaleExp;
     GLfloat mLeft;
     GLfloat mRight;
     GLfloat mBottom;
@@ -126,18 +126,11 @@ private:
     GLuint mOutVboPos;
     GLuint mOutVboTex;
 
-    // GLuint fbo = 0;
-
-    // QRect image;
-    // QRect frame;
-    // QTransform frameTransform;
     QPointF mPrevPos;
 
     QTransform mSelectedPointTransform;
     QPointF mCursor;
     bool mDrawingCursor = false;
-
-    // QRect prevFrame;
 
     QOpenGLShaderProgram* mCursorProgram = nullptr;
     QOpenGLVertexArrayObject* mCursorVao = nullptr;

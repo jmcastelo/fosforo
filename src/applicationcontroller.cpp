@@ -4,9 +4,6 @@
 
 ApplicationController::ApplicationController()
 {
-    // iterationTimer = new TimerThread(iterationFPS, this);
-    // updateTimer = new TimerThread(updateFPS, this);
-
     updateViewTimer.setInterval(1000.0 / 60.0);
     updateViewTimer.setTimerType(Qt::TimerType::PreciseTimer);
     updateViewTimer.setSingleShot(false);
@@ -57,26 +54,12 @@ ApplicationController::ApplicationController()
     midiControl->setObserver();
 
     controlWidget = new ControlWidget(renderManager->version(), graphWidget, midiListWidget);
-    // controlWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    // controlWidget->setMinimumSize(0, 0);
 
     controlWidget->updateWindowSizeLineEdits(renderManager->texWidth(), renderManager->texHeight());
 
     connect(graphWidget, &GraphWidget::selectedNodesChanged, controlWidget, &ControlWidget::selectOpsTableRows);
 
-    // connect(iterationTimer, &TimerThread::timeout, this, &ApplicationController::beat);
-    // connect(iterationTimer, &TimerThread::stepTimeMeasured, controlWidget, &ControlWidget::updateIterationMetricsLabels);
-    // connect(iterationTimer, &TimerThread::stepPerformed, controlWidget, &ControlWidget::updateIterationNumberLabel);
-
     connect(renderManager, &RenderManager::frameReady, outputWindow, &OutputWindow::render);
-    // connect(renderManager, &RenderManager::stepTimeMeasured, controlWidget, &ControlWidget::updateIterationMetricsLabels);
-    // connect(renderManager, &RenderManager::stepPerformed, controlWidget, &ControlWidget::updateIterationNumberLabel);
-    // connect(updateTimer, &TimerThread::timeout, outputWindow, QOverload<>::of(&OutputWindow::update));
-    // connect(updateTimer, &TimerThread::stepTimeMeasured, controlWidget, &ControlWidget::updateUpdateMetricsLabels);
-
-    // connect(this, &ApplicationController::iterationPerformed, controlWidget, &ControlWidget::updateIterationNumberLabel);
-    // connect(this, &ApplicationController::iterationTimeMeasured, controlWidget, &ControlWidget::updateIterationMetricsLabels);
-    // connect(this, &ApplicationController::updateTimeMeasured, controlWidget, &ControlWidget::updateUpdateMetricsLabels);
 
     connect(&updateViewTimer, &QTimer::timeout, outputWindow, &OutputWindow::updateView);
 
@@ -84,17 +67,7 @@ ApplicationController::ApplicationController()
         renderManager->init(outputWindow->context());
         // plotsWidget->init(outputWindow->context());
 
-        // numIterations = 0;
-        // numUpdates = 0;
-
-        // iterationStart = std::chrono::steady_clock::now();
-        // updateStart = std::chrono::steady_clock::now();
-
-        // iterationTimer->start();
-        // updateTimer->start();
-
         renderManager->start();
-
         updateViewTimer.start();
     });
     connect(outputWindow, &OutputWindow::renderDone, this, &ApplicationController::measureFps);
@@ -107,11 +80,8 @@ ApplicationController::ApplicationController()
     connect(plotsWidget, &PlotsWidget::selectedPointChanged, outputWindow, &OutputWindow::setCursor);
     connect(plotsWidget, &PlotsWidget::drawCursor, outputWindow, &OutputWindow::setDrawingCursor);
     connect(outputWindow, &OutputWindow::closing, this, &ApplicationController::onOutputWindowClose);
-    // connect(outputWindow, &OutputWindow::sizeChanged, renderManager, &RenderManager::resize);
     connect(outputWindow, &OutputWindow::resetIterations, renderManager, &RenderManager::reset);
     connect(outputWindow, &OutputWindow::startPauseIts, controlWidget, &ControlWidget::toggleIterationState);
-    // connect(outputWindow, &OutputWindow::sizeChanged, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
-    // connect(outputWindow, &OutputWindow::sizeChanged, plotsWidget, &PlotsWidget::setSize);
 
     connect(controlWidget, &ControlWidget::iterateStateChanged, this, &ApplicationController::setIterationState);
     connect(controlWidget, &ControlWidget::closing, this, &ApplicationController::onControlWidgetClose);
@@ -122,7 +92,6 @@ ApplicationController::ApplicationController()
     connect(nodeManager, &NodeManager::outputTextureChanged, renderManager, &RenderManager::setOutputTextureId);
     connect(nodeManager, &NodeManager::outputTextureChanged, outputWindow, &OutputWindow::setOutputTextureId);
     connect(nodeManager, &NodeManager::outputTextureChanged, plotsWidget, &PlotsWidget::setTextureID);
-    // connect(nodeManager, &NodeManager::outputFBOChanged, plotsWidget, &PlotsWidget::setFBO);
     connect(nodeManager, &NodeManager::sortedOperationsChanged, renderManager, &RenderManager::setSortedOperations);
     connect(nodeManager, &NodeManager::operationEdited, renderManager, &RenderManager::adjustOperationOrtho);
     connect(nodeManager, &NodeManager::parameterValueChanged, overlay, &Overlay::addMessage);
@@ -149,17 +118,10 @@ ApplicationController::ApplicationController()
     connect(configParser, &ConfigurationParser::newImageSizeRead, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
     connect(configParser, &ConfigurationParser::newImageSizeRead, this, &ApplicationController::setSize);
 
-    // resize(renderManager->texWidth(), renderManager->texHeight());
-
-    QSize screenSize = QGuiApplication::primaryScreen()->size();
-    int glSide = qMin(screenSize.width(), screenSize.height());
-    int ctrlWidth= screenSize.width() - glSide;
-
-    // outputWindow->resize(renderManager->texWidth(), renderManager->texHeight());
-    outputWindow->resize(glSide, glSide);
+    outputWindow->resize(1024, 1024);
     outputWindow->show();
 
-    controlWidget->resize(ctrlWidth, screenSize.height());
+    controlWidget->resize(1024, 1024);
     controlWidget->show();
 }
 
@@ -177,35 +139,7 @@ ApplicationController::~ApplicationController()
     delete overlay;
     delete videoInControl;
     delete midiControl;
-    // delete iterationTimer;
-    // delete updateTimer;
 }
-
-
-
-/*void ApplicationController::beat()
-{
-    // timer.start();
-
-    if (recorder)
-    {
-        if (recorder->isRecording())
-        {
-            iterate();
-            recorder->sendVideoFrame(renderManager->outputImage());
-        }
-    }
-    else
-    {
-        iterate();
-    }
-
-    // outputWindow->update();
-    // outputWindow->render();
-
-    // qint64 cpuTimeNs = timer.nsecsElapsed();
-    // qDebug() << "CPU time (ms):" << cpuTimeNs / 1'000'000.0;
-}*/
 
 
 
@@ -234,49 +168,6 @@ void ApplicationController::measureFps()
         multiStepStart = std::chrono::steady_clock::now();
     }
 }
-
-
-
-/*void ApplicationController::computeIterationFPS()
-{
-    iterationEnd = std::chrono::steady_clock::now();
-    iterationTime = std::chrono::duration_cast<std::chrono::microseconds>(iterationEnd - iterationStart);
-
-    numIterations++;
-
-    if (iterationTime.count() >= 1'000'000)
-    {
-        double uspf = static_cast<double>(iterationTime.count()) / numIterations;
-        double fps = numIterations * 1'000'000.0 / iterationTime.count();
-
-        emit iterationTimeMeasured(uspf, fps);
-        emit iterationPerformed();
-
-        numIterations = 0;
-        iterationStart = std::chrono::steady_clock::now();
-    }
-}
-
-
-
-void ApplicationController::computeUpdateFPS()
-{
-    updateEnd = std::chrono::steady_clock::now();
-    updateTime = std::chrono::duration_cast<std::chrono::microseconds>(updateEnd - updateStart);
-
-    numUpdates++;
-
-    if (updateTime.count() >= 1'000'000)
-    {
-        double uspf = static_cast<double>(updateTime.count()) / numUpdates;
-        double fps = numUpdates * 1'000'000.0 / updateTime.count();
-
-        emit updateTimeMeasured(uspf, fps);
-
-        numUpdates = 0;
-        updateStart = std::chrono::steady_clock::now();
-    }
-}*/
 
 
 
@@ -314,7 +205,6 @@ void ApplicationController::showMidiWidget()
 
 void ApplicationController::setSize(int width, int height)
 {
-    // outputWindow->resize(width, height);
     renderManager->resize(width, height);
     outputWindow->setOutputTextureSize(width, height);
     plotsWidget->setSize(width, height);
@@ -324,9 +214,6 @@ void ApplicationController::setSize(int width, int height)
 
 void ApplicationController::closeAll()
 {
-    // iterationTimer->stop();
-    // updateTimer->stop();
-
     disconnect(graphWidget, &GraphWidget::selectedNodesChanged, controlWidget, &ControlWidget::selectOpsTableRows);
 
     renderManager->stop();
@@ -352,85 +239,3 @@ void ApplicationController::onControlWidgetClose()
     disconnect(outputWindow, &OutputWindow::closing, this, &ApplicationController::onOutputWindowClose);
     outputWindow->close();
 }
-
-
-
-/*void ApplicationController::resizeEvent(QResizeEvent* event)
-{
-    QApplicationController::resizeEvent(event);
-
-    if (stackedLayout->currentWidget() == controlWidget)
-        outputWindow->resize(event->size());
-    else
-        controlWidget->resize(event->size());
-
-    int width = event->size().width();
-    int height = event->size().height();
-
-    renderManager->resize(width, height);
-    plotsWidget->setSize(width, height);
-    controlWidget->updateWindowSizeLineEdits(width, height);
-}*/
-
-
-
-/*void ApplicationController::keyPressEvent(QKeyEvent* event)
-{
-    if (event->modifiers() == Qt::ControlModifier)
-    {
-        if (event->key() == Qt::Key_Tab)
-        {
-            if (stackedLayout->currentWidget() == controlWidget)
-            {
-                stackedLayout->setCurrentWidget(outputWindow);
-                outputWindow->update();
-            }
-            else {
-                stackedLayout->setCurrentWidget(controlWidget);
-            }
-        }
-        else if (event->key() == Qt::Key_PageUp)
-        {
-            opacity += 0.1;
-            if (opacity > 1.0)
-                opacity = 1.0;
-            controlWidgetOpacityEffect->setOpacity(opacity);
-            outputWindow->update();
-        }
-        else if (event->key() == Qt::Key_PageDown)
-        {
-            opacity -= 0.1;
-            if (opacity < 0.0)
-                opacity = 0.0;
-            controlWidgetOpacityEffect->setOpacity(opacity);
-            outputWindow->update();
-        }
-    }
-    else if (event->key() == Qt::Key_Space)
-    {
-        renderManager->reset();
-    }
-
-    event->accept();
-}*/
-
-
-
-/*void ApplicationController::closeEvent(QCloseEvent* event)
-{
-    iterationTimer->stop();
-    // updateTimer->stop();
-
-    renderManager->setActive(false);
-
-    midiListWidget->close();
-
-    // graphWidget->close();
-    graphWidget->clearScene();
-
-    controlWidget->close();
-
-    plotsWidget->close();
-
-    QApplicationController::closeEvent(event);
-}*/
