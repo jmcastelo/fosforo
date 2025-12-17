@@ -682,10 +682,14 @@ void RenderManager::genImageTexture(QByteArray devId)
         GLuint newTexId = 0;
         mContext->makeCurrent(mSurface);
         genTexture(&newTexId, mTexFormat);
+        clearTexture(&newTexId);
         mContext->doneCurrent();
 
         mVideoTextures.insert(devId, newTexId);
-        mFrameImageMap.insert(devId, QImage());
+
+        QImage img(mTexWidth, mTexHeight, QImage::Format_RGBA8888);
+        img.fill(Qt::black);
+        mFrameImageMap.insert(devId, img);
     }
 }
 

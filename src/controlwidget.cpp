@@ -188,12 +188,12 @@ void ControlWidget::constructSystemToolBar()
     systemToolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
     systemToolBar->setMinimumSize(0, 0);
 
-    iterateAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/media-playback-start.png")), "Start/pause feedback loop (CTRL+Space)");
+    iterateAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/media-playback-start.png")), "Start/pause feedback loop (CTRL+SHIFT+Space)");
     iterateAction->setCheckable(true);
-    iterateAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Space));
+    iterateAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Space));
 
-    QAction* resetAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/view-refresh.png")), "Reset (CTRL+SHIFT+Space)");
-    resetAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Space));
+    QAction* resetAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/view-refresh.png")), "Reset (CTRL+Space)");
+    resetAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Space));
 
     // systemToolBar->addSeparator();
 
@@ -232,7 +232,7 @@ void ControlWidget::constructSystemToolBar()
 
     QAction* aboutAction = systemToolBar->addAction(QIcon(QPixmap(":/icons/help-about.png")), "About");
 
-    connect(iterateAction, &QAction::triggered, this, &ControlWidget::iterate);
+    connect(iterateAction, &QAction::toggled, this, &ControlWidget::iterate);
     connect(resetAction, &QAction::triggered, this, &ControlWidget::resetIterations);
     connect(screenshotAction, &QAction::triggered, this, &ControlWidget::screenshot);
     connect(recordAction, &QAction::triggered, this, &ControlWidget::record);
@@ -243,6 +243,13 @@ void ControlWidget::constructSystemToolBar()
     connect(loadConfigAction, &QAction::triggered, this, &ControlWidget::loadConfig);
     connect(saveConfigAction, &QAction::triggered, this, &ControlWidget::saveConfig);
     connect(aboutAction, &QAction::triggered, this, &ControlWidget::about);
+}
+
+
+
+void ControlWidget::toggleIterationState()
+{
+    iterateAction->toggle();
 }
 
 

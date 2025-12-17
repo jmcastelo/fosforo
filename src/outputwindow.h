@@ -67,12 +67,12 @@ signals:
     void openGLInitialized();
     void sizeChanged(int width, int height);
     void selectedPointChanged(QPoint point);
-    void scaleTransformChanged(QTransform transform);
 
     void fullScreenToggled(bool checked);
     void screenshot();
     void record();
     void resetIterations();
+    void startPauseIts();
 
     void closing();
 
@@ -82,12 +82,11 @@ public slots:
     void setOutputTextureId(GLuint* pTexId);
     void setOutputTextureSize(GLuint width, GLuint height);
 
-    void resetZoom(int width, int height);
-
     void setDrawingCursor(bool on) { mDrawingCursor = on; }
     void setCursor(QPoint point);
 
     void render(quintptr fence);
+    void updateView();
 
     void toggleFullScreen(bool checked);
 

@@ -83,7 +83,6 @@ signals:
 
     void seedDrawn();
 
-    void showMidiWidget();
     void showPlotsWidget();
 
     void overlayToggled(bool show);
@@ -126,6 +125,8 @@ public slots:
     void toggleRecording();
 
     void toggleFullScreenAction(bool checked);
+
+    void toggleIterationState();
 
 protected:
     //void resizeEvent(QResizeEvent* event) override;

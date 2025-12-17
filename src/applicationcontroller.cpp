@@ -7,6 +7,10 @@ ApplicationController::ApplicationController()
     // iterationTimer = new TimerThread(iterationFPS, this);
     // updateTimer = new TimerThread(updateFPS, this);
 
+    updateViewTimer.setInterval(1000.0 / 60.0);
+    updateViewTimer.setTimerType(Qt::TimerType::PreciseTimer);
+    updateViewTimer.setSingleShot(false);
+
     videoInControl = new VideoInputControl();
 
     factory = new Factory(videoInControl);
@@ -74,6 +78,8 @@ ApplicationController::ApplicationController()
     // connect(this, &ApplicationController::iterationTimeMeasured, controlWidget, &ControlWidget::updateIterationMetricsLabels);
     // connect(this, &ApplicationController::updateTimeMeasured, controlWidget, &ControlWidget::updateUpdateMetricsLabels);
 
+    connect(&updateViewTimer, &QTimer::timeout, outputWindow, &OutputWindow::updateView);
+
     connect(outputWindow, &OutputWindow::openGLInitialized, this, [&]() {
         renderManager->init(outputWindow->context());
         // plotsWidget->init(outputWindow->context());
@@ -88,6 +94,8 @@ ApplicationController::ApplicationController()
         // updateTimer->start();
 
         renderManager->start();
+
+        updateViewTimer.start();
     });
     connect(outputWindow, &OutputWindow::renderDone, this, &ApplicationController::measureFps);
     connect(outputWindow, &OutputWindow::renderDone, plotsWidget, &PlotsWidget::updatePlots);
@@ -95,13 +103,13 @@ ApplicationController::ApplicationController()
     connect(outputWindow, &OutputWindow::fullScreenToggled, controlWidget, &ControlWidget::toggleFullScreenAction);
     connect(outputWindow, &OutputWindow::screenshot, controlWidget, &ControlWidget::screenshot);
     connect(outputWindow, &OutputWindow::record, controlWidget, &ControlWidget::toggleRecording);
-    connect(outputWindow, &OutputWindow::scaleTransformChanged, plotsWidget, &PlotsWidget::transformSources);
     connect(outputWindow, &OutputWindow::selectedPointChanged, plotsWidget, &PlotsWidget::setSelectedPoint);
     connect(plotsWidget, &PlotsWidget::selectedPointChanged, outputWindow, &OutputWindow::setCursor);
     connect(plotsWidget, &PlotsWidget::drawCursor, outputWindow, &OutputWindow::setDrawingCursor);
     connect(outputWindow, &OutputWindow::closing, this, &ApplicationController::onOutputWindowClose);
     // connect(outputWindow, &OutputWindow::sizeChanged, renderManager, &RenderManager::resize);
     connect(outputWindow, &OutputWindow::resetIterations, renderManager, &RenderManager::reset);
+    connect(outputWindow, &OutputWindow::startPauseIts, controlWidget, &ControlWidget::toggleIterationState);
     // connect(outputWindow, &OutputWindow::sizeChanged, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
     // connect(outputWindow, &OutputWindow::sizeChanged, plotsWidget, &PlotsWidget::setSize);
 
@@ -129,7 +137,6 @@ ApplicationController::ApplicationController()
     connect(controlWidget, &ControlWidget::takeScreenshot, renderManager, &RenderManager::takeScreenshot);
     connect(controlWidget, &ControlWidget::texFormatChanged, renderManager, &RenderManager::setTextureFormat);
     connect(controlWidget, &ControlWidget::imageSizeChanged, this, &ApplicationController::setSize);
-    connect(controlWidget, &ControlWidget::showMidiWidget, this, &ApplicationController::showMidiWidget);
     connect(controlWidget, &ControlWidget::showPlotsWidget, plotsWidget, &QWidget::show);
     connect(controlWidget, &ControlWidget::overlayToggled, overlay, &Overlay::enable);
     connect(controlWidget, &ControlWidget::configRead, renderManager, &RenderManager::resetIterationNumer);
@@ -274,11 +281,17 @@ void ApplicationController::computeUpdateFPS()
 
 void ApplicationController::setIterationState(bool state)
 {
+    if (state) {
+        updateViewTimer.stop();
+    }
+
     renderManager->setActive(state);
 
     if (state) {
         stepStart = std::chrono::steady_clock::now();
         multiStepStart = stepStart;
+    } else {
+        updateViewTimer.start();
     }
 }
 

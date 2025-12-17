@@ -234,6 +234,9 @@ void OutputWindow::keyPressEvent(QKeyEvent* event)
             emit resetIterations();
         }
     }
+    else if (event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier) && event->key() == Qt::Key_Space) {
+        emit startPauseIts();
+    }
 
     event->accept();
 }
@@ -340,26 +343,6 @@ void OutputWindow::setCursor(QPoint selPoint)
 
 
 
-void OutputWindow::resetZoom(int newWidth, int newHeight)
-{
-    /*QRect oldImage = image;
-
-    image = QRect(0, 0, newWidth, newHeight);
-
-    qreal scaleX = static_cast<qreal>(newWidth) / oldImage.width();
-    qreal scaleY = static_cast<qreal>(newHeight) / oldImage.height();
-
-    frameTransform.setMatrix(frameTransform.m11(), 0.0, 0.0, 0.0, frameTransform.m22(), 0.0, scaleX * frameTransform.dx(), scaleY * frameTransform.dy(), 1.0);
-
-    frame = frameTransform.mapRect(image);
-
-    QTransform scaleTransform = QTransform().scale(scaleX, scaleY);
-
-    emit scaleTransformChanged(scaleTransform);*/
-}
-
-
-
 void OutputWindow::setOutputTextureId(GLuint* pTexId)
 {
     pOutTexId = pTexId;
@@ -454,7 +437,7 @@ void OutputWindow::setOutTranslation(QPointF delta)
 
 void OutputWindow::setOutScaling(float delta)
 {
-    mScaleExp += 1.0e-3 * delta;
+    mScaleExp += 2.0e-4 * delta;
 }
 
 
@@ -748,8 +731,6 @@ void OutputWindow::resizeGL(int width, int height)
     setCursorTransform();
     doneCurrent();
 
-    resetZoom(width, height);
-
     mOverlay->setViewportRect(width, height);
 
     // emit sizeChanged(width, height);
@@ -789,4 +770,20 @@ void OutputWindow::render(quintptr pFence)
     context()->doneCurrent();
 
     emit renderDone();
+}
+
+
+
+void OutputWindow::updateView()
+{
+    context()->makeCurrent(this);
+    // makeCurrent();
+
+    paintGL();
+    paintOverGL();
+
+    context()->swapBuffers(this);
+
+    context()->doneCurrent();
+    // doneCurrent();
 }

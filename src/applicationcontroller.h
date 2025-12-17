@@ -18,11 +18,7 @@
 #include "videoinputcontrol.h"
 
 #include <QObject>
-#include <QStackedLayout>
-#include <QGraphicsOpacityEffect>
-#include <QChronoTimer>
-#include <QElapsedTimer>
-#include <QQueue>
+#include <QTimer>
 
 
 
@@ -83,6 +79,8 @@ private:
     unsigned int numSteps = 0;
     std::chrono::nanoseconds stepTime;
     std::chrono::milliseconds multiStepTime;
+
+    QTimer updateViewTimer;
 
     // QQueue<qint64> timestamps;
 
