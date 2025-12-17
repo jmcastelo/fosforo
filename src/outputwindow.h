@@ -89,6 +89,7 @@ public slots:
     void updateView();
 
     void toggleFullScreen(bool checked);
+    void toggleAutoResize(bool checked);
 
 protected:
     void wheelEvent(QWheelEvent* event) override;
@@ -103,13 +104,18 @@ private:
     int mTexWidth;
     int mTexHeight;
 
+    bool mAutoResize = false;
+    bool mFullScreen = false;
+    int mOldWidth;
+    int mOldHeight;
+
     GLfloat mVertLeft;
     GLfloat mVertRight;
     GLfloat mVertBottom;
     GLfloat mVertTop;
 
-    QPointF mTranslation;
-    GLfloat mScaleExp;
+    QPointF mTranslation, mTranslationOld;
+    GLfloat mScaleExp, mScaleExpOld;
     GLfloat mLeft;
     GLfloat mRight;
     GLfloat mBottom;
@@ -148,8 +154,8 @@ private:
     void setOutTranslation(QPointF delta);
     void setOutScaling(float delta);
     void setOutOrthographic(int width, int height);
-    void setOutTransform();
 
+    void setOutTransform();
     void setCursorTransform();
 
     void setSelectedPoint(QPointF pos);

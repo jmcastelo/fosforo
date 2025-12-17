@@ -144,6 +144,7 @@ ApplicationController::ApplicationController()
     connect(controlWidget, &ControlWidget::writeConfig, configParser, &ConfigurationParser::write);
     connect(controlWidget, &ControlWidget::nodesSelected, graphWidget, &GraphWidget::markNodes);
     connect(controlWidget, &ControlWidget::fullScreenToggled, outputWindow, &OutputWindow::toggleFullScreen);
+    connect(controlWidget, &ControlWidget::autoResizeWindow, outputWindow, &OutputWindow::toggleAutoResize);
 
     connect(configParser, &ConfigurationParser::newImageSizeRead, controlWidget, &ControlWidget::updateWindowSizeLineEdits);
     connect(configParser, &ConfigurationParser::newImageSizeRead, this, &ApplicationController::setSize);

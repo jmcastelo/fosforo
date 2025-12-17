@@ -215,12 +215,12 @@ void OutputWindow::keyPressEvent(QKeyEvent* event)
         {
             if (windowState() == Qt::WindowFullScreen)
             {
-                showNormal();
+                toggleFullScreen(false);
                 emit fullScreenToggled(false);
             }
             else
             {
-                showFullScreen();
+                toggleFullScreen(true);
                 emit fullScreenToggled(true);
             }
         }
@@ -254,6 +254,8 @@ void OutputWindow::closeEvent(QCloseEvent* event)
 
 void OutputWindow::toggleFullScreen(bool checked)
 {
+    mFullScreen = checked;
+
     if (checked) {
         showFullScreen();
     }
@@ -261,6 +263,40 @@ void OutputWindow::toggleFullScreen(bool checked)
         showNormal();
     }
 }
+
+
+
+void OutputWindow::toggleAutoResize(bool checked)
+{
+    mAutoResize = checked;
+
+    if (mFullScreen) {
+        toggleFullScreen(false);
+        emit fullScreenToggled(false);
+    }
+
+    if (checked)
+    {
+        // mTranslationOld = mTranslation;
+        // mScaleExpOld = mScaleExp;
+
+        mTranslation = QPointF(0.0, 0.0);
+        mScaleExp = 0.0;
+
+        mOldWidth = width();
+        mOldHeight = height();
+
+        resize(mTexWidth, mTexHeight);
+    }
+    else
+    {
+        // mTranslation = mTranslationOld;
+        // mScaleExp = mScaleExpOld;
+
+        resize(mOldWidth, mOldHeight);
+    }
+}
+
 
 
 void OutputWindow::setSelectedPoint(QPointF pos)
@@ -358,6 +394,10 @@ void OutputWindow::setOutputTextureSize(GLuint width, GLuint height)
     makeCurrent();
     setVao();
     doneCurrent();
+
+    if (mAutoResize && !mFullScreen) {
+        resize(mTexWidth, mTexHeight);
+    }
 }
 
 

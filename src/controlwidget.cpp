@@ -630,14 +630,19 @@ void ControlWidget::constructDisplayOptionsWidget()
     windowHeightIntValidator->setLocale(QLocale::English);
     windowHeightLineEdit->setValidator(windowHeightIntValidator);
 
+    QCheckBox* autoResizeCheckBox = new QCheckBox;
+    autoResizeCheckBox->setCheckable(true);
+    autoResizeCheckBox->setChecked(false);
+
     texFormatComboBox = new QComboBox;
     texFormatComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
     QFormLayout* formLayout = new QFormLayout;
     formLayout->setFormAlignment(Qt::AlignCenter);
     formLayout->addRow("FPS:", fpsLineEdit);
-    formLayout->addRow("Width (px):", windowWidthLineEdit);
-    formLayout->addRow("Height (px):", windowHeightLineEdit);
+    formLayout->addRow("Image width (px):", windowWidthLineEdit);
+    formLayout->addRow("Image height (px):", windowHeightLineEdit);
+    formLayout->addRow("Auto-resize window:", autoResizeCheckBox);
     formLayout->addRow("Format:", texFormatComboBox);
 
     displayOptionsWidget = new QWidget;
@@ -657,6 +662,8 @@ void ControlWidget::constructDisplayOptionsWidget()
     connect(windowHeightLineEdit, &FocusLineEdit::editingFinished, this, [=, this]() {
         emit imageSizeChanged(windowWidthLineEdit->text().toInt(), windowHeightLineEdit->text().toInt());
     });
+
+    connect(autoResizeCheckBox, &QCheckBox::clicked, this, &ControlWidget::autoResizeWindow);
 
     connect(texFormatComboBox, &QComboBox::activated, this, [&](int index) {
         int selectedValue = texFormatComboBox->itemData(index).toInt();

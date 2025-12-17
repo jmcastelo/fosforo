@@ -90,6 +90,8 @@ signals:
 
     void imageSizeChanged(int width, int height);
 
+    void autoResizeWindow(bool checked);
+
     void texFormatChanged(TextureFormat format);
 
     void startRecording(QString recordFilename, int framesPerSecond, QMediaRecorder::Quality quality, QMediaFormat format, bool yuv420p);
