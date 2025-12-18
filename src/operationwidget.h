@@ -176,6 +176,7 @@ private:
     QMetaObject::Connection addPresetButtonConn;
     QList<QMetaObject::Connection> midiLinkButtonConns;
 
+    bool mAnyParamEditable = false;
 
     template <typename T>
     void setFocusedWidget(ParameterWidget<T>* widget);

@@ -282,6 +282,8 @@ void OperationWidget::setup()
 {
     lastFocusedWidget = nullptr;
 
+    mAnyParamEditable = false;
+
     // Parameter widgets
 
     foreach (auto parameter, mOperation->uniformParameters<float>())
@@ -299,6 +301,8 @@ void OperationWidget::setup()
         uniformFloatParamWidgets.append(widget);
 
         setFocusedWidget<float>(widget);
+
+        mAnyParamEditable |= widget->isEditable();
     }
 
     foreach (auto parameter, mOperation->uniformParameters<int>())
@@ -316,6 +320,8 @@ void OperationWidget::setup()
         uniformIntParamWidgets.append(widget);
 
         setFocusedWidget<int>(widget);
+
+        mAnyParamEditable |= widget->isEditable();
     }
 
     foreach (auto parameter, mOperation->uniformParameters<unsigned int>())
@@ -333,6 +339,8 @@ void OperationWidget::setup()
         uniformUintParamWidgets.append(widget);
 
         setFocusedWidget<unsigned int>(widget);
+
+        mAnyParamEditable |= widget->isEditable();
     }
 
     foreach (auto parameter, mOperation->mat4UniformParameters())
@@ -350,6 +358,8 @@ void OperationWidget::setup()
         uniformMat4ParamWidgets.append(widget);
 
         setFocusedWidget<float>(widget);
+
+        mAnyParamEditable |= widget->isEditable();
     }
 
     foreach (auto parameter, mOperation->optionsParameters<GLenum>())
@@ -410,6 +420,15 @@ void OperationWidget::setup()
     headerWidget->adjustSize();
     selParamWidget->adjustSize();
     adjustSize();
+
+    // Set visibility conditioned to existence of editable parameters
+
+    selParamWidget->setVisible(mAnyParamEditable);
+    gridWidget->setVisible(mAnyParamEditable);
+
+    if (!mAnyParamEditable) {
+        mainLayout->setStretchFactor(gridWidget, 0);
+    }
 }
 
 
@@ -1251,13 +1270,15 @@ void OperationWidget::toggleBody(bool visible)
     toggleBodyAction->setIcon(visible ? QIcon(QPixmap(":/icons/go-down.png")) : QIcon(QPixmap(":/icons/go-up.png")));
     toggleBodyAction->setText(visible ? "Hide" : "Show");
 
-    selParamWidget->setVisible(visible);
-    gridWidget->setVisible(visible);
+    selParamWidget->setVisible(visible && mAnyParamEditable);
+    gridWidget->setVisible(visible && mAnyParamEditable);
 
-    if (visible)
+    if (visible && mAnyParamEditable) {
         mainLayout->setStretchFactor(gridWidget, 1);
-    else
+    }
+    else {
         mainLayout->setStretchFactor(gridWidget, 0);
+    }
 
     adjustSize();
 }

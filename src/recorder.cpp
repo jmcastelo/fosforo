@@ -91,9 +91,11 @@ QVideoFrame Recorder::copyImageToVideoFrame(QImage* image)
         int height = img.height();
 
         // Allocate memory for YUV420P
+
         unsigned char* yuvData = new unsigned char[width * height * 3 / 2]; // Y + U + V
 
         // Convert RGB to YUV420P
+
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 QRgb rgb = img.pixel(x, y);
@@ -102,14 +104,17 @@ QVideoFrame Recorder::copyImageToVideoFrame(QImage* image)
                 int b = qBlue(rgb);
 
                 // Calculate Y, U, V
+
                 int Y = (0.299 * r + 0.587 * g + 0.114 * b);
                 int U = (-0.14713 * r - 0.28886 * g + 0.436 * b) + 128;
                 int V = (0.615 * r - 0.51499 * g - 0.10001 * b) + 128;
 
                 // Store Y
+
                 yuvData[y * width + x] = Y;
 
                 // Store U and V in subsampled format
+
                 if (x % 2 == 0 && y % 2 == 0) {
                     yuvData[width * height + (y / 2) * (width / 2) + (x / 2)] = U;
                     yuvData[width * height + (width * height / 4) + (y / 2) * (width / 2) + (x / 2)] = V;
