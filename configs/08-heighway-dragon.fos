@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fosforo version="1.0 alpha">
+    <display>
+        <size>
+            <width>2048</width>
+            <height>2048</height>
+        </size>
+        <scene>
+            <x>4488.86</x>
+            <y>4308.51</y>
+            <width>1976.52</width>
+            <height>2113.08</height>
+        </scene>
+        <output_node>{18f32ea4-3ddc-47d4-a723-074699355f06}</output_node>
+    </display>
+    <nodes>
+        <seed_node id="{33e99d6f-b332-462c-8bae-4a9bf83ad206}">
+            <type>2</type>
+            <fixed>1</fixed>
+            <image_filename>/home/jmcastelo/Code/C++/fosforo/seeds/blurred-disk.png</image_filename>
+            <position>
+                <x>5273.92</x>
+                <y>4501.69</y>
+            </position>
+        </seed_node>
+        <operation_node id="{18f32ea4-3ddc-47d4-a723-074699355f06}">
+            <operation name="Hue Shift" enabled="1">
+                <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCnVuaWZvcm0gbWF0NCBvcnRobzsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gb3J0aG8gKiB2ZWM0KHBvcywgMC4wLCAxLjApOwogICAgdGV4Q29vcmRzID0gdGV4Owp9Cg==</vertex_shader>
+                <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp1bmlmb3JtIGZsb2F0IHNoaWZ0Owp1bmlmb3JtIGZsb2F0IG9wYWNpdHk7CgovLyBIdWUgaW4gWzAsMV0KCnZlYzMgcmdiMmhzdih2ZWMzIGMpCnsKICAgIHZlYzQgSyA9IHZlYzQoMC4wLCAtMS4wIC8gMy4wLCAyLjAgLyAzLjAsIC0xLjApOwogICAgdmVjNCBwID0gbWl4KHZlYzQoYy5iZywgSy53eiksIHZlYzQoYy5nYiwgSy54eSksIHN0ZXAoYy5iLCBjLmcpKTsKICAgIHZlYzQgcSA9IG1peCh2ZWM0KHAueHl3LCBjLnIpLCB2ZWM0KGMuciwgcC55engpLCBzdGVwKHAueCwgYy5yKSk7CgogICAgZmxvYXQgZCA9IHEueCAtIG1pbihxLncsIHEueSk7CiAgICBmbG9hdCBlID0gMS4wZS0xMDsKICAgIHJldHVybiB2ZWMzKGFicyhxLnogKyAocS53IC0gcS55KSAvICg2LjAgKiBkICsgZSkpLCBkIC8gKHEueCArIGUpLCBxLngpOwp9Cgp2ZWMzIGhzdjJyZ2IodmVjMyBjKQp7CiAgICB2ZWM0IEsgPSB2ZWM0KDEuMCwgMi4wIC8gMy4wLCAxLjAgLyAzLjAsIDMuMCk7CiAgICB2ZWMzIHAgPSBhYnMoZnJhY3QoYy54eHggKyBLLnh5eikgKiA2LjAgLSBLLnd3dyk7CiAgICByZXR1cm4gYy56ICogbWl4KEsueHh4LCBjbGFtcChwIC0gSy54eHgsIDAuMCwgMS4wKSwgYy55KTsKfQoKdm9pZCBtYWluKCkKewogICAgdmVjMyBzcmNDb2xvciA9IHRleHR1cmUoaW5UZXh0dXJlLCB0ZXhDb29yZHMpLnJnYjsKICAgIHZlYzMgaHN2Q29sb3IgPSByZ2IyaHN2KHNyY0NvbG9yKTsKICAgIGhzdkNvbG9yLnggPSBhYnMoZnJhY3QoaHN2Q29sb3IueCArIHNoaWZ0KSk7CiAgICB2ZWMzIGRzdENvbG9yID0gaHN2MnJnYihoc3ZDb2xvcik7CiAgICBmcmFnQ29sb3IgPSB2ZWM0KG1peChzcmNDb2xvciwgZHN0Q29sb3IsIG9wYWNpdHkpLCAxLjApOwp9Cg==</fragment_shader>
+                <sampler2d>inTexture</sampler2d>
+                <parameter name="Shift" type="float_uniform" editable="1" row="0" column="0">
+                    <uniform name="shift" type="5126" numitems="1">
+                        <number id="{1497b40c-1efd-46ba-8df4-73cfbf484609}" inf="0" sup="1" min="0" max="1">0.01</number>
+                    </uniform>
+                </parameter>
+                <parameter name="Opacity" type="float_uniform" editable="1" row="0" column="1">
+                    <uniform name="opacity" type="5126" numitems="1">
+                        <number id="{4870b02f-0d53-4d39-9152-8e865a8f18ee}" inf="0" sup="1" min="0" max="1">1</number>
+                    </uniform>
+                </parameter>
+                <parameter name="Ortho" type="mat4_uniform" editable="0" row="1" column="0">
+                    <uniform name="ortho" type="35676" mat4_type="3">
+                        <number id="{8d8c96e0-b169-4d0c-b611-26c52138f09a}" name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
+                        <number id="{447f7eec-a580-4207-97af-b417c4e31ee1}" name="Right" inf="0" sup="10" min="0" max="2">1</number>
+                        <number id="{031a3cd8-6c83-4399-a01c-c73d908be83e}" name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>
+                        <number id="{50f6b966-f805-499c-a3d3-196985e3322a}" name="Top" inf="0" sup="10" min="0" max="2">1</number>
+                    </uniform>
+                </parameter>
+            </operation>
+            <inputs>
+                <input id="{33e99d6f-b332-462c-8bae-4a9bf83ad206}">
+                    <type>2</type>
+                    <blendfactor>1</blendfactor>
+                </input>
+                <input id="{ecef9490-d7e9-4cd3-b89b-40edd477e0ea}">
+                    <type>1</type>
+                    <blendfactor>1</blendfactor>
+                </input>
+            </inputs>
+            <position>
+                <x>5307.29</x>
+                <y>4784.56</y>
+            </position>
+        </operation_node>
+        <operation_node id="{e866df6d-8244-4ffb-a16b-1dadc92bd804}">
+            <operation name="Affine" enabled="1">
+                <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dCAobG9jYXRpb24gPSAwKSBpbiB2ZWMyIHBvczsKbGF5b3V0IChsb2NhdGlvbiA9IDEpIGluIHZlYzIgdGV4OwoKdW5pZm9ybSBtYXQ0IG9ydGhvOwp1bmlmb3JtIG1hdDQgcm90YXRpb247CnVuaWZvcm0gbWF0NCB0cmFuc2xhdGlvbjsKdW5pZm9ybSBtYXQ0IHNjYWxpbmc7CgpvdXQgdmVjMiB0ZXhDb29yZHM7Cgp2b2lkIG1haW4oKQp7CiAgICBnbF9Qb3NpdGlvbiA9IG9ydGhvKiB0cmFuc2xhdGlvbiAqIHJvdGF0aW9uICogc2NhbGluZyAqIHZlYzQocG9zLCAwLjAsIDEuMCk7CiAgICB0ZXhDb29yZHMgPSB0ZXg7Cn0K</vertex_shader>
+                <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp2b2lkIG1haW4oKQp7CiAgICBmcmFnQ29sb3IgPSB0ZXh0dXJlKGluVGV4dHVyZSwgdGV4Q29vcmRzKTsKfQo=</fragment_shader>
+                <sampler2d>inTexture</sampler2d>
+                <parameter name="Ortho" type="mat4_uniform" editable="0" row="2" column="0">
+                    <uniform name="ortho" type="35676" mat4_type="3">
+                        <number id="{c6c19260-4c8c-4075-b884-f9dcabd2e783}" name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
+                        <number id="{c3b1b3bf-a326-47e9-9a80-af92a8f9765d}" name="Right" inf="0" sup="10" min="0" max="2">1</number>
+                        <number id="{43dbe896-9931-41a4-aa93-9bb531086aee}" name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>
+                        <number id="{7e2c01f3-0d6c-43b8-9d2c-1fb65b2f36e3}" name="Top" inf="0" sup="10" min="0" max="2">1</number>
+                    </uniform>
+                </parameter>
+                <parameter name="Rotation" type="mat4_uniform" editable="1" row="1" column="1">
+                    <uniform name="rotation" type="35676" mat4_type="1">
+                        <number id="{320d4496-502e-4f08-8635-d5bbdaabe2cc}" name="Angle" inf="-360" sup="360" min="-180" max="180">135</number>
+                    </uniform>
+                </parameter>
+                <parameter name="Translation" type="mat4_uniform" editable="1" row="0" column="1">
+                    <uniform name="translation" type="35676" mat4_type="0">
+                        <number id="{2642fe87-93f0-4061-8e8f-814ef4e69c46}" name="X" inf="-1" sup="1" min="-1" max="1">0.4</number>
+                        <number id="{c2773cf3-478d-4825-82da-d7ae547a27ab}" name="Y" inf="-1" sup="1" min="-1" max="1">0</number>
+                    </uniform>
+                </parameter>
+                <parameter name="Scaling" type="mat4_uniform" editable="1" row="0" column="0">
+                    <uniform name="scaling" type="35676" mat4_type="2">
+                        <number id="{417b1492-5501-4d54-bb85-f381ad8d1c34}" name="X" inf="0" sup="1000" min="0" max="2">0.707</number>
+                        <number id="{5429fba7-2499-47f8-b1f0-d56597174c86}" name="Y" inf="0" sup="1000" min="0" max="2">0.707</number>
+                    </uniform>
+                </parameter>
+                <parameter name="Interpolation" type="options" editable="1" row="1" column="0" value="9729">
+                    <option name="Nearest neighbor">9728</option>
+                    <option name="Linear">9729</option>
+                </parameter>
+            </operation>
+            <inputs>
+                <input id="{18f32ea4-3ddc-47d4-a723-074699355f06}">
+                    <type>0</type>
+                    <blendfactor>1</blendfactor>
+                </input>
+            </inputs>
+            <position>
+                <x>5921</x>
+                <y>5016.87</y>
+            </position>
+        </operation_node>
+        <operation_node id="{ecef9490-d7e9-4cd3-b89b-40edd477e0ea}">
+            <operation name="Saturation" enabled="1">
+                <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dChsb2NhdGlvbiA9IDApIGluIHZlYzIgcG9zOwpsYXlvdXQobG9jYXRpb24gPSAxKSBpbiB2ZWMyIHRleDsKCnVuaWZvcm0gbWF0NCBvcnRobzsKCm91dCB2ZWMyIHRleENvb3JkczsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gb3J0aG8gKiB2ZWM0KHBvcywgMC4wLCAxLjApOwogICAgdGV4Q29vcmRzID0gdGV4Owp9Cg==</vertex_shader>
+                <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp1bmlmb3JtIGZsb2F0IHNhdHVyYXRpb247CnVuaWZvcm0gZmxvYXQgb3BhY2l0eTsKCi8vIEhTViBpbiBbMCwxXQoKdmVjMyByZ2IyaHN2KHZlYzMgYykKewogICAgdmVjNCBLID0gdmVjNCgwLjAsIC0xLjAgLyAzLjAsIDIuMCAvIDMuMCwgLTEuMCk7CiAgICB2ZWM0IHAgPSBtaXgodmVjNChjLmJnLCBLLnd6KSwgdmVjNChjLmdiLCBLLnh5KSwgc3RlcChjLmIsIGMuZykpOwogICAgdmVjNCBxID0gbWl4KHZlYzQocC54eXcsIGMuciksIHZlYzQoYy5yLCBwLnl6eCksIHN0ZXAocC54LCBjLnIpKTsKCiAgICBmbG9hdCBkID0gcS54IC0gbWluKHEudywgcS55KTsKICAgIGZsb2F0IGUgPSAxLjBlLTEwOwogICAgcmV0dXJuIHZlYzMoYWJzKHEueiArIChxLncgLSBxLnkpIC8gKDYuMCAqIGQgKyBlKSksIGQgLyAocS54ICsgZSksIHEueCk7Cn0KCnZlYzMgaHN2MnJnYih2ZWMzIGMpCnsKICAgIHZlYzQgSyA9IHZlYzQoMS4wLCAyLjAgLyAzLjAsIDEuMCAvIDMuMCwgMy4wKTsKICAgIHZlYzMgcCA9IGFicyhmcmFjdChjLnh4eCArIEsueHl6KSAqIDYuMCAtIEsud3d3KTsKICAgIHJldHVybiBjLnogKiBtaXgoSy54eHgsIGNsYW1wKHAgLSBLLnh4eCwgMC4wLCAxLjApLCBjLnkpOwp9Cgp2b2lkIG1haW4oKQp7CiAgICB2ZWMzIHNyY0NvbG9yID0gdGV4dHVyZShpblRleHR1cmUsIHRleENvb3JkcykucmdiOwogICAgdmVjMyBoc3ZDb2xvciA9IHJnYjJoc3Yoc3JjQ29sb3IpOwogICAgaHN2Q29sb3IueSA9IHNhdHVyYXRpb247CiAgICB2ZWMzIGRzdENvbG9yID0gaHN2MnJnYihoc3ZDb2xvcik7CiAgICBmcmFnQ29sb3IgPSB2ZWM0KG1peChzcmNDb2xvciwgZHN0Q29sb3IsIG9wYWNpdHkpLCAxLjApOwp9Cg==</fragment_shader>
+                <sampler2d>inTexture</sampler2d>
+                <parameter name="Saturation" type="float_uniform" editable="1" row="0" column="0">
+                    <uniform name="saturation" type="5126" numitems="1">
+                        <number id="{5eb52755-82a9-45e4-b4fa-65d874398f5c}" inf="0" sup="1" min="0" max="1">0.61</number>
+                    </uniform>
+                </parameter>
+                <parameter name="Opacity" type="float_uniform" editable="1" row="0" column="1">
+                    <uniform name="opacity" type="5126" numitems="1">
+                        <number id="{fd54dc83-7554-4c1d-9356-12b3ddf79b6d}" inf="0" sup="1" min="0" max="1">1</number>
+                    </uniform>
+                </parameter>
+                <parameter name="Ortho" type="mat4_uniform" editable="0" row="1" column="0">
+                    <uniform name="ortho" type="35676" mat4_type="3">
+                        <number id="{40a768b0-83b9-4d8f-ad3e-f45a2c2b36b4}" name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
+                        <number id="{1f475f0f-1225-4507-a998-5095ba379209}" name="Right" inf="0" sup="10" min="0" max="2">1</number>
+                        <number id="{9643a5bf-1e50-4b84-9f2f-6214277ed78d}" name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>
+                        <number id="{311dc678-be55-4e32-8b10-1d8489f16d09}" name="Top" inf="0" sup="10" min="0" max="2">1</number>
+                    </uniform>
+                </parameter>
+            </operation>
+            <inputs>
+                <input id="{e866df6d-8244-4ffb-a16b-1dadc92bd804}">
+                    <type>0</type>
+                    <blendfactor>1</blendfactor>
+                </input>
+                <input id="{f52ee4e5-92ae-4dbf-95e1-9ecee6478f79}">
+                    <type>0</type>
+                    <blendfactor>1</blendfactor>
+                </input>
+            </inputs>
+            <position>
+                <x>5305.54</x>
+                <y>5655.5</y>
+            </position>
+        </operation_node>
+        <operation_node id="{f52ee4e5-92ae-4dbf-95e1-9ecee6478f79}">
+            <operation name="Affine" enabled="1">
+                <vertex_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmxheW91dCAobG9jYXRpb24gPSAwKSBpbiB2ZWMyIHBvczsKbGF5b3V0IChsb2NhdGlvbiA9IDEpIGluIHZlYzIgdGV4OwoKdW5pZm9ybSBtYXQ0IG9ydGhvOwp1bmlmb3JtIG1hdDQgcm90YXRpb247CnVuaWZvcm0gbWF0NCB0cmFuc2xhdGlvbjsKdW5pZm9ybSBtYXQ0IHNjYWxpbmc7CgpvdXQgdmVjMiB0ZXhDb29yZHM7Cgp2b2lkIG1haW4oKQp7CiAgICBnbF9Qb3NpdGlvbiA9IG9ydGhvKiB0cmFuc2xhdGlvbiAqIHJvdGF0aW9uICogc2NhbGluZyAqIHZlYzQocG9zLCAwLjAsIDEuMCk7CiAgICB0ZXhDb29yZHMgPSB0ZXg7Cn0K</vertex_shader>
+                <fragment_shader>I3ZlcnNpb24gMzMwIGNvcmUKCmluIHZlYzIgdGV4Q29vcmRzOwpvdXQgdmVjNCBmcmFnQ29sb3I7Cgp1bmlmb3JtIHNhbXBsZXIyRCBpblRleHR1cmU7Cgp2b2lkIG1haW4oKQp7CiAgICBmcmFnQ29sb3IgPSB0ZXh0dXJlKGluVGV4dHVyZSwgdGV4Q29vcmRzKTsKfQo=</fragment_shader>
+                <sampler2d>inTexture</sampler2d>
+                <parameter name="Ortho" type="mat4_uniform" editable="0" row="2" column="0">
+                    <uniform name="ortho" type="35676" mat4_type="3">
+                        <number id="{97f48dda-01f3-4f2c-8c55-3c3aed815106}" name="Left" inf="-10" sup="0" min="-2" max="0">-1</number>
+                        <number id="{402415b8-2626-45c7-952c-c68bc714c245}" name="Right" inf="0" sup="10" min="0" max="2">1</number>
+                        <number id="{05f1d133-f3f5-4627-aafc-945abe6c1a9a}" name="Bottom" inf="-10" sup="0" min="-2" max="0">-1</number>
+                        <number id="{3c80b323-487a-4406-bfd0-d4da40800ec1}" name="Top" inf="0" sup="10" min="0" max="2">1</number>
+                    </uniform>
+                </parameter>
+                <parameter name="Rotation" type="mat4_uniform" editable="1" row="1" column="1">
+                    <uniform name="rotation" type="35676" mat4_type="1">
+                        <number id="{eac878dd-5973-459b-9dbb-14614a381668}" name="Angle" inf="-360" sup="360" min="-180" max="180">-45</number>
+                    </uniform>
+                </parameter>
+                <parameter name="Translation" type="mat4_uniform" editable="1" row="0" column="1">
+                    <uniform name="translation" type="35676" mat4_type="0">
+                        <number id="{802e9bb8-4ec7-4f0a-8dfa-0c046b1feaa9}" name="X" inf="-1" sup="1" min="-1" max="1">-0.4</number>
+                        <number id="{69473cd7-9c20-453e-b877-d8d4b8986447}" name="Y" inf="-1" sup="1" min="-1" max="1">0</number>
+                    </uniform>
+                </parameter>
+                <parameter name="Scaling" type="mat4_uniform" editable="1" row="0" column="0">
+                    <uniform name="scaling" type="35676" mat4_type="2">
+                        <number id="{339a75fa-9919-4249-a493-506c4a650e9f}" name="X" inf="0" sup="1000" min="0" max="2">0.707</number>
+                        <number id="{2aec03da-0dce-413a-97e1-eb006aedcd3c}" name="Y" inf="0" sup="1000" min="0" max="2">0.707</number>
+                    </uniform>
+                </parameter>
+                <parameter name="Interpolation" type="options" editable="1" row="1" column="0" value="9729">
+                    <option name="Nearest neighbor">9728</option>
+                    <option name="Linear">9729</option>
+                </parameter>
+            </operation>
+            <inputs>
+                <input id="{18f32ea4-3ddc-47d4-a723-074699355f06}">
+                    <type>0</type>
+                    <blendfactor>1</blendfactor>
+                </input>
+            </inputs>
+            <position>
+                <x>4632</x>
+                <y>5005</y>
+            </position>
+        </operation_node>
+    </nodes>
+</fosforo>
