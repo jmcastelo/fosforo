@@ -29,9 +29,9 @@ CONFIG += qt c++20
 unix:QMAKE_CXXFLAGS += -DLIBREMIDI_ALSA=1 -DLIBREMIDI_HEADER_ONLY=1 -pthread
 unix:LIBS += -lasound -pthread
 
-win32:QMAKE_CXXFLAGS += -DLIBREMIDI_WINUWP=1 -DLIBREMIDI_HEADER_ONLY=1
+win32:QMAKE_CXXFLAGS += -DLIBREMIDI_WINUWP=1 -DLIBREMIDI_HEADER_ONLY=1 -D_ALLOW_COROUTINE_ABI_MISMATCH
 win32:LIBS += "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64\WindowsApp.lib"
-win32:QMAKE_LIBDIR += "$$_PRO_FILE_PWD_\..\ffmpeg\install\lib"
+win32:QMAKE_LIBDIR += "$$_PRO_FILE_PWD_\..\ffmpeg-8.0.1-msvc\lib"
 win32:INCLUDEPATH += "..\libremidi\include"
 win32:INCLUDEPATH += "C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\cppwinrt"
 
